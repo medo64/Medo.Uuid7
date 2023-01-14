@@ -19,9 +19,25 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>UUIDv7 implementation.</Description>
+    <PackageId>Uuid7</PackageId>
+    <Version>1.0.0</Version>
     <Authors>Josip Medved</Authors>
-    <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
+    <Copyright>MIT</Copyright>
+    <Company>www.medo64.com</Company>
+    <PackageTags>UUID,UUID7,UUIDv7</PackageTags>
+    <PackageIcon>ICON.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <Description>
+        This is a C# implementation of UUIDv7 generation algorithm.
+    </Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../ICON.png" Pack="true" PackagePath="" />
+    <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 
 </Project>
