@@ -1,5 +1,6 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-01-14: Using random monotonic counter increment
 //2023-01-12: Expanded monotonic counter from 18 to 26 bits
 //            Added ToId22String and FromId22String methods
 //            Moved to semi-random increment within the same millisecond
