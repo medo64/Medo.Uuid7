@@ -22,32 +22,7 @@ using System.Security.Cryptography;
 /// <summary>
 /// Implements UUID version 7 as defined in RFC draft at
 /// https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html.
-/// As monotonicity is important for UUID version 7 generation, this
-/// implementation uses randomly seeded 26 bit monotonic counter (25 random
-/// bits + 1 rollover guard bit) with a 4-bit increment. Counter uses 12-bits
-/// from rand_a field and it "steals" 14 bits from rand_b field.
-/// Counter is fully randomized each millisecond tick. Within the same
-/// millisecond tick, counter will be increased using 4-bit nanosecond tick
-/// value. Counter seed is different for each thread.
-/// The last 48 bits are filled with independently generated random data
-/// for each generated UUID.
-/// As each UUID uses 48 random bits in addition to at least 21 bits of randomly
-/// seeded counter (25 bits with up to 4-bit increment), this means we have at
-/// least 69 bits of entropy (and that is without taking 48-bit timestamp into
-/// account).
 /// </summary>
-/// <remarks>
-///  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/// |                           unix_ts_ms                          |
-/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/// |          unix_ts_ms           |  ver  |        counter        |
-/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/// |var|          counter          |            random             |
-/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/// |                            random                             |
-/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-/// </remarks>
 [DebuggerDisplay("{ToString(),nq}")]
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable<Uuid7>, IEquatable<Guid> {
@@ -72,10 +47,10 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             RandomNumberGenerator.Fill(Bytes.AsSpan(6));  // 12-bit rand_a + all of rand_b (extra bits will be overwritten later)
             MonotonicCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
-            MonotonicCounter += (uint)ticks & 0x0F + 1;    // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
-            Bytes[7] = (byte)(MonotonicCounter >> 14);     // bits 14:21 of monotonics counter
-            Bytes[9] = (byte)(MonotonicCounter);           // bits 0:7 of monotonics counter
-            RandomNumberGenerator.Fill(Bytes.AsSpan(10));  // rest of rand_b (14 bits "stolen" for monotonic counter)
+            RandomNumberGenerator.Fill(Bytes.AsSpan(9));  // rest of rand_b (14 bits "stolen" for monotonic counter)
+            MonotonicCounter += (uint)Bytes[9] >> 4 + 1;  // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            Bytes[7] = (byte)(MonotonicCounter >> 14);    // bits 14:21 of monotonics counter
+            Bytes[9] = (byte)(MonotonicCounter);          // bits 0:7 of monotonics counter
         }
 
         //Fixup

@@ -2,9 +2,9 @@ Medo.Uuid7
 ==========
 
 This project is implementation of UUID version 7 algorithm as defined in
-[New UUID Formats draft 04 RFC](https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html).
+[New UUID Formats draft 04 RFC][rfc_draft_04].
 
-You can find packaged librarly at [NuGet](https://www.nuget.org/packages/Uuid7/)
+You can find packaged librarly at [NuGet][nuget_uuid7]
 and add it you your application using the following command:
 
     dotnet add package Uuid7
@@ -45,7 +45,7 @@ Additional 62 bits of pseudo-random data.
 ### Implementation
 
 As monotonicity is important for UUID version 7 generation, this implementation
-implements most of [monotonic random counter](https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html#monotonicity_counters)
+implements most of [monotonic random counter][rfc_draft_04#counters]
 recommendations.
 
 Implementation uses randomly seeded 26 bit monotonic counter (25 random bits + 1
@@ -53,22 +53,22 @@ rollover guard bit) with a 4-bit increment.
 
 Counter uses 12-bits from rand_a field and it "steals" 14 bits from rand_b
 field. Counter will have its 25 bits fully randomized each millisecond tick.
-
-Within the same millisecond tick, counter will be increased using the lowest 4
-bits of current nanosecond-resolution time as its increment. While this is not
-strictly random as recommended, it should be sufficiently unguessable.
+Within the same millisecond tick, counter will be randomly increased using 4 bit
+increment.
 
 In the case of multithreaded use, the counter seed is different for each thread.
+
+In the worst case, this implementation guarantees at least 2^21 monotonically
+increasing UUIDs per millisecond. Up to 2^23 monotonically increasing UUID
+values per millisecond can be expected on average. Monotonic increase for each
+generated value is guaranteed on per thread basis.
 
 The last 48 bits are filled with random data that is different for each
 generated UUID.
 
-As each UUID uses 48 random bits in addition to at least 21 bits of randomly
-seeded counter (25 bits with up to 4-bit increment), this means we have at least
-69 bits of entropy (and that is without taking 48-bit timestamp into account).
-
-As long as there is no more than 2^21 UUIDs generated per millisecond each
-thread will produce monotonically increasing UUID values.
+As each UUID uses 48 random bits in addition to 25 random bits from the seeded
+counter, this means we have at least 73 bits of entropy (without taking 48-bit
+timestamp into account).
 
 With those implementation details in mind, the final layout is defined as below.
 
@@ -119,7 +119,7 @@ Example:
 
 ### Id25
 
-Alternative string representation is Id25 (Base-35), courtesy of [stevesimmons](https://github.com/stevesimmons/uuid7-csharp/).
+Alternative string representation is Id25 (Base-35), courtesy of [stevesimmons][git_stevesimmons_uuid7].
 While I have seen similar encodings used before, his implementation is the first
 one I saw being used on UUIDs. Since it uses only numbers and lowercase
 characters, it actually retains lexicographical sorting property the default
@@ -142,3 +142,10 @@ UUID will always fit in 22 characters.
 Example:
 
     1BuKkq6yWzmN2fCaHBjCRr
+
+
+
+[rfc_draft_04]: https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html
+[rfc_draft_04#counters]: https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html#monotonicity_counters
+[nuget_uuid7]: https://www.nuget.org/packages/Uuid7/
+[git_stevesimmons_uuid7]: https://github.com/stevesimmons/uuid7-csharp/
