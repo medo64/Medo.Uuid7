@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+    <LangVersion>11.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>Medo.Uuid7</AssemblyName>
+    <RootNamespace>Medo</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>UUIDv7 implementation.</Description>
+    <Authors>Josip Medved</Authors>
+    <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
+  </PropertyGroup>
+
+</Project>
