@@ -58,13 +58,13 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     public Uuid7() {
         Bytes = new byte[16];
 
-        var now = DateTimeOffset.UtcNow;
-        var ms = now.ToUnixTimeMilliseconds();
+        var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
+        var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
 
         // Timestamp
-        var msBytes = new byte[8];
+        Span<byte> msBytes = stackalloc byte[8];  // stackalloc into span doesn't require unsafe context
         BinaryPrimitives.WriteInt64BigEndian(msBytes, ms);
-        Buffer.BlockCopy(msBytes, 2, Bytes, 0, 6);
+        msBytes[2..].CopyTo(Bytes);  // just lower 48 bits are used
 
         // Randomness
         if (LastMillisecond != ms) {
@@ -72,7 +72,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             RandomNumberGenerator.Fill(Bytes.AsSpan(6));  // 12-bit rand_a + all of rand_b (extra bits will be overwritten later)
             MonotonicCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
-            MonotonicCounter += (uint)(now.Ticks % 16 + 1);  // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            MonotonicCounter += (uint)(ticks % 16 + 1);  // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
             Bytes[7] = (byte)((MonotonicCounter >> 14) & 0xFF);   // bits 14:21 of monotonics counter
             Bytes[9] = (byte)(MonotonicCounter & 0xFF);           // bits 0:7 of monotonics counter
             RandomNumberGenerator.Fill(Bytes.AsSpan(10));  // rest of rand_b (14 bits "stolen" for monotonic counter)
@@ -491,6 +491,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
 
     #region Helpers
+
+    private const long UnixEpochMilliseconds = 62_135_596_800_000;
+    private const long TicksPerMillisecond = 10_000;
 
     private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
         Debug.Assert(buffer1.Length == 16);

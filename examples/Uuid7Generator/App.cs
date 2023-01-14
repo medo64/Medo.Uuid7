@@ -24,7 +24,7 @@ internal static class App {
         {
             var uuidCount = 0;
             var sw = Stopwatch.StartNew();
-            while (sw.ElapsedMilliseconds < 3000) {
+            while (sw.ElapsedMilliseconds < 5000) {
                 _ = Uuid7.NewUuid7();
                 uuidCount++;
             }
@@ -37,7 +37,7 @@ internal static class App {
         {
             var guidCount = 0;
             var sw = Stopwatch.StartNew();
-            while (sw.ElapsedMilliseconds < 3000) {
+            while (sw.ElapsedMilliseconds < 5000) {
                 _ = Guid.NewGuid();
                 guidCount++;
             }
