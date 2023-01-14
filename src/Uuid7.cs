@@ -352,51 +352,63 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return !(left == right);
     }
 
+    /// <inheritdoc/>
     public static bool operator <(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) < 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator <(Uuid7 left, Guid right) {
         return left.CompareTo(right) < 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator <(Guid left, Uuid7 right) {
         return left.CompareTo(right) < 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator >(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) > 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator >(Uuid7 left, Guid right) {
         return left.CompareTo(right) > 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator >(Guid left, Uuid7 right) {
         return left.CompareTo(right) > 0;
     }
 
 
+    /// <inheritdoc/>
     public static bool operator <=(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) is < 0 or 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator <=(Uuid7 left, Guid right) {
         return left.CompareTo(right) is < 0 or 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator <=(Guid left, Uuid7 right) {
         return left.CompareTo(right) is < 0 or 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator >=(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) is > 0 or 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator >=(Uuid7 left, Guid right) {
         return left.CompareTo(right) is > 0 or 0;
     }
 
+    /// <inheritdoc/>
     public static bool operator >=(Guid left, Uuid7 right) {
         return left.CompareTo(right) is > 0 or 0;
     }

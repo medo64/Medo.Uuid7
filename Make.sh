@@ -118,11 +118,11 @@ function release() {
 function package() {
     mkdir -p "$BASE_DIRECTORY/build/package/"
     echo ".NET `dotnet --version`"
-    dotnet pack "$BASE_DIRECTORY/src/Medo.Uuid7.sln" \
+    dotnet pack "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" \
                 --configuration "Release" \
                 --force \
                 --include-source \
-                    -p:SymbolPackageFormat=snupkg \
+                -p:SymbolPackageFormat=snupkg \
                 --output "$BASE_DIRECTORY/build/package/" \
                 --verbosity "minimal" \
                 || return 1
