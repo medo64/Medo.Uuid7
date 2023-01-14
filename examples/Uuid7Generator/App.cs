@@ -19,6 +19,7 @@ internal static class App {
             Console.WriteLine();
         }
 
+        Thread.CurrentThread.Priority = ThreadPriority.Highest;
         Thread.Sleep(1000);
 
         {
