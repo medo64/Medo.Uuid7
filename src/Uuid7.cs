@@ -48,15 +48,15 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             RandomNumberGenerator.Fill(Bytes.AsSpan(6));  // 12-bit rand_a + all of rand_b (extra bits will be overwritten later)
             MonotonicCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
-            RandomNumberGenerator.Fill(Bytes.AsSpan(9));  // rest of rand_b (14 bits "stolen" for monotonic counter)
-            MonotonicCounter += (uint)Bytes[9] >> 4 + 1;  // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            RandomNumberGenerator.Fill(Bytes.AsSpan(9));  // rest of rand_b (14 bits "stolen" for monotonic counter) + 1 extra bytes at start (for random increment)
+            MonotonicCounter += (uint)Bytes[9] >> 4 + 1;  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
             Bytes[7] = (byte)(MonotonicCounter >> 14);    // bits 14:21 of monotonics counter
             Bytes[9] = (byte)(MonotonicCounter);          // bits 0:7 of monotonics counter
         }
 
         //Fixup
         Bytes[6] = (byte)(0x70 | ((MonotonicCounter >> 22) & 0x0F));  // set 4-bit version + bits 22:25 of monotonics counter
-        Bytes[8] = (byte)(0x80 | ((MonotonicCounter >> 8) & 0x3F));  // set 2-bit variant + bits 8:13 of monotonics counter
+        Bytes[8] = (byte)(0x80 | ((MonotonicCounter >> 8) & 0x3F));   // set 2-bit variant + bits 8:13 of monotonics counter
     }
 
     /// <summary>
