@@ -4,6 +4,11 @@ Medo.Uuid7
 This project is implementation of UUID version 7 algorithm as defined in
 [New UUID Formats draft 04 RFC](https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html).
 
+You can find packaged librarly at [NuGet](https://www.nuget.org/packages/Uuid7/)
+and add it you your application using the following command:
+
+    dotnet add package Uuid7
+
 
 ## Format
 
