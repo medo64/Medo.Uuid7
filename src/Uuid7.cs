@@ -72,9 +72,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             RandomNumberGenerator.Fill(Bytes.AsSpan(6));  // 12-bit rand_a + all of rand_b (extra bits will be overwritten later)
             MonotonicCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
-            MonotonicCounter += (uint)(ticks % 16 + 1);  // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
-            Bytes[7] = (byte)((MonotonicCounter >> 14) & 0xFF);   // bits 14:21 of monotonics counter
-            Bytes[9] = (byte)(MonotonicCounter & 0xFF);           // bits 0:7 of monotonics counter
+            MonotonicCounter += (uint)(ticks % 16 + 1);    // not fully random increment but random enough; will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            Bytes[7] = (byte)(MonotonicCounter >> 14);     // bits 14:21 of monotonics counter
+            Bytes[9] = (byte)(MonotonicCounter);           // bits 0:7 of monotonics counter
             RandomNumberGenerator.Fill(Bytes.AsSpan(10));  // rest of rand_b (14 bits "stolen" for monotonic counter)
         }
 
