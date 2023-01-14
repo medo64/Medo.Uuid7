@@ -20,12 +20,13 @@
 
   <PropertyGroup>
     <PackageId>Uuid7</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Josip Medved</Authors>
     <Copyright>MIT</Copyright>
     <Company>www.medo64.com</Company>
     <PackageTags>UUID,UUID7,UUIDv7</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>
@@ -37,6 +38,7 @@
 
   <ItemGroup>
     <None Include="../ICON.png" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
     <None Include="../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
