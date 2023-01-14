@@ -462,16 +462,18 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return new Uuid7();
     }
 
+
     /// <summary>
     /// Fills a span with UUIDs.
     /// </summary>
     /// <param name="data">The span to fill.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
     public static void Fill(Span<Uuid7> data) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
         for (var i = 0; i < data.Length; i++) {
             data[i] = NewUuid7();
         }
     }
-
 
     #endregion Static
 
