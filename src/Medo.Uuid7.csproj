@@ -10,12 +10,14 @@
   <PropertyGroup>
     <AssemblyName>Medo.Uuid7</AssemblyName>
     <RootNamespace>Medo</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
-    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -28,7 +30,6 @@
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
