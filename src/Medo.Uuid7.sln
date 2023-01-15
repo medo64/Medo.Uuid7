@@ -1,22 +1,24 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo.Uuid7", "Medo.Uuid7.csproj", "{D143B5D9-B94A-4786-833B-21E2F04B00FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7", "Medo.Uuid7.csproj", "{D143B5D9-B94A-4786-833B-21E2F04B00FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\tests\Tests.csproj", "{9491E824-4704-4423-9DDD-24473BB652C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7.Tests", "..\tests\Medo.Uuid7.Tests.csproj", "{9491E824-4704-4423-9DDD-24473BB652C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uuid7Generator", "..\examples\Uuid7Generator\Uuid7Generator.csproj", "{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uuid7Generator", "..\examples\Uuid7Generator\Uuid7Generator.csproj", "{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uuid7Benchmark", "..\examples\Uuid7Benchmark\Uuid7Benchmark.csproj", "{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uuid7Benchmark", "..\examples\Uuid7Benchmark\Uuid7Benchmark.csproj", "{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{854054C8-5DA5-4AF9-99FF-55E25D1414B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{E733F172-95B4-414B-9509-F16CA9FA1B09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D143B5D9-B94A-4786-833B-21E2F04B00FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -35,5 +37,16 @@ Global
 		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9491E824-4704-4423-9DDD-24473BB652C9} = {854054C8-5DA5-4AF9-99FF-55E25D1414B5}
+		{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F} = {E733F172-95B4-414B-9509-F16CA9FA1B09}
+		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E} = {E733F172-95B4-414B-9509-F16CA9FA1B09}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A93995A-4613-4325-A3D2-7B6D261D4549}
 	EndGlobalSection
 EndGlobal
