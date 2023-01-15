@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\tests\Tests.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uuid7Generator", "..\examples\Uuid7Generator\Uuid7Generator.csproj", "{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uuid7Benchmark", "..\examples\Uuid7Benchmark\Uuid7Benchmark.csproj", "{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,5 +31,9 @@ Global
 		{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
