@@ -169,8 +169,8 @@ while [ $# -gt 0 ]; do
         dist)       dist || break ;;
         debug)      debug || break ;;
         release)    release || break ;;
-        package)    package || break ;;
-        nuget)      package || break ; shift ; nuget "$1" || break ;;
+        package)    test && package || break ;;
+        nuget)      test && package || break ; shift ; nuget "$1" || break ;;
         test)       test || break ;;
 
         *)  echo "${ANSI_RED}Unknown operation '$OPERATION'!${ANSI_RESET}" >&2 ; exit 1 ;;
