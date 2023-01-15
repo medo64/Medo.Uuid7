@@ -20,7 +20,7 @@
 
   <PropertyGroup>
     <PackageId>Uuid7</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>Josip Medved</Authors>
     <Copyright>MIT</Copyright>
     <Company>www.medo64.com</Company>

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.1] - 2023-01-14
+
+- Fixed monotonicity bug
+
+
 ## [1.1.0] - 2023-01-14
 
 - Using random increment (was tick based before)
