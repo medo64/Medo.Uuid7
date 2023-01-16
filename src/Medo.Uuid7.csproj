@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>Medo.Uuid7</AssemblyName>
+    <RootNamespace>Medo</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
     <LangVersion>11.0</LangVersion>
@@ -8,8 +13,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyName>Medo.Uuid7</AssemblyName>
-    <RootNamespace>Medo</RootNamespace>
+    <Deterministic>true</Deterministic>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -24,7 +32,7 @@
     <PackageId>Uuid7</PackageId>
     <Version>1.1.1</Version>
     <Authors>Josip Medved</Authors>
-    <Copyright>MIT</Copyright>
+    <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
     <Company>www.medo64.com</Company>
     <PackageTags>UUID,UUID7,UUIDv7</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>

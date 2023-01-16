@@ -3,7 +3,9 @@
 /dist/
 /research/
 
-**/bin
-**/obj
-**/.vs
+**/bin/
+**/obj/
+**/.vs/
 **/*.csproj.user
+
+.nuget.key
