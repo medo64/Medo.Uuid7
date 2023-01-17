@@ -146,8 +146,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Input must contain exactly 22 characters.
     /// </summary>
     /// <param name="id22Text">Id22 text.</param>
+    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Input must be 22 characters.</exception>
     public static Uuid7 FromId22String(string id22Text) {
+        if (id22Text == null) { throw new ArgumentNullException(nameof(id22Text), "Text cannot be null."); }
+
         var alphabetDict = Id22AlphabetDict.Value;
         var count = 0;
         var number = new BigInteger();
@@ -209,8 +212,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Input must contain exactly 25 characters.
     /// </summary>
     /// <param name="id25Text">Id25 text.</param>
+    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Input must be 25 characters.</exception>
     public static Uuid7 FromId25String(string id25Text) {
+        if (id25Text == null) { throw new ArgumentNullException(nameof(id25Text), "Text cannot be null."); }
+
         var alphabetDict = Id25AlphabetDict.Value;
         var count = 0;
         var number = new BigInteger();
@@ -247,8 +253,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Input must contain exactly 32 characters.
     /// </summary>
     /// <param name="text">UUID text.</param>
+    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Input must be 32 characters.</exception>
     public static Uuid7 FromString(string text) {
+        if (text == null) { throw new ArgumentNullException(nameof(text), "Text cannot be null."); }
+
         var count = 0;
         var number = new BigInteger();
         foreach (var ch in text.ToLowerInvariant()) {  // convert to lowercase first
