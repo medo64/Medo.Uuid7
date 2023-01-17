@@ -1,9 +1,17 @@
 #!/bin/bash
+BASE_DIRECTORY="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
+PROJECT_FILE="$BASE_DIRECTORY/src/Medo.Uuid7.csproj"
+TEST_PROJECT_FILE="$BASE_DIRECTORY/tests/Medo.Uuid7.Tests.csproj"
+PACKAGE_CONTENT_FILES="Makefile Make.sh CONTRIBUTING.md ICON.png LICENSE.md README.md .editorconfig"
+PACKAGE_CONTENT_DIRECTORIES="src/ tests/ examples/"
+
 
 if [ -t 1 ]; then
     ANSI_RESET="$(tput sgr0)"
     ANSI_UNDERLINE="$(tput smul)"
     ANSI_RED="`[ $(tput colors) -ge 16 ] && tput setaf 9 || tput setaf 1 bold`"
+    ANSI_GREEN="`[ $(tput colors) -ge 16 ] && tput setaf 10 || tput setaf 2 bold`"
     ANSI_YELLOW="`[ $(tput colors) -ge 16 ] && tput setaf 11 || tput setaf 3 bold`"
     ANSI_CYAN="`[ $(tput colors) -ge 16 ] && tput setaf 14 || tput setaf 6 bold`"
     ANSI_WHITE="`[ $(tput colors) -ge 16 ] && tput setaf 15 || tput setaf 7 bold`"
@@ -34,26 +42,32 @@ while getopts ":h" OPT; do
     esac
 done
 
+trap "exit 255" SIGHUP SIGINT SIGQUIT SIGPIPE SIGTERM
+trap "echo -n \"$ANSI_RESET\"" EXIT
+
+
 if ! command -v dotnet >/dev/null; then
     echo "${ANSI_RED}No dotnet found!${ANSI_RESET}" >&2
     exit 1
 fi
+echo ".NET `dotnet --version`"
 
-trap "exit 255" SIGHUP SIGINT SIGQUIT SIGPIPE SIGTERM
-trap "echo -n \"$ANSI_RESET\"" EXIT
+if [[ "$PROJECT_FILE" == "" ]]; then
+    echo "${ANSI_RED}No project file found!${ANSI_RESET}" >&2
+    exit 1
+fi
 
-BASE_DIRECTORY="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+PACKAGE_ID=`cat "$PROJECT_FILE" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`
+PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+PACKAGE_FRAMEWORKS=`cat "$PROJECT_FILE" | grep "<TargetFramework" | sed 's^</\?TargetFrameworks\?>^^g' | tr ';' ' ' | xargs`
 
 
 function clean() {
     rm -r "$BASE_DIRECTORY/bin/" 2>/dev/null
     rm -r "$BASE_DIRECTORY/build/" 2>/dev/null
-    rm -r "$BASE_DIRECTORY/src/bin/" 2>/dev/null
-    rm -r "$BASE_DIRECTORY/src/obj/" 2>/dev/null
-    rm -r "$BASE_DIRECTORY/tests/bin/" 2>/dev/null
-    rm -r "$BASE_DIRECTORY/tests/obj/" 2>/dev/null
-    rm -r "$BASE_DIRECTORY/examples/**/bin/" 2>/dev/null
-    rm -r "$BASE_DIRECTORY/examples/**/obj/" 2>/dev/null
+    find "$BASE_DIRECTORY/src" -type d \( -name "bin" -o -name "obj" \) -exec rm -rf {} + 2>/dev/null
+    find "$BASE_DIRECTORY/tests" -type d \( -name "bin" -o -name "obj" \) -exec rm -rf {} + 2>/dev/null
+    find "$BASE_DIRECTORY/examples" -type d \( -name "bin" -o -name "obj" \) -exec rm -rf {} + 2>/dev/null
     return 0
 }
 
@@ -64,59 +78,87 @@ function distclean() {
 }
 
 function dist() {
-    DIST_DIRECTORY="$BASE_DIRECTORY/build/dist/$PACKAGE_ID-$PACKAGE_VERSION"
+    echo
+    DIST_DIRECTORY="$BASE_DIRECTORY/build/dist"
+    DIST_SUBDIRECTORY="$DIST_DIRECTORY/$PACKAGE_ID-$PACKAGE_VERSION"
     DIST_FILE=
-    rm -r "$DIST_DIRECTORY/" 2>/dev/null
-    mkdir -p "$DIST_DIRECTORY/"
-    for DIRECTORY in "Makefile" "Make.sh" "CONTRIBUTING.md" "ICON.png" "LICENSE.md" "README.md" ".editorconfig" "src/" "tests/" "examples/"; do
-        cp -r "$BASE_DIRECTORY/$DIRECTORY" "$DIST_DIRECTORY/"
+    rm -r "$DIST_SUBDIRECTORY/" 2>/dev/null
+    mkdir -p "$DIST_SUBDIRECTORY/"
+    for DIRECTORY in $PACKAGE_CONTENT_FILES $PACKAGE_CONTENT_DIRECTORIES; do
+        cp -r "$BASE_DIRECTORY/$DIRECTORY" "$DIST_SUBDIRECTORY/"
     done
-    find "$DIST_DIRECTORY/src/" -name ".vs" -type d -exec rm -rf {} \; 2>/dev/null
-    find "$DIST_DIRECTORY/src/" -name "bin" -type d -exec rm -rf {} \; 2>/dev/null
-    find "$DIST_DIRECTORY/obj/" -name "bin" -type d -exec rm -rf {} \; 2>/dev/null
+    find "$DIST_SUBDIRECTORY/" -name ".vs" -type d -exec rm -rf {} \; 2>/dev/null
+    find "$DIST_SUBDIRECTORY/" -name "bin" -type d -exec rm -rf {} \; 2>/dev/null
+    find "$DIST_SUBDIRECTORY/" -name "obj" -type d -exec rm -rf {} \; 2>/dev/null
+    find "$DIST_SUBDIRECTORY/" -name "TestResults" -type d -exec rm -rf {} \; 2>/dev/null
     tar -cz -C "$BASE_DIRECTORY/build/dist/" \
         --owner=0 --group=0 \
-        -f "$DIST_DIRECTORY.tar.gz" \
+        -f "$DIST_SUBDIRECTORY.tar.gz" \
         "$PACKAGE_ID-$PACKAGE_VERSION/" || return 1
     mkdir -p "$BASE_DIRECTORY/dist/"
-    mv "$DIST_DIRECTORY.tar.gz" "$BASE_DIRECTORY/dist/" || return 1
-    echo "${ANSI_CYAN}Output at 'dist/$PACKAGE_ID-$PACKAGE_VERSION.tar.gz'${ANSI_RESET}"
+    mv "$DIST_SUBDIRECTORY.tar.gz" "$BASE_DIRECTORY/dist/" || return 1
+    echo "${ANSI_GREEN}Output at ${ANSI_CYAN}dist/$PACKAGE_ID-$PACKAGE_VERSION.tar.gz${ANSI_RESET}"
     return 0
 }
 
 function debug() {
+    echo
     mkdir -p "$BASE_DIRECTORY/bin/"
     mkdir -p "$BASE_DIRECTORY/build/debug/"
-    dotnet build "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" \
+    dotnet build "$PROJECT_FILE" \
                  --configuration "Debug" \
                  --verbosity "minimal" \
                  || return 1
-    cp -r "$BASE_DIRECTORY/src/bin/Debug/net6.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY6=$?
-    cp -r "$BASE_DIRECTORY/src/bin/Debug/net7.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY7=$?
-    if [[ "$COPY6" -ne 0 ]] && [[ "$COPY7" -ne 0 ]]; then return 1; fi
-    echo "${ANSI_CYAN}Output in 'bin/'${ANSI_RESET}"
+    ATLEAST_ONE_COPY=0
+    for FRAMEWORK in $PACKAGE_FRAMEWORKS; do
+        cp -r "$BASE_DIRECTORY/src/bin/Debug/$FRAMEWORK/" "$BASE_DIRECTORY/bin/" 2>/dev/null
+        if [[ $? -eq 0 ]]; then ATLEAST_ONE_COPY=1; fi
+    done
+    if [[ "$ATLEAST_ONE_COPY" -eq 0 ]]; then return 1; fi
+    echo
+    echo "${ANSI_GREEN}Output in ${ANSI_CYAN}bin/${ANSI_RESET}"
 }
 
 function release() {
+    echo
     if [[ `shell git status -s 2>/dev/null | wc -l` -gt 0 ]]; then
         echo "${ANSI_YELLOW}Uncommited changes present.${ANSI_RESET}" >&2
     fi
     mkdir -p "$BASE_DIRECTORY/bin/"
     mkdir -p "$BASE_DIRECTORY/build/release/"
-    dotnet build "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" \
+    dotnet build "$PROJECT_FILE" \
                  --configuration "Release" \
                  --verbosity "minimal" \
                  || return 1
-    cp -r "$BASE_DIRECTORY/src/bin/Release/net6.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY6=$?
-    cp -r "$BASE_DIRECTORY/src/bin/Release/net7.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY7=$?
-    if [[ "$COPY6" -ne 0 ]] && [[ "$COPY7" -ne 0 ]]; then return 1; fi
-    echo "${ANSI_CYAN}Output in 'bin/'${ANSI_RESET}"
+    ATLEAST_ONE_COPY=0
+    for FRAMEWORK in $PACKAGE_FRAMEWORKS; do
+        cp -r "$BASE_DIRECTORY/src/bin/Release/$FRAMEWORK/" "$BASE_DIRECTORY/bin/" 2>/dev/null
+        if [[ $? -eq 0 ]]; then ATLEAST_ONE_COPY=1; fi
+    done
+    if [[ "$ATLEAST_ONE_COPY" -eq 0 ]]; then return 1; fi
+    echo
+    echo "${ANSI_GREEN}Output in ${ANSI_CYAN}bin/${ANSI_RESET}"
+}
+
+function test() {
+    echo
+    if [[ "$TEST_PROJECT_FILE" == "" ]]; then
+        echo "${ANSI_RED}No test project file found!${ANSI_RESET}" >&2
+        exit 1
+    fi
+    mkdir -p "$BASE_DIRECTORY/build/test/"
+    dotnet test "$TEST_PROJECT_FILE" \
+                --configuration "Debug" \
+                --verbosity "minimal" \
+                || return 1
+    echo
+    echo "${ANSI_GREEN}Testing completed${ANSI_RESET}"
 }
 
 function package() {
+    echo
     mkdir -p "$BASE_DIRECTORY/build/package/"
-    echo ".NET `dotnet --version`"
-    dotnet pack "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" \
+    dotnet pack "$PROJECT_FILE" \
                 --configuration "Release" \
                 --force \
                 --include-source \
@@ -126,7 +168,8 @@ function package() {
     mkdir -p "$BASE_DIRECTORY/dist/"
     cp "$BASE_DIRECTORY/build/package/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" "$BASE_DIRECTORY/dist/" || return 1
     cp "$BASE_DIRECTORY/build/package/$PACKAGE_ID.$PACKAGE_VERSION.snupkg" "$BASE_DIRECTORY/dist/" || return 1
-    echo "${ANSI_CYAN}Output at 'dist/$PACKAGE_ID-$PACKAGE_VERSION.nupkg'${ANSI_RESET}"
+    echo
+    echo "${ANSI_GREEN}Output at ${ANSI_CYAN}dist/$PACKAGE_ID-$PACKAGE_VERSION.nupkg${ANSI_RESET}"
     return 0
 }
 
@@ -136,28 +179,15 @@ function nuget() {  # (api_key)
         echo "${ANSI_RED}No key in .nuget.key!${ANSI_RESET}" >&2
         return 1;
     fi
-    echo ".NET `dotnet --version`"
     dotnet nuget push "$BASE_DIRECTORY/dist/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" \
                       --source "https://api.nuget.org/v3/index.json" \
                       --api-key "$API_KEY" \
                       --symbol-api-key "$API_KEY" \
                       || return 1
-    echo "${ANSI_CYAN}Sent to 'dist/$PACKAGE_ID-$PACKAGE_VERSION.nupkg'${ANSI_RESET}"
+    echo "${ANSI_GREEN}Sent to ${ANSI_CYAN}dist/$PACKAGE_ID-$PACKAGE_VERSION.nupkg${ANSI_RESET}"
     return 0
 }
 
-function test() {
-    mkdir -p "$BASE_DIRECTORY/build/test/"
-    echo ".NET `dotnet --version`"
-    dotnet test "$BASE_DIRECTORY/src/Medo.Uuid7.sln" \
-                --configuration "Debug" \
-                --verbosity "minimal" \
-                || return 1
-}
-
-
-PACKAGE_ID=`cat "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`
-PACKAGE_VERSION=`cat "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
 
 while [ $# -gt 0 ]; do
     OPERATION="$1"
@@ -165,12 +195,12 @@ while [ $# -gt 0 ]; do
         all)        clean || break ;;
         clean)      clean || break ;;
         distclean)  distclean || break ;;
-        dist)       distclean && dist || break ;;
+        dist)       dist || break ;;
         debug)      clean && debug || break ;;
         release)    clean && release || break ;;
+        test)       clean && test || break ;;
         package)    clean && test && package || break ;;
         nuget)      clean && test && package && nuget || break ;;
-        test)       clean && test || break ;;
 
         *)  echo "${ANSI_RED}Unknown operation '$OPERATION'!${ANSI_RESET}" >&2 ; exit 1 ;;
     esac
