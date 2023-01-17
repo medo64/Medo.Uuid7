@@ -87,14 +87,13 @@ function dist() {
 function debug() {
     mkdir -p "$BASE_DIRECTORY/bin/"
     mkdir -p "$BASE_DIRECTORY/build/debug/"
-    dotnet build "$BASE_DIRECTORY/src/Medo.Uuid7.sln" \
-                 --framework "net7.0" \
+    dotnet build "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" \
                  --configuration "Debug" \
-                 --output "$BASE_DIRECTORY/build/debug/" \
                  --verbosity "minimal" \
                  || return 1
-    cp "$BASE_DIRECTORY/build/debug/Medo.Uuid7.dll" "$BASE_DIRECTORY/bin/" || return 1
-    cp "$BASE_DIRECTORY/build/debug/Medo.Uuid7.pdb" "$BASE_DIRECTORY/bin/" || return 1
+    cp -r "$BASE_DIRECTORY/src/bin/Debug/net6.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY6=$?
+    cp -r "$BASE_DIRECTORY/src/bin/Debug/net7.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY7=$?
+    if [[ "$COPY6" -ne 0 ]] && [[ "$COPY7" -ne 0 ]]; then return 1; fi
     echo "${ANSI_CYAN}Output in 'bin/'${ANSI_RESET}"
 }
 
@@ -104,14 +103,13 @@ function release() {
     fi
     mkdir -p "$BASE_DIRECTORY/bin/"
     mkdir -p "$BASE_DIRECTORY/build/release/"
-    dotnet build "$BASE_DIRECTORY/src/Medo.Uuid7.sln" \
-                 --framework "net7.0" \
+    dotnet build "$BASE_DIRECTORY/src/Medo.Uuid7.csproj" \
                  --configuration "Release" \
-                 --output "$BASE_DIRECTORY/build/release/" \
                  --verbosity "minimal" \
                  || return 1
-    cp "$BASE_DIRECTORY/build/release/Medo.Uuid7.dll" "$BASE_DIRECTORY/bin/" || return 1
-    cp "$BASE_DIRECTORY/build/release/Medo.Uuid7.pdb" "$BASE_DIRECTORY/bin/" || return 1
+    cp -r "$BASE_DIRECTORY/src/bin/Release/net6.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY6=$?
+    cp -r "$BASE_DIRECTORY/src/bin/Release/net7.0/" "$BASE_DIRECTORY/bin/" 2>/dev/null ; COPY7=$?
+    if [[ "$COPY6" -ne 0 ]] && [[ "$COPY7" -ne 0 ]]; then return 1; fi
     echo "${ANSI_CYAN}Output in 'bin/'${ANSI_RESET}"
 }
 
@@ -153,7 +151,6 @@ function test() {
     echo ".NET `dotnet --version`"
     dotnet test "$BASE_DIRECTORY/src/Medo.Uuid7.sln" \
                 --configuration "Debug" \
-                --output "$BASE_DIRECTORY/build/test/" \
                 --verbosity "minimal" \
                 || return 1
 }

@@ -3,22 +3,22 @@
 all: release
 
 clean:
-	@./Make.sh clean
+	@bash ./Make.sh clean
 
 distclean: clean
-	@./Make.sh distclean
+	@bash ./Make.sh distclean
 
 dist:
-	@./Make.sh dist
+	@bash ./Make.sh dist
 
 debug:
-	@./Make.sh debug
+	@bash ./Make.sh debug
 
 release:
-	@./Make.sh release
+	@bash ./Make.sh release
 
 package:
-	@./Make.sh package
+	@bash ./Make.sh package
 
 test: debug
-	@./Make.sh test
+	@bash ./Make.sh test
