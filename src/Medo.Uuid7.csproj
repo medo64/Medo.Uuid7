@@ -26,6 +26,8 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <NoWarn>CA1720</NoWarn>
+    <!-- CA1720: Identifiers should not contain type names -->
   </PropertyGroup>
 
   <PropertyGroup>
