@@ -242,10 +242,20 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     #region FromString
 
+    private static readonly BigInteger Base16Modulo = 16;
     private static readonly char[] Base16Alphabet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7',
                                                                  '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-    private static readonly BigInteger Base16Modulo = 16;
+    private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
+        var dict = new Dictionary<char, BigInteger>();
+        for (var i = 0; i < Base16Alphabet.Length; i++) {
+            var ch = Base16Alphabet[i];
+            dict.Add(ch, i);
+            if (char.IsLetter(ch)) {  // case-insensitive
+                dict.Add(char.ToUpperInvariant(ch), i);
+            }
+        }
+        return dict;
+    });
 
     /// <summary>
     /// Returns UUID from given text representation.
@@ -258,11 +268,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     public static Uuid7 FromString(string text) {
         if (text == null) { throw new ArgumentNullException(nameof(text), "Text cannot be null."); }
 
+        var alphabetDict = Base16AlphabetDict.Value;
         var count = 0;
         var number = new BigInteger();
-        foreach (var ch in text.ToLowerInvariant()) {  // convert to lowercase first
-            var offset = Array.IndexOf(Base16Alphabet, ch);
-            if (offset >= 0) {
+        foreach (var ch in text) {
+            if (alphabetDict.TryGetValue(ch, out var offset)) {
                 number = BigInteger.Multiply(number, Base16Modulo);
                 number = BigInteger.Add(number, offset);
                 count++;
