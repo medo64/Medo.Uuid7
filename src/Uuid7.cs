@@ -111,17 +111,19 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     #region Id22
 
-    private static readonly BigInteger Id22Modulo = 58;
-    private static readonly char[] Id22Alphabet = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
-                                                               'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
-                                                               'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-                                                               'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-                                                               'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
-                                                               's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-    private static readonly Lazy<Dictionary<char, BigInteger>> Id22AlphabetDict = new(() => {
+    private static readonly BigInteger Base58Modulo = 58;
+    private static readonly char[] Base58Alphabet = new char[] {
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
+        'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
+        'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+        'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+        'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+    };
+    private static readonly Lazy<Dictionary<char, BigInteger>> Base58AlphabetDict = new(() => {
         var dict = new Dictionary<char, BigInteger>();
-        for (var i = 0; i < Id22Alphabet.Length; i++) {
-            dict.Add(Id22Alphabet[i], i);
+        for (var i = 0; i < Base58Alphabet.Length; i++) {
+            dict.Add(Base58Alphabet[i], i);
         }
         return dict;
     });
@@ -134,8 +136,8 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         var number = new BigInteger(Bytes, isUnsigned: true, isBigEndian: true);
         var result = new char[22];  // always the same length
         for (var i = 21; i >= 0; i--) {
-            number = BigInteger.DivRem(number, Id22Modulo, out var remainder);
-            result[i] = Id22Alphabet[(int)remainder];
+            number = BigInteger.DivRem(number, Base58Modulo, out var remainder);
+            result[i] = Base58Alphabet[(int)remainder];
         }
         return new string(result);
     }
@@ -151,12 +153,12 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     public static Uuid7 FromId22String(string id22Text) {
         if (id22Text == null) { throw new ArgumentNullException(nameof(id22Text), "Text cannot be null."); }
 
-        var alphabetDict = Id22AlphabetDict.Value;
+        var alphabetDict = Base58AlphabetDict.Value;
         var count = 0;
         var number = new BigInteger();
         foreach (var ch in id22Text) {
             if (alphabetDict.TryGetValue(ch, out var offset)) {
-                number = BigInteger.Multiply(number, Id22Modulo);
+                number = BigInteger.Multiply(number, Base58Modulo);
                 number = BigInteger.Add(number, offset);
                 count++;
             }
@@ -176,16 +178,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     #region Id25
 
-    private static readonly BigInteger Id25Modulo = 35;
-    private static readonly char[] Id25Alphabet = new char[] { '0', '1', '2', '3', '4', '5', '6',
-                                                               '7', '8', '9', 'a', 'b', 'c', 'd',
-                                                               'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                                                               'm', 'n', 'o', 'p', 'q', 'r', 's',
-                                                               't', 'u', 'v', 'w', 'x', 'y', 'z' };
-    private static readonly Lazy<Dictionary<char, BigInteger>> Id25AlphabetDict = new(() => {
+    private static readonly BigInteger Base35Modulo = 35;
+    private static readonly char[] Base35Alphabet = new char[] {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+        'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+        'v', 'w', 'x', 'y', 'z'
+    };
+    private static readonly Lazy<Dictionary<char, BigInteger>> Base35AlphabetDict = new(() => {
         var dict = new Dictionary<char, BigInteger>();
-        for (var i = 0; i < Id25Alphabet.Length; i++) {
-            dict.Add(Id25Alphabet[i], i);
+        for (var i = 0; i < Base35Alphabet.Length; i++) {
+            var ch = Base35Alphabet[i];
+            dict.Add(ch, i);
+            if (char.IsLetter(ch)) {  // case-insensitive
+                dict.Add(char.ToUpperInvariant(ch), i);
+            }
         }
         return dict;
     });
@@ -200,8 +207,8 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         var number = new BigInteger(Bytes, isUnsigned: true, isBigEndian: true);
         var result = new char[25];  // always the same length
         for (var i = 24; i >= 0; i--) {
-            number = BigInteger.DivRem(number, Id25Modulo, out var remainder);
-            result[i] = Id25Alphabet[(int)remainder];
+            number = BigInteger.DivRem(number, Base35Modulo, out var remainder);
+            result[i] = Base35Alphabet[(int)remainder];
         }
         return new string(result);
     }
@@ -217,12 +224,12 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     public static Uuid7 FromId25String(string id25Text) {
         if (id25Text == null) { throw new ArgumentNullException(nameof(id25Text), "Text cannot be null."); }
 
-        var alphabetDict = Id25AlphabetDict.Value;
+        var alphabetDict = Base35AlphabetDict.Value;
         var count = 0;
         var number = new BigInteger();
-        foreach (var ch in id25Text.ToLowerInvariant()) {  // convert to lowercase first
+        foreach (var ch in id25Text) {
             if (alphabetDict.TryGetValue(ch, out var offset)) {
-                number = BigInteger.Multiply(number, Id25Modulo);
+                number = BigInteger.Multiply(number, Base35Modulo);
                 number = BigInteger.Add(number, offset);
                 count++;
             }
@@ -243,8 +250,10 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     #region FromString
 
     private static readonly BigInteger Base16Modulo = 16;
-    private static readonly char[] Base16Alphabet = new char[] { '0', '1', '2', '3', '4', '5', '6', '7',
-                                                                 '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    private static readonly char[] Base16Alphabet = new char[] {
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
     private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
         var dict = new Dictionary<char, BigInteger>();
         for (var i = 0; i < Base16Alphabet.Length; i++) {
