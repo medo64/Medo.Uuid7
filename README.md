@@ -4,7 +4,7 @@ Medo.Uuid7
 This project is implementation of UUID version 7 algorithm as defined in
 [New UUID Formats draft 04 RFC][rfc_draft_04].
 
-You can find packaged librarly at [NuGet][nuget_uuid7]
+You can find packaged library at [NuGet][nuget_uuid7]
 and add it you your application using the following command:
 
     dotnet add package Uuid7
