@@ -1,5 +1,6 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-04-12: Timestamps are monotonically increasing even if time goes backward
 //2023-01-14: Using random monotonic counter increment
 //2023-01-12: Expanded monotonic counter from 18 to 26 bits
 //            Added ToId22String and FromId22String methods
@@ -37,14 +38,24 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
         var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
 
+        var newStep = false;
+        if (ms != LastMillisecond) {  // we need to switch millisecond (i.e. counter)
+            newStep = true;
+            LastMillisecond = ms;
+            if (MillisecondCounter < ms) {  // normal time progression
+                MillisecondCounter = ms;
+            } else {  // time went backward, just increase counter
+                MillisecondCounter += 1;
+            }
+        }
+
         // Timestamp
         Span<byte> msBytes = stackalloc byte[8];  // stackalloc into span doesn't require unsafe context
-        BinaryPrimitives.WriteInt64BigEndian(msBytes, ms);
+        BinaryPrimitives.WriteInt64BigEndian(msBytes, MillisecondCounter);
         msBytes[2..].CopyTo(Bytes);  // just lower 48 bits are used
 
         // Randomness
-        if (LastMillisecond != ms) {
-            LastMillisecond = ms;
+        if (newStep) {
             RandomNumberGenerator.Fill(Bytes.AsSpan(6));  // 12-bit rand_a + all of rand_b (extra bits will be overwritten later)
             MonotonicCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
@@ -86,10 +97,13 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
 
     [ThreadStatic]
-    private static long LastMillisecond;
+    private static long LastMillisecond;  // real time
 
     [ThreadStatic]
-    private static uint MonotonicCounter;
+    private static long MillisecondCounter;  // usually real time but doesn't go backward
+
+    [ThreadStatic]
+    private static uint MonotonicCounter;  // counter that gets embedded into UUID
 
 
     /// <summary>
