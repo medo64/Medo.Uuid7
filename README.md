@@ -2,7 +2,7 @@ Medo.Uuid7
 ==========
 
 This project is implementation of UUID version 7 algorithm as defined in
-[New UUID Formats draft 04 RFC][rfc_draft_04].
+[New UUID Formats draft 03 RFC][rfc_4122bis].
 
 You can find packaged library at [NuGet][nuget_uuid7]
 and add it you your application using the following command:
@@ -45,7 +45,7 @@ Additional 62 bits of pseudo-random data.
 ### Implementation
 
 As monotonicity is important for UUID version 7 generation, this implementation
-implements most of [monotonic random counter][rfc_draft_04#counters]
+implements most of [monotonic random counter][rfc_4122bis#counters]
 recommendations.
 
 Implementation uses randomly seeded 26 bit monotonic counter (25 random bits + 1
@@ -145,7 +145,7 @@ Example:
 
 
 
-[rfc_draft_04]: https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html
-[rfc_draft_04#counters]: https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html#monotonicity_counters
+[rfc_4122bis]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-03.html
+[rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-03.html#name-monotonicity-and-counters
 [nuget_uuid7]: https://www.nuget.org/packages/Uuid7/
 [git_stevesimmons_uuid7]: https://github.com/stevesimmons/uuid7-csharp/

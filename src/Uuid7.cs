@@ -23,7 +23,7 @@ using System.Security.Cryptography;
 
 /// <summary>
 /// Implements UUID version 7 as defined in RFC draft at
-/// https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-04.html.
+/// https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-03.html.
 /// </summary>
 [DebuggerDisplay("{ToString(),nq}")]
 [StructLayout(LayoutKind.Sequential)]
