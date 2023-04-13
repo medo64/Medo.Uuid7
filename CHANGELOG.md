@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.0] - 2023-04-12
+
+- Timestamps are monotonically increasing even if time goes backward
+
+
 ## [1.1.1] - 2023-01-14
 
 - Fixed monotonicity bug
