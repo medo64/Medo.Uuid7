@@ -281,6 +281,26 @@ public class Uuid7_Tests {
         Assert.AreEqual(uuid, Uuid7.FromString(text));
     }
 
+    [TestMethod]
+    public void Uuid7_StringFormat() {
+        var bytes = new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 };
+        var uuid = new Uuid7(bytes);
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", uuid.ToString(null));
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", uuid.ToString(""));
+        Assert.AreEqual("0001020334357677b8b9fafbfcfdfeff", uuid.ToString("N"));
+        Assert.AreEqual("0001020334357677b8b9fafbfcfdfeff", uuid.ToString("n"));
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", uuid.ToString("D"));
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", uuid.ToString("d"));
+        Assert.AreEqual("{00010203-3435-7677-b8b9-fafbfcfdfeff}", uuid.ToString("B"));
+        Assert.AreEqual("{00010203-3435-7677-b8b9-fafbfcfdfeff}", uuid.ToString("b"));
+        Assert.AreEqual("(00010203-3435-7677-b8b9-fafbfcfdfeff)", uuid.ToString("P"));
+        Assert.AreEqual("(00010203-3435-7677-b8b9-fafbfcfdfeff)", uuid.ToString("p"));
+        Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", uuid.ToString("X"));
+        Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", uuid.ToString("x"));
+        Assert.ThrowsException<FormatException>(() => {
+            uuid.ToString("y");
+        });
+    }
 
     [DataTestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "1111111111111111111111")]
