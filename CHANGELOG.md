@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2023-04-30
+
+- Added IFormattable interface
+- Fixed EF NullReferenceException when CompareArrays gets a null input
+
+
 ## [1.2.0] - 2023-04-12
 
 - Timestamps are monotonically increasing even if time goes backward
