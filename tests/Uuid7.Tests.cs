@@ -399,6 +399,23 @@ public class Uuid7_Tests {
     }
 
 
+    [TestMethod]
+    public void Uuid7_Equals_Null() {  // https://github.com/medo64/Medo.Uuid7/issues/1
+        var x = Uuid7.NewUuid7();
+        var method = typeof(IEquatable<Uuid7>).GetMethod("Equals");
+        var result = method.Invoke(x, new object[] { null });
+        Assert.AreEqual(false, result);
+    }
+
+    [TestMethod]
+    public void Uuid7_CompareTo_Null() {  // https://github.com/medo64/Medo.Uuid7/issues/1
+        var x = Uuid7.NewUuid7();
+        var method = typeof(IComparable<Uuid7>).GetMethod("CompareTo");
+        var result = method.Invoke(x, new object[] { null });
+        Assert.AreEqual(+1, result);
+    }
+
+
     #region Helpers
 
     private BigInteger UuidToNumber(Uuid7 uuid) {

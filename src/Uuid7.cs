@@ -548,14 +548,19 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private const long TicksPerMillisecond = 10_000;
 
     private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
-        Debug.Assert(buffer1.Length == 16);
-        Debug.Assert(buffer2.Length == 16);
-        var comparer = Comparer<byte>.Default;
-        for (int i = 0; i < buffer1.Length; i++) {
-            if (comparer.Compare(buffer1[i], buffer2[i]) < 0) { return -1; }
-            if (comparer.Compare(buffer1[i], buffer2[i]) > 0) { return +1; }
+        if ((buffer1 != null) && (buffer2 != null) && (buffer1.Length == 16) && (buffer2.Length == 16)) {  // protecting against EF or similar API that uses reflection (https://github.com/medo64/Medo.Uuid7/issues/1)
+            var comparer = Comparer<byte>.Default;
+            for (int i = 0; i < buffer1.Length; i++) {
+                if (comparer.Compare(buffer1[i], buffer2[i]) < 0) { return -1; }
+                if (comparer.Compare(buffer1[i], buffer2[i]) > 0) { return +1; }
+            }
+        } else if ((buffer1 == null) || (buffer1.Length != 16)) {
+            return -1;
+        } else if ((buffer2 == null) || (buffer2.Length != 16)) {
+            return +1;
         }
-        return 0;  // they're equal
+
+        return 0;  // object are equal
     }
 
     #endregion Helpers
