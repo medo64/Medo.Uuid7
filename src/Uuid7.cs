@@ -1,5 +1,6 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-05-16: Performance improvements
 //2023-04-12: Timestamps are monotonically increasing even if time goes backward
 //2023-01-14: Using random monotonic counter increment
 //2023-01-12: Expanded monotonic counter from 18 to 26 bits
@@ -37,11 +38,10 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
         var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
-
-        var newStep = false;
         var msCounter = MillisecondCounter;
-        if (ms != LastMillisecond) {  // we need to switch millisecond (i.e. counter)
-            newStep = true;
+
+        var newStep = (ms != LastMillisecond);
+        if (newStep) {  // we need to switch millisecond (i.e. counter)
             LastMillisecond = ms;
             if (msCounter < ms) {  // normal time progression
                 msCounter = ms;
