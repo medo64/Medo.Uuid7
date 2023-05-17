@@ -13,7 +13,6 @@
 namespace Medo;
 
 using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -53,9 +52,12 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         }
 
         // Timestamp
-        Span<byte> msBytes = stackalloc byte[8];  // stackalloc into span doesn't require unsafe context
-        BinaryPrimitives.WriteInt64BigEndian(msBytes, msCounter);
-        msBytes[2..].CopyTo(Bytes);  // just lower 48 bits are used
+        Bytes[0] = (byte)(msCounter >> 40);
+        Bytes[1] = (byte)(msCounter >> 32);
+        Bytes[2] = (byte)(msCounter >> 24);
+        Bytes[3] = (byte)(msCounter >> 16);
+        Bytes[4] = (byte)(msCounter >> 8);
+        Bytes[5] = (byte)msCounter;
 
         // Randomness
         uint monoCounter;
