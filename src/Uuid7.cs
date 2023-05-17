@@ -40,19 +40,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
 
         var newStep = false;
+        var msCounter = MillisecondCounter;
         if (ms != LastMillisecond) {  // we need to switch millisecond (i.e. counter)
             newStep = true;
             LastMillisecond = ms;
-            if (MillisecondCounter < ms) {  // normal time progression
-                MillisecondCounter = ms;
+            if (msCounter < ms) {  // normal time progression
+                msCounter = ms;
             } else {  // time went backward, just increase counter
-                MillisecondCounter += 1;
+                msCounter++;
             }
+            MillisecondCounter = msCounter;
         }
 
         // Timestamp
         Span<byte> msBytes = stackalloc byte[8];  // stackalloc into span doesn't require unsafe context
-        BinaryPrimitives.WriteInt64BigEndian(msBytes, MillisecondCounter);
+        BinaryPrimitives.WriteInt64BigEndian(msBytes, msCounter);
         msBytes[2..].CopyTo(Bytes);  // just lower 48 bits are used
 
         // Randomness
