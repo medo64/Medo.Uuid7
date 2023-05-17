@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.1] - 2023-05-16
+
+- Performance optimizations
+
 ## [1.3.0] - 2023-04-30
 
 - Added IFormattable interface
