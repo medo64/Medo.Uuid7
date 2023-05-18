@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.2] - 2023-05-17
+
+- .NET Standard 2.0 support
+- ToString() performance optimizations
+
 ## [1.3.1] - 2023-05-16
 
 - Performance optimizations
