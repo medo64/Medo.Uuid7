@@ -356,6 +356,7 @@ public class Uuid7_Tests {
     }
 
 
+#if NET6_0_OR_GREATER
     [TestMethod]
     public void Uuid7_Fill() {
         var uuids = new Uuid7[10000];
@@ -368,6 +369,7 @@ public class Uuid7_Tests {
             prevUuid = uuid;
         }
     }
+#endif
 
 
     [TestMethod]
@@ -418,9 +420,21 @@ public class Uuid7_Tests {
 
     #region Helpers
 
+#if NET6_0_OR_GREATER
     private BigInteger UuidToNumber(Uuid7 uuid) {
         return new BigInteger(uuid.ToByteArray(), isUnsigned: true, isBigEndian: true);
     }
+#else
+    private BigInteger UuidToNumber(Uuid7 uuid) {
+        var bytes = uuid.ToByteArray();
+        if (BitConverter.IsLittleEndian) {
+            Array.Reverse(bytes);
+        }
+        var bytes2 = new byte[bytes.Length + 1];
+        Buffer.BlockCopy(bytes, 0, bytes2, 1, bytes.Length);
+        return new BigInteger(bytes2);
+    }
+#endif
 
     private static bool CompareArrays(byte[] buffer1, byte[] buffer2) {
         var comparer = EqualityComparer<byte>.Default;

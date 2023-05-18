@@ -1,5 +1,6 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-05-17: Support for .NET Standard 2.0
 //2023-05-16: Performance improvements
 //2023-04-12: Timestamps are monotonically increasing even if time goes backward
 //2023-01-14: Using random monotonic counter increment
@@ -16,11 +17,15 @@ namespace Medo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+
+#if NET6_0_OR_GREATER
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 /// <summary>
 /// Implements UUID version 7 as defined in RFC draft at
@@ -62,10 +67,10 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         // Randomness
         uint monoCounter;
         if (newStep) {
-            RandomNumberGenerator.Fill(Bytes.AsSpan(6));  // 12-bit rand_a + all of rand_b (extra bits will be overwritten later)
+            Random.GetBytes(Bytes, 6, 10);
             monoCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
-            RandomNumberGenerator.Fill(Bytes.AsSpan(9));  // rest of rand_b (14 bits "stolen" for monotonic counter) + 1 extra bytes at start (for random increment)
+            Random.GetBytes(Bytes, 9, 7);
             monoCounter = MonotonicCounter + ((uint)Bytes[9] >> 4) + 1;  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
             Bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
             Bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
@@ -87,7 +92,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         if (buffer == null) { throw new ArgumentNullException(nameof(buffer), "Buffer cannot be null."); }
         if (buffer.Length != 16) { throw new ArgumentOutOfRangeException(nameof(buffer), "Buffer must be exactly 16 bytes in length."); }
         Bytes = new byte[16];
-        Buffer.BlockCopy(buffer, 0, Bytes, 0, Bytes.Length);
+        Buffer.BlockCopy(buffer, 0, Bytes, 0, 16);
     }
 
     /// <summary>
@@ -113,6 +118,8 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private static uint MonotonicCounter;  // counter that gets embedded into UUID
 
 
+    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+
     /// <summary>
     /// Returns current UUID version 7 as binary equivalent System.Guid.
     /// </summary>
@@ -125,7 +132,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public byte[] ToByteArray() {
         var copy = new byte[16];
-        Buffer.BlockCopy(Bytes, 0, copy, 0, copy.Length);
+        Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
         return copy;
     }
 
@@ -154,7 +161,14 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// using the same alphabet as bitcoin does.
     /// </summary>
     public string ToId22String() {
+#if NET6_0_OR_GREATER
         var number = new BigInteger(Bytes, isUnsigned: true, isBigEndian: true);
+#else
+        var bytes = new byte[17];
+        Buffer.BlockCopy(Bytes, 0, bytes, 1, 16);
+        if (BitConverter.IsLittleEndian) { Array.Reverse(bytes); }
+        var number = new BigInteger(bytes);
+#endif
         var result = new char[22];  // always the same length
         for (var i = 21; i >= 0; i--) {
             number = BigInteger.DivRem(number, Base58Modulo, out var remainder);
@@ -186,10 +200,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         }
         if (count != 22) { throw new FormatException("Input must be 22 characters."); }
 
+#if NET6_0_OR_GREATER
         var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+#else
+        byte[] numberBytes = number.ToByteArray();
+        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
+        var buffer = new byte[16];
+        if (numberBytes.Length > 16) {
+            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        } else {
+            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+        }
+#endif
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
-            Buffer.BlockCopy(buffer, 0, newBuffer, newBuffer.Length - buffer.Length, buffer.Length);
+            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
         return new Uuid7(buffer);
@@ -225,7 +250,14 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// compatible and thus not necessarily interchangeable.
     /// </summary>
     public string ToId25String() {
+#if NET6_0_OR_GREATER
         var number = new BigInteger(Bytes, isUnsigned: true, isBigEndian: true);
+#else
+        var bytes = new byte[17];
+        Buffer.BlockCopy(Bytes, 0, bytes, 1, 16);
+        if (BitConverter.IsLittleEndian) { Array.Reverse(bytes); }
+        var number = new BigInteger(bytes);
+#endif
         var result = new char[25];  // always the same length
         for (var i = 24; i >= 0; i--) {
             number = BigInteger.DivRem(number, Base35Modulo, out var remainder);
@@ -257,10 +289,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         }
         if (count != 25) { throw new FormatException("Input must be 25 characters."); }
 
+#if NET6_0_OR_GREATER
         var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+#else
+        byte[] numberBytes = number.ToByteArray();
+        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
+        var buffer = new byte[16];
+        if (numberBytes.Length > 16) {
+            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        } else {
+            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+        }
+#endif
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
-            Buffer.BlockCopy(buffer, 0, newBuffer, newBuffer.Length - buffer.Length, buffer.Length);
+            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
         return new Uuid7(buffer);
@@ -310,10 +353,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         }
         if (count != 32) { throw new FormatException("Input must be 32 characters."); }
 
+#if NET6_0_OR_GREATER
         var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+#else
+        byte[] numberBytes = number.ToByteArray();
+        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
+        var buffer = new byte[16];
+        if (numberBytes.Length > 16) {
+            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        } else {
+            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+        }
+#endif
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
-            Buffer.BlockCopy(buffer, 0, newBuffer, newBuffer.Length - buffer.Length, buffer.Length);
+            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
         return new Uuid7(buffer);
@@ -324,7 +378,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     #region Overrides
 
     /// <inheritdoc/>
+#if NET6_0_OR_GREATER
     public override bool Equals([NotNullWhen(true)] object? obj) {
+#else
+    public override bool Equals(object? obj) {
+#endif
         if (obj is Uuid7 uuid) {
             return CompareArrays(Bytes, uuid.Bytes) == 0;
         } else if (obj is Guid guid) {
@@ -368,9 +426,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return format switch {  // treat uppercase and lowercase the same (compatibility with Guid ToFormat)
             "N" or "n" => string.Format(CultureInfo.InvariantCulture, "{0:x2}{1:x2}{2:x2}{3:x2}{4:x2}{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
             "D" or "d" => string.Format(CultureInfo.InvariantCulture, "{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
-            "B" or "b" => string.Format(CultureInfo.InvariantCulture, "{{{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}}}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
+            "B" or "b" => string.Format(CultureInfo.InvariantCulture, "{{{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]) + "}",  // }} gets misinterpreted in .NET Standard 2.0
             "P" or "p" => string.Format(CultureInfo.InvariantCulture, "({0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2})", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
-            "X" or "x" => string.Format(CultureInfo.InvariantCulture, "{{0x{0:x2}{1:x2}{2:x2}{3:x2},0x{4:x2}{5:x2},0x{6:x2}{7:x2},{{0x{8:x2},0x{9:x2},0x{10:x2},0x{11:x2},0x{12:x2},0x{13:x2},0x{14:x2},0x{15:x2}}}}}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
+            "X" or "x" => string.Format(CultureInfo.InvariantCulture, "{{0x{0:x2}{1:x2}{2:x2}{3:x2},0x{4:x2}{5:x2},0x{6:x2}{7:x2},{{0x{8:x2},0x{9:x2},0x{10:x2},0x{11:x2},0x{12:x2},0x{13:x2},0x{14:x2},0x{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]) + "}}",  // }} gets misinterpreted in .NET Standard 2.0
             null or "" => string.Format(CultureInfo.InvariantCulture, "{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
             _ => throw new FormatException("Invalid UUID format.")
         };
@@ -533,6 +591,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
 
+#if NET6_0_OR_GREATER
     /// <summary>
     /// Fills a span with UUIDs.
     /// </summary>
@@ -544,6 +603,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             data[i] = NewUuid7();
         }
     }
+#endif
 
     #endregion Static
 
