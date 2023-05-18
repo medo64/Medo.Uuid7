@@ -507,7 +507,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
                 chars[j + 0] = '0';
                 chars[j + 1] = 'x';
                 j += 2;
-            } else if (i is 4 or 6 or >= 9 ) {
+            } else if (i is 4 or 6 or >= 9) {
                 chars[j + 2] = ',';
                 chars[j + 3] = '0';
                 chars[j + 4] = 'x';
