@@ -1,6 +1,7 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2023-05-17: Support for .NET Standard 2.0
+//            ToString() performance improvements
 //2023-05-16: Performance improvements
 //2023-04-12: Timestamps are monotonically increasing even if time goes backward
 //2023-01-14: Using random monotonic counter increment
@@ -17,7 +18,6 @@ namespace Medo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -398,7 +398,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     /// <inheritdoc/>
     public override string ToString() {
-        return ToString(format: null, formatProvider: null);
+        return ToDefaultString(Bytes);
     }
 
     #endregion Overrides
@@ -421,17 +421,110 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 #if NET7_0_OR_GREATER
     public string ToString([StringSyntax(StringSyntaxAttribute.GuidFormat)] string? format, IFormatProvider? formatProvider) {
 #else
-    public string ToString(string? format, IFormatProvider? formatProvider) {
+    public string ToString(string? format, IFormatProvider? formatProvider) {  // formatProvider is ignored
 #endif
         return format switch {  // treat uppercase and lowercase the same (compatibility with Guid ToFormat)
-            "N" or "n" => string.Format(CultureInfo.InvariantCulture, "{0:x2}{1:x2}{2:x2}{3:x2}{4:x2}{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
-            "D" or "d" => string.Format(CultureInfo.InvariantCulture, "{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
-            "B" or "b" => string.Format(CultureInfo.InvariantCulture, "{{{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]) + "}",  // }} gets misinterpreted in .NET Standard 2.0
-            "P" or "p" => string.Format(CultureInfo.InvariantCulture, "({0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2})", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
-            "X" or "x" => string.Format(CultureInfo.InvariantCulture, "{{0x{0:x2}{1:x2}{2:x2}{3:x2},0x{4:x2}{5:x2},0x{6:x2}{7:x2},{{0x{8:x2},0x{9:x2},0x{10:x2},0x{11:x2},0x{12:x2},0x{13:x2},0x{14:x2},0x{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]) + "}}",  // }} gets misinterpreted in .NET Standard 2.0
-            null or "" => string.Format(CultureInfo.InvariantCulture, "{0:x2}{1:x2}{2:x2}{3:x2}-{4:x2}{5:x2}-{6:x2}{7:x2}-{8:x2}{9:x2}-{10:x2}{11:x2}{12:x2}{13:x2}{14:x2}{15:x2}", Bytes[0], Bytes[1], Bytes[2], Bytes[3], Bytes[4], Bytes[5], Bytes[6], Bytes[7], Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]),
-            _ => throw new FormatException("Invalid UUID format.")
+            "D" or "d" or "" or null => ToDefaultString(Bytes),
+            "N" or "n" => ToNoHypensString(Bytes),
+            "B" or "b" => ToBracesString(Bytes),
+            "P" or "p" => ToParenthesesString(Bytes),
+            "X" or "x" => ToHexadecimalString(Bytes),
+            _ => throw new FormatException("Invalid UUID format."),
         };
+    }
+
+    private static string ToDefaultString(byte[] bytes) {
+        var chars = new char[36];
+        var j = 0;
+        for (var i = 0; i < 16; i++) {
+            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            if (i is 3 or 5 or 7 or 9) {
+                chars[j + 2] = '-';
+                j += 3;
+            } else {
+                j += 2;
+            }
+        }
+        return new string(chars);
+    }
+
+    private static string ToNoHypensString(byte[] bytes) {
+        var chars = new char[32];
+        var j = 0;
+        for (var i = 0; i < 16; i++) {
+            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            j += 2;
+        }
+        return new string(chars);
+    }
+
+    private static string ToBracesString(byte[] bytes) {
+        var chars = new char[38];
+        chars[0] = '{';
+        chars[37] = '}';
+        var j = 1;
+        for (var i = 0; i < 16; i++) {
+            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            if (i is 3 or 5 or 7 or 9) {
+                chars[j + 2] = '-';
+                j += 3;
+            } else {
+                j += 2;
+            }
+        }
+        return new string(chars);
+    }
+
+    private static string ToParenthesesString(byte[] bytes) {
+        var chars = new char[38];
+        chars[0] = '(';
+        chars[37] = ')';
+        var j = 1;
+        for (var i = 0; i < 16; i++) {
+            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            if (i is 3 or 5 or 7 or 9) {
+                chars[j + 2] = '-';
+                j += 3;
+            } else {
+                j += 2;
+            }
+        }
+        return new string(chars);
+    }
+
+    private static string ToHexadecimalString(byte[] bytes) {
+        var chars = new char[68];
+        chars[0] = '{';
+        chars[66] = '}';
+        chars[67] = '}';
+        var j = 1;
+        for (var i = 0; i < 16; i++) {
+            if (i is 0) {
+                chars[j + 0] = '0';
+                chars[j + 1] = 'x';
+                j += 2;
+            } else if (i is 4 or 6 or >= 9 ) {
+                chars[j + 2] = ',';
+                chars[j + 3] = '0';
+                chars[j + 4] = 'x';
+                j += 5;
+            } else if (i is 8) {
+                chars[j + 2] = ',';
+                chars[j + 3] = '{';
+                chars[j + 4] = '0';
+                chars[j + 5] = 'x';
+                j += 6;
+            } else {
+                j += 2;
+            }
+            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+        }
+        return new string(chars);
     }
 
     #endregion IFormattable
