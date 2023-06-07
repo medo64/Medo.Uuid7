@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
@@ -40,46 +41,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public Uuid7() {
         Bytes = new byte[16];
-
-        var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
-        var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
-        var msCounter = MillisecondCounter;
-
-        var newStep = (ms != LastMillisecond);
-        if (newStep) {  // we need to switch millisecond (i.e. counter)
-            LastMillisecond = ms;
-            if (msCounter < ms) {  // normal time progression
-                msCounter = ms;
-            } else {  // time went backward, just increase counter
-                msCounter++;
-            }
-            MillisecondCounter = msCounter;
-        }
-
-        // Timestamp
-        Bytes[0] = (byte)(msCounter >> 40);
-        Bytes[1] = (byte)(msCounter >> 32);
-        Bytes[2] = (byte)(msCounter >> 24);
-        Bytes[3] = (byte)(msCounter >> 16);
-        Bytes[4] = (byte)(msCounter >> 8);
-        Bytes[5] = (byte)msCounter;
-
-        // Randomness
-        uint monoCounter;
-        if (newStep) {
-            Random.GetBytes(Bytes, 6, 10);
-            monoCounter = (uint)(((Bytes[6] & 0x07) << 22) | (Bytes[7] << 14) | ((Bytes[8] & 0x3F) << 8) | Bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
-        } else {
-            Random.GetBytes(Bytes, 9, 7);
-            monoCounter = MonotonicCounter + ((uint)Bytes[9] >> 4) + 1;  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
-            Bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
-            Bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
-        }
-        MonotonicCounter = monoCounter;
-
-        //Fixup
-        Bytes[6] = (byte)(0x70 | ((monoCounter >> 22) & 0x0F));  // set 4-bit version + bits 22:25 of monotonics counter
-        Bytes[8] = (byte)(0x80 | ((monoCounter >> 8) & 0x3F));   // set 2-bit variant + bits 8:13 of monotonics counter
+        FillBytes(ref Bytes);
     }
 
     /// <summary>
@@ -108,6 +70,52 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private readonly byte[] Bytes;
 
 
+    #region Implemenation
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void FillBytes(ref byte[] bytes) {
+        var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
+        var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
+        var msCounter = MillisecondCounter;
+
+        var newStep = (ms != LastMillisecond);
+        if (newStep) {  // we need to switch millisecond (i.e. counter)
+            LastMillisecond = ms;
+            if (msCounter < ms) {  // normal time progression
+                msCounter = ms;
+            } else {  // time went backward, just increase counter
+                msCounter++;
+            }
+            MillisecondCounter = msCounter;
+        }
+
+        // Timestamp
+        bytes[0] = (byte)(msCounter >> 40);
+        bytes[1] = (byte)(msCounter >> 32);
+        bytes[2] = (byte)(msCounter >> 24);
+        bytes[3] = (byte)(msCounter >> 16);
+        bytes[4] = (byte)(msCounter >> 8);
+        bytes[5] = (byte)msCounter;
+
+        // Randomness
+        uint monoCounter;
+        if (newStep) {
+            Random.GetBytes(bytes, 6, 10);
+            monoCounter = (uint)(((bytes[6] & 0x07) << 22) | (bytes[7] << 14) | ((bytes[8] & 0x3F) << 8) | bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
+        } else {
+            Random.GetBytes(bytes, 9, 7);
+            monoCounter = MonotonicCounter + ((uint)bytes[9] >> 4) + 1;  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
+            bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
+        }
+        MonotonicCounter = monoCounter;
+
+        //Fixup
+        bytes[6] = (byte)(0x70 | ((monoCounter >> 22) & 0x0F));  // set 4-bit version + bits 22:25 of monotonics counter
+        bytes[8] = (byte)(0x80 | ((monoCounter >> 8) & 0x3F));   // set 2-bit variant + bits 8:13 of monotonics counter
+    }
+
+
     [ThreadStatic]
     private static long LastMillisecond;  // real time
 
@@ -117,8 +125,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     [ThreadStatic]
     private static uint MonotonicCounter;  // counter that gets embedded into UUID
 
-
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+
+    #endregion Implemenation
 
     /// <summary>
     /// Returns current UUID version 7 as binary equivalent System.Guid.
@@ -665,13 +674,13 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     /// <summary>
     /// A read-only instance of the Guid structure whose value is all zeros.
-    /// Please note this is not a valid UUID7 as it lacks version bits.
+    /// Please note this is not a valid UUID7 as it lacks its version bits.
     /// </summary>
     public static readonly Uuid7 Empty = new(new byte[16]);
 
     /// <summary>
     /// A read-only instance of the Guid structure whose value is all 1's.
-    /// Please note this is not a valid UUID7 as it lacks version bits.
+    /// Please note this is not a valid UUID7 as it lacks its version bits.
     /// </summary>
     public static readonly Uuid7 Max = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
 
