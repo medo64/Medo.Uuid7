@@ -1,5 +1,6 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-06-07: Minor optimizations
 //2023-05-17: Support for .NET Standard 2.0
 //            ToString() performance improvements
 //2023-05-16: Performance improvements
@@ -86,12 +87,13 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void FillBytes7(ref byte[] bytes) {
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
-        var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
+        var millisecond = ticks / TicksPerMillisecond;
         var msCounter = MillisecondCounter;
 
-        var newStep = (ms != LastMillisecond);
+        var newStep = (millisecond != LastMillisecond);
         if (newStep) {  // we need to switch millisecond (i.e. counter)
-            LastMillisecond = ms;
+            LastMillisecond = millisecond;
+            var ms = millisecond - UnixEpochMilliseconds;
             if (msCounter < ms) {  // normal time progression
                 msCounter = ms;
             } else {  // time went backward, just increase counter
@@ -128,7 +130,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
 
     [ThreadStatic]
-    private static long LastMillisecond;  // real time
+    private static long LastMillisecond;  // real time in milliseconds since 0001-01-01
 
     [ThreadStatic]
     private static long MillisecondCounter;  // usually real time but doesn't go backward
