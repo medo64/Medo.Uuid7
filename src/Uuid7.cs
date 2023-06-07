@@ -41,7 +41,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public Uuid7() {
         Bytes = new byte[16];
-        FillBytes(ref Bytes);
+        FillBytes7(ref Bytes);
     }
 
     /// <summary>
@@ -65,15 +65,26 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         Bytes = guid.ToByteArray();
     }
 
+    /// <summary>
+    /// Creates a new instance with a given byte array.
+    /// No check if array is version 7 UUID is made.
+    /// No check for array length is made.
+    /// </summary>
+    private Uuid7(ref byte[] buffer) {
+        Bytes = buffer;
+    }
+
 
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
     private readonly byte[] Bytes;
 
 
-    #region Implemenation
+    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+
+    #region Implemenation (v7)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void FillBytes(ref byte[] bytes) {
+    private static void FillBytes7(ref byte[] bytes) {
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
         var ms = (ticks / TicksPerMillisecond) - UnixEpochMilliseconds;
         var msCounter = MillisecondCounter;
@@ -125,9 +136,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     [ThreadStatic]
     private static uint MonotonicCounter;  // counter that gets embedded into UUID
 
-    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
+    #endregion Implemenation (v7)
+
+    #region Implemenation (v4)
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void FillBytes4(ref byte[] bytes) {
+        Random.GetBytes(bytes, 0, 16);
+
+        //Fixup
+        bytes[6] = (byte)(0x40 | (bytes[6] & 0x0F));  // set 4-bit version
+        bytes[8] = (byte)(0x20 | (bytes[8] & 0x3F));  // set 2-bit variant
+    }
 
     #endregion Implemenation
+
 
     /// <summary>
     /// Returns current UUID version 7 as binary equivalent System.Guid.
@@ -690,6 +713,14 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public static Uuid7 NewUuid7() {
         return new Uuid7();
+    }
+
+    /// <summary>
+    /// Returns new UUID version 4.
+    /// </summary>
+    public static Uuid7 NewUuid4() {
+        var bytes = new byte[16];
+        return new Uuid7(ref bytes);
     }
 
 
