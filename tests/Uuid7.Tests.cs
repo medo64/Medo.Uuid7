@@ -36,6 +36,14 @@ public class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_GuidToString() {
+        var uuid = new Uuid7(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+        var guid = uuid.ToGuid();
+        Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+        Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", guid.ToString());  // GUIDs are little-endian so string representation will not be the same
+    }
+
+    [TestMethod]
     public void Uuid7_TestAlwaysIncreasing() {
         var oldUuid = Uuid7.Empty;
         for (var i = 0; i < 1000000; i++) {  // assuming we're not generating more than 2^21 each millisecond, they will be monotonically increasing
