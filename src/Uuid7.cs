@@ -91,18 +91,20 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
     private static void FillBytes7(ref byte[] bytes) {
+        DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
-        var millisecond = ticks / TicksPerMillisecond;
+        var millisecond = unchecked(ticks / TicksPerMillisecond);
         var msCounter = MillisecondCounter;
 
         var newStep = (millisecond != LastMillisecond);
         if (newStep) {  // we need to switch millisecond (i.e. counter)
             LastMillisecond = millisecond;
-            var ms = millisecond - UnixEpochMilliseconds;
+            long ms;
+            ms = unchecked(millisecond - UnixEpochMilliseconds);
             if (msCounter < ms) {  // normal time progression
                 msCounter = ms;
             } else {  // time went backward, just increase counter
-                msCounter++;
+                unchecked { msCounter++; }
             }
             MillisecondCounter = msCounter;
         }
@@ -122,7 +124,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             monoCounter = (uint)(((bytes[6] & 0x07) << 22) | (bytes[7] << 14) | ((bytes[8] & 0x3F) << 8) | bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
             Random.GetBytes(bytes, 9, 7);
-            monoCounter = MonotonicCounter + ((uint)bytes[9] >> 4) + 1;  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            monoCounter = unchecked(MonotonicCounter + ((uint)bytes[9] >> 4) + 1);  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
             bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
             bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
         }
