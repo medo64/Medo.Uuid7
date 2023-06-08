@@ -1,6 +1,7 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2023-06-07: Minor optimizations
+//            Added NewUuid4() method
 //2023-05-17: Support for .NET Standard 2.0
 //            ToString() performance improvements
 //2023-05-16: Performance improvements
