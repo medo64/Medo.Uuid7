@@ -15,13 +15,36 @@ Features:
   characteristics over UUID versions 1 or 6. The inclusion of the timestamp
   ensures a high level of uniqueness, minimizing the chances of collisions
   across different systems or instances.
-
-Library also supports generation of the fully random version 4 UUIDs.
+* Multiple string representations: In addition to the standard UUID string
+  formatting, library also offers ID22 and ID25 string conversions.
+* Wide compatibility: Support for .NET Standard 2.0 makes this library
+  compatible with .NET Framework 4.6.1 or higher.
 
 You can find packaged library at [NuGet][nuget_uuid7].
 
 
-## Format
+## Usage
+
+To generate a new database-friendly UUID, simply call `NewUuid7` method:
+```csharp
+using System;
+using Medo;
+
+var uuid = Uuid7.NewUuid7();  // or 'new Uuid7()'
+Console.WriteLine($"UUID : {uuid}");
+```
+
+Alternatively, if a fully random UUID v4 is desired, call `NewUuid4` method:
+```csharp
+using System;
+using Medo;
+
+var uuid = Uuid7.NewUuid4();
+Console.WriteLine($"UUID : {uuid}");
+```
+
+
+## UUID Format
 
 The format of UUIDv7 is as specified below.
 
