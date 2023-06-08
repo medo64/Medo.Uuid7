@@ -16,6 +16,8 @@ Features:
   ensures a high level of uniqueness, minimizing the chances of collisions
   across different systems or instances.
 
+Library also supports generation of the fully random version 4 UUIDs.
+
 You can find packaged library at [NuGet][nuget_uuid7].
 
 
