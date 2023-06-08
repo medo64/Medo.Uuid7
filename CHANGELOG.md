@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.3] - 2023-06-07
+
+- Minor optimiztions
+- Added fully random v4 UUID support
+
+
 ## [1.3.2] - 2023-05-17
 
 - .NET Standard 2.0 support
