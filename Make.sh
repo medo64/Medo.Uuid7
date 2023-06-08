@@ -3,7 +3,7 @@ BASE_DIRECTORY="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 PROJECT_FILE="$BASE_DIRECTORY/src/Medo.Uuid7.csproj"
 TEST_PROJECT_FILE="$BASE_DIRECTORY/tests/Medo.Uuid7.Tests.csproj"
-PACKAGE_CONTENT_FILES="Makefile Make.sh CONTRIBUTING.md ICON.png LICENSE.md README.md .editorconfig"
+PACKAGE_CONTENT_FILES="Makefile Make.sh CHANGELOG.md CONTRIBUTING.md ICON.png LICENSE.md README.md .editorconfig"
 PACKAGE_CONTENT_DIRECTORIES="src/ tests/ examples/"
 
 
