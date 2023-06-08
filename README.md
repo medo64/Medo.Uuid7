@@ -1,13 +1,22 @@
 Medo.Uuid7
 ==========
 
-This project is implementation of UUID version 7 algorithm as defined in
-[New UUID Formats draft 03 RFC][rfc_4122bis].
+The UUID7 library is an implementation of the [UUID version 7 specification][rfc_4122bis],
+which introduces a time-ordered value field derived from the timestamp source.
+It offers improved entropy characteristics compared to versions 1 or 6 of the
+UUID standard. The inherent monotonicity of UUID version 7 makes it an excellent
+choice for utilization as a database key.
 
-You can find packaged library at [NuGet][nuget_uuid7]
-and add it you your application using the following command:
+Features:
+* Time-ordered value field: UUID7 utilizes the widely implemented Unix Epoch
+  timestamp source to generate a time-ordered value field. This enables easy
+  sorting and indexing of resources based on their creation time.
+* Enhanced entropy characteristics: UUID7 provides improved entropy
+  characteristics over UUID versions 1 or 6. The inclusion of the timestamp
+  ensures a high level of uniqueness, minimizing the chances of collisions
+  across different systems or instances.
 
-    dotnet add package Uuid7
+You can find packaged library at [NuGet][nuget_uuid7].
 
 
 ## Format
