@@ -10,14 +10,18 @@ internal static class App {
     public static void Main() {
         Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-        var uuids = new Uuid7[5];
-        Uuid7.Fill(uuids);
+        Thread.Sleep(1000);
 
-        foreach (var uuid in uuids) {
-            Console.WriteLine($"UUID: {uuid}");
-            Console.WriteLine($"ID25: {uuid.ToId25String()}");
-            Console.WriteLine($"ID22: {uuid.ToId22String()}");
-            Console.WriteLine();
+        var uuids = new Uuid7[5];
+        {
+            Uuid7.Fill(uuids);
+
+            foreach (var uuid in uuids) {
+                Console.WriteLine($"UUID: {uuid}");
+                Console.WriteLine($"ID25: {uuid.ToId25String()}");
+                Console.WriteLine($"ID22: {uuid.ToId22String()}");
+                Console.WriteLine();
+            }
         }
 
         Thread.Sleep(1000);
