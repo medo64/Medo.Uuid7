@@ -722,6 +722,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public static Uuid7 NewUuid4() {
         var bytes = new byte[16];
+        FillBytes4(ref bytes);
         return new Uuid7(ref bytes);
     }
 
