@@ -2,7 +2,7 @@
 
 ## [1.3.3] - 2023-06-07
 
-- Minor optimiztions
+- Minor optimizations
 - Added fully random v4 UUID support
 
 
