@@ -32,7 +32,7 @@
 
   <PropertyGroup>
     <PackageId>Uuid7</PackageId>
-    <Version>1.3.2</Version>
+    <Version>1.3.3</Version>
     <Authors>Josip Medved</Authors>
     <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
     <Company>www.medo64.com</Company>
