@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.4] - 2023-06-12
+
+- Minor optimizations
+- Updated readme
+
+
 ## [1.3.3] - 2023-06-07
 
 - Minor optimizations
