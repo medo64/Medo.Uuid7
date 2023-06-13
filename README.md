@@ -25,7 +25,7 @@ You can find packaged library at [NuGet][nuget_uuid7].
 
 ## Usage
 
-To generate a new database-friendly UUID, simply call `NewUuid7` method:
+To generate a new database-friendly UUID v7, simply call `NewUuid7` method:
 ```csharp
 using System;
 using Medo;
