@@ -45,6 +45,24 @@ Console.WriteLine($"UUID : {uuid}");
 ```
 
 
+### Configuration
+
+#### Disable buffering
+
+Buffering of random numbers significantly increases performance at the cost of
+less frequent but bigger requests toward random number generator. If buffering
+is not desired (e.g. only a small count of UUIDs is needed), you can disable it
+using `UUID7_NO_RANDOM_BUFFER` preprocessor constant.
+
+```plain
+<PropertyGroup>
+    <DefineConstants>UUID7_NO_RANDOM_BUFFER</DefineConstants>
+</PropertyGroup>
+```
+
+Note that this will decrease performance significantly.
+
+
 ## UUID Format
 
 The format of UUIDv7 is as specified below.
