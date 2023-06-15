@@ -1,5 +1,6 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-06-14: Added buffer for random bytes
 //2023-06-07: Minor optimizations
 //            Added NewUuid4() method
 //2023-05-17: Support for .NET Standard 2.0
@@ -777,9 +778,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
 
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
+#if !UUID7_NO_RANDOM_BUFFER
     private static readonly object RandomBufferLock = new();
     private static readonly byte[] RandomBuffer = new byte[1024];
     private static int RandomBufferIndex = RandomBuffer.Length;  // first call needs to fill buffer no matter what
+#endif
 
 #if NET6_0_OR_GREATER
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -787,6 +790,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
     private static void GetRandomBytes(ref byte[] bytes, int offset, int count) {
+#if !UUID7_NO_RANDOM_BUFFER
         lock (RandomBufferLock) {
             if (RandomBufferIndex + count > RandomBuffer.Length) {  // ignore any leftover bytes
                 Random.GetBytes(RandomBuffer);
@@ -795,6 +799,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             Buffer.BlockCopy(RandomBuffer, RandomBufferIndex, bytes, offset, count);
             RandomBufferIndex += count;
         }
+#else
+        Random.GetBytes(bytes, offset, count);
+#endif
     }
 
     #endregion Helpers
