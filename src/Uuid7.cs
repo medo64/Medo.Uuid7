@@ -794,7 +794,12 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 #if !UUID7_NO_RANDOM_BUFFER
         var buffer = RandomBuffer.Value!;
         var bufferIndex = RandomBufferIndex.Value;
-        if (bufferIndex + count > RandomBufferSize) {  // ignore any leftover bytes
+        if (bufferIndex + count > RandomBufferSize) {
+            var leftover = RandomBufferSize - bufferIndex;
+            Buffer.BlockCopy(buffer, bufferIndex, bytes, offset, leftover);  // make sure to use all bytes
+            offset += leftover;
+            count -= leftover;
+
             Random.GetBytes(buffer);
             bufferIndex = 0;
         }
