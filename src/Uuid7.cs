@@ -757,9 +757,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private const long TicksPerMillisecond = 10_000;
 
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-#else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
     private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
         if ((buffer1 != null) && (buffer2 != null) && (buffer1.Length == 16) && (buffer2.Length == 16)) {  // protecting against EF or similar API that uses reflection (https://github.com/medo64/Medo.Uuid7/issues/1)
@@ -803,6 +801,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             Random.GetBytes(buffer);
             bufferIndex = 0;
         }
+
         Buffer.BlockCopy(buffer, bufferIndex, bytes, offset, count);
         RandomBufferIndex.Value = bufferIndex + count;
 #else
