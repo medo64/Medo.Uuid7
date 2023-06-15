@@ -780,7 +780,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
 #if !UUID7_NO_RANDOM_BUFFER
-    private const int RandomBufferSize = 1024;
+    private const int RandomBufferSize = 2048;
     private static readonly ThreadLocal<byte[]> RandomBuffer = new(() => new byte[RandomBufferSize]);
     private static readonly ThreadLocal<int> RandomBufferIndex = new(() => RandomBufferSize);  // first call needs to fill buffer no matter what
 #endif
