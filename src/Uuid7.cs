@@ -25,6 +25,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Threading;
 
 #if NET6_0_OR_GREATER
 using System.ComponentModel.DataAnnotations;
@@ -779,9 +780,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
 #if !UUID7_NO_RANDOM_BUFFER
-    private static readonly object RandomBufferLock = new();
-    private static readonly byte[] RandomBuffer = new byte[1024];
-    private static int RandomBufferIndex = RandomBuffer.Length;  // first call needs to fill buffer no matter what
+    private const int RandomBufferSize = 1024;
+    private static readonly ThreadLocal<byte[]> RandomBuffer = new(() => new byte[RandomBufferSize]);
+    private static readonly ThreadLocal<int> RandomBufferIndex = new(() => RandomBufferSize);  // first call needs to fill buffer no matter what
 #endif
 
 #if NET6_0_OR_GREATER
@@ -791,14 +792,14 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 #endif
     private static void GetRandomBytes(ref byte[] bytes, int offset, int count) {
 #if !UUID7_NO_RANDOM_BUFFER
-        lock (RandomBufferLock) {
-            if (RandomBufferIndex + count > RandomBuffer.Length) {  // ignore any leftover bytes
-                Random.GetBytes(RandomBuffer);
-                RandomBufferIndex = 0;
-            }
-            Buffer.BlockCopy(RandomBuffer, RandomBufferIndex, bytes, offset, count);
-            RandomBufferIndex += count;
+        var buffer = RandomBuffer.Value!;
+        var bufferIndex = RandomBufferIndex.Value;
+        if (bufferIndex + count > RandomBufferSize) {  // ignore any leftover bytes
+            Random.GetBytes(buffer);
+            bufferIndex = 0;
         }
+        Buffer.BlockCopy(buffer, bufferIndex, bytes, offset, count);
+        RandomBufferIndex.Value = bufferIndex + count;
 #else
         Random.GetBytes(bytes, offset, count);
 #endif
