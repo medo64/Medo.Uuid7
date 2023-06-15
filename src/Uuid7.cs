@@ -81,8 +81,6 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private readonly byte[] Bytes;
 
 
-    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
-
     #region Implemenation (v7)
 
 #if NET6_0_OR_GREATER
@@ -120,10 +118,10 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         // Randomness
         uint monoCounter;
         if (newStep) {
-            Random.GetBytes(bytes, 6, 10);
+            GetRandomBytes(ref bytes, 6, 10);
             monoCounter = (uint)(((bytes[6] & 0x07) << 22) | (bytes[7] << 14) | ((bytes[8] & 0x3F) << 8) | bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
-            Random.GetBytes(bytes, 9, 7);
+            GetRandomBytes(ref bytes, 9, 7);
             monoCounter = unchecked(MonotonicCounter + ((uint)bytes[9] >> 4) + 1);  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
             bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
             bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
@@ -151,7 +149,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void FillBytes4(ref byte[] bytes) {
-        Random.GetBytes(bytes, 0, 16);
+        GetRandomBytes(ref bytes, 0, 16);
 
         //Fixup
         bytes[6] = (byte)(0x40 | (bytes[6] & 0x0F));  // set 4-bit version
@@ -756,6 +754,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private const long UnixEpochMilliseconds = 62_135_596_800_000;
     private const long TicksPerMillisecond = 10_000;
 
+#if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+#else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
     private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
         if ((buffer1 != null) && (buffer2 != null) && (buffer1.Length == 16) && (buffer2.Length == 16)) {  // protecting against EF or similar API that uses reflection (https://github.com/medo64/Medo.Uuid7/issues/1)
             var comparer = Comparer<byte>.Default;
@@ -770,6 +773,28 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         }
 
         return 0;  // object are equal
+    }
+
+
+    private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
+    private static readonly object RandomBufferLock = new();
+    private static readonly byte[] RandomBuffer = new byte[1024];
+    private static int RandomBufferIndex = RandomBuffer.Length;  // first call needs to fill buffer no matter what
+
+#if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+#else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+    private static void GetRandomBytes(ref byte[] bytes, int offset, int count) {
+        lock (RandomBufferLock) {
+            if (RandomBufferIndex + count > RandomBuffer.Length) {  // ignore any leftover bytes
+                Random.GetBytes(RandomBuffer);
+                RandomBufferIndex = 0;
+            }
+            Buffer.BlockCopy(RandomBuffer, RandomBufferIndex, bytes, offset, count);
+            RandomBufferIndex += count;
+        }
     }
 
     #endregion Helpers
