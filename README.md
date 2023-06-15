@@ -1,11 +1,12 @@
 Medo.Uuid7
 ==========
 
-The UUID7 library is an implementation of the [UUID version 7 specification][rfc_4122bis],
-which introduces a time-ordered value field derived from the timestamp source.
-It offers improved entropy characteristics compared to versions 1 or 6 of the
-UUID standard. The inherent monotonicity of UUID version 7 makes it an excellent
-choice for utilization as a database key.
+The UUID7 library is an implementation of the UUID version 7 variant as defined
+in [the new UUID specification][rfc_4122bis], which introduces a time-ordered
+value field derived from the timestamp source. It offers improved entropy
+characteristics compared to versions 1 or 6 of the UUID standard. The inherent
+monotonicity of UUID version 7 makes it an excellent choice for utilization as a
+binary database key.
 
 Features:
 * Time-ordered value field: UUID7 utilizes the widely implemented Unix Epoch
