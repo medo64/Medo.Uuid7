@@ -17,9 +17,11 @@
 - .NET Standard 2.0 support
 - ToString() performance optimizations
 
+
 ## [1.3.1] - 2023-05-16
 
 - Performance optimizations
+
 
 ## [1.3.0] - 2023-04-30
 
@@ -60,6 +62,13 @@
 
 
 [unreleased]: https://github.com/medo64//Medo.uuid7
+[1.3.4]: https://www.nuget.org/packages/Uuid7/1.3.4
+[1.3.3]: https://www.nuget.org/packages/Uuid7/1.3.3
+[1.3.2]: https://www.nuget.org/packages/Uuid7/1.3.2
+[1.3.1]: https://www.nuget.org/packages/Uuid7/1.3.1
+[1.3.0]: https://www.nuget.org/packages/Uuid7/1.3.0
+[1.2.0]: https://www.nuget.org/packages/Uuid7/1.2.0
+[1.1.1]: https://www.nuget.org/packages/Uuid7/1.1.1
 [1.1.0]: https://www.nuget.org/packages/Uuid7/1.1.0
 [1.0.2]: https://www.nuget.org/packages/Uuid7/1.0.2
 [1.0.1]: https://www.nuget.org/packages/Uuid7/1.0.1
