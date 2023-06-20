@@ -179,6 +179,10 @@ function nuget() {  # (api_key)
         echo "${ANSI_RED}No key in .nuget.key!${ANSI_RESET}" >&2
         return 1;
     fi
+    if [[ "$PACKAGE_VERSION" == "0.0.0" ]]; then
+        echo "${ANSI_RED}No version in project file!${ANSI_RESET}" >&2
+        return 1;
+    fi
     dotnet nuget push "$BASE_DIRECTORY/dist/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" \
                       --source "https://api.nuget.org/v3/index.json" \
                       --api-key "$API_KEY" \
