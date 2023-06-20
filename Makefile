@@ -20,5 +20,8 @@ release:
 package:
 	@bash ./Make.sh package
 
+nuget:
+	@bash ./Make.sh nuget
+
 test: debug
 	@bash ./Make.sh test
