@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Medo;
 
@@ -26,16 +26,30 @@ public class Uuid4_Tests {
         Assert.AreEqual(uuid1, uuid2);
     }
 
-    [Ignore]
     [TestMethod]
-    public void Uuid4_TestMany() {
+    public void Uuid4_TestUniqueness() {
+        var set = new HashSet<Uuid7>();
+
         var sw = Stopwatch.StartNew();
-        var i = 0;
         while (sw.ElapsedMilliseconds < 1000) {
-            _ = Uuid7.NewUuid4();
-            i++;
+            if (!set.Add(Uuid7.NewUuid4())) {
+                throw new InvalidOperationException("Duplicate UUIDv4 generated.");
+            }
         }
-        //Console.WriteLine($"Generated {i:#,##0} UUIDs in 1 second");
+    }
+
+    [TestMethod]
+    public void Uuid4_TestThreadedUniqueness() {
+        var set = new ConcurrentDictionary<Uuid7, nint>();
+
+        Parallel.For(0, Math.Max(1, Environment.ProcessorCount / 2), (i) => {
+            var sw = Stopwatch.StartNew();
+            while (sw.ElapsedMilliseconds < 1000) {
+                if (!set.TryAdd(Uuid7.NewUuid4(), 0)) {
+                    throw new InvalidOperationException("Duplicate UUIDv4 generated.");
+                }
+            }
+        });
     }
 
 }
