@@ -36,7 +36,7 @@
     <Authors>Josip Medved</Authors>
     <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
     <Company>www.medo64.com</Company>
-    <PackageTags>UUID,UUID7,UUIDv7</PackageTags>
+    <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -44,7 +44,12 @@
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <Description>
-        This is a C# implementation of UUIDv7 generation algorithm.
+        A library that enables fast generation of version 7 (time-ordered)
+        UUIDs, designed for efficient utilization in databases and resource
+        indexing. It provides conversions to and from GUIDs, multiple string
+        representations, and wide compatibility with .NET 7 and higher,
+        including .NET 4.6.1 and higher (.NET Standard 2.0). Additionally,
+        it supports version 4 (fully random) UUIDs.
     </Description>
   </PropertyGroup>
 

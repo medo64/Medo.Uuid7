@@ -20,6 +20,8 @@ Features:
   formatting, library also offers ID22 and ID25 string conversions.
 * Wide compatibility: Support for .NET Standard 2.0 makes this library
   compatible with .NET Framework 4.6.1 or higher.
+* High performance: Speed comparable to the optimized built-in GUID generator in
+  both single-threaded and multi-threaded scenarios under Windows and Linux.
 
 You can find packaged library at [NuGet][nuget_uuid7].
 
