@@ -7,6 +7,11 @@
 - Obsoleted NuGet package Uuid7
 
 
+## [1.3.5] - 2023-06-19
+
+- Updated readme
+
+
 ## [1.3.4] - 2023-06-12
 
 - Minor optimizations
@@ -70,6 +75,7 @@
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
 [1.4.0]: https://www.nuget.org/packages/Medo.Uuid7/1.4.0
+[1.3.5]: https://www.nuget.org/packages/Uuid7/1.3.5
 [1.3.4]: https://www.nuget.org/packages/Uuid7/1.3.4
 [1.3.3]: https://www.nuget.org/packages/Uuid7/1.3.3
 [1.3.2]: https://www.nuget.org/packages/Uuid7/1.3.2
