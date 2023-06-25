@@ -418,7 +418,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     #region Overrides
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if this instance is equal to a specified object.
+    /// Object can be either Uuid7 or Guid.
+    /// </summary>
+    /// <param name="obj">An object to compare to this instance.</param>
 #if NET6_0_OR_GREATER
     public override bool Equals([NotNullWhen(true)] object? obj) {
 #else
@@ -432,12 +436,16 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return false;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns a hash code for the current object.
+    /// </summary>
     public override int GetHashCode() {
         return Bytes.GetHashCode();
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns a string that represents the current object.
+    /// </summary>
     public override string ToString() {
         return ToDefaultString(Bytes);
     }
@@ -458,7 +466,12 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return ToString(format, formatProvider: null);
     }
 
-    /// <inheritdoc/>
+
+    /// <summary>
+    /// Formats the value of the current instance using the specified format.
+    /// </summary>
+    /// <param name="format">The format to use.</param>
+    /// <param name="formatProvider">Not used.</param>
 #if NET7_0_OR_GREATER
     public string ToString([StringSyntax(StringSyntaxAttribute.GuidFormat)] string? format, IFormatProvider? formatProvider) {
 #else
@@ -572,95 +585,171 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
     #region Operators
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if both operands are equal.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator ==(Uuid7 left, Uuid7 right) {
         return left.Equals(right);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if both operands are equal.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator ==(Uuid7 left, Guid right) {
         return left.Equals(right);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if both operands are equal.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator ==(Guid left, Uuid7 right) {
         return left.Equals(right);
     }
 
-    /// <inheritdoc/>
+
+    /// <summary>
+    /// Returns true if both operands are not equal.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator !=(Uuid7 left, Uuid7 right) {
         return !(left == right);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if both operands are not equal.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator !=(Uuid7 left, Guid right) {
         return !(left == right);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if both operands are not equal.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator !=(Guid left, Uuid7 right) {
         return !(left == right);
     }
 
-    /// <inheritdoc/>
+
+    /// <summary>
+    /// Returns true if left-hand operand is less than right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator <(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) < 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is less than right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator <(Uuid7 left, Guid right) {
         return left.CompareTo(right) < 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is less than right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator <(Guid left, Uuid7 right) {
         return left.CompareTo(right) < 0;
     }
 
-    /// <inheritdoc/>
-    public static bool operator >(Uuid7 left, Uuid7 right) {
-        return left.CompareTo(right) > 0;
-    }
 
-    /// <inheritdoc/>
-    public static bool operator >(Uuid7 left, Guid right) {
-        return left.CompareTo(right) > 0;
-    }
-
-    /// <inheritdoc/>
-    public static bool operator >(Guid left, Uuid7 right) {
-        return left.CompareTo(right) > 0;
-    }
-
-
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is less than or equal to right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator <=(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) is < 0 or 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is less than or equal to right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator <=(Uuid7 left, Guid right) {
         return left.CompareTo(right) is < 0 or 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is less than or equal to right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator <=(Guid left, Uuid7 right) {
         return left.CompareTo(right) is < 0 or 0;
     }
 
-    /// <inheritdoc/>
+
+    /// <summary>
+    /// Returns true if left-hand operand is greater than or equal to right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator >=(Uuid7 left, Uuid7 right) {
         return left.CompareTo(right) is > 0 or 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is greater than or equal to right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator >=(Uuid7 left, Guid right) {
         return left.CompareTo(right) is > 0 or 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Returns true if left-hand operand is greater than or equal to right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
     public static bool operator >=(Guid left, Uuid7 right) {
         return left.CompareTo(right) is > 0 or 0;
+    }
+
+
+    /// <summary>
+    /// Returns true if left-hand operand is greater than right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
+    public static bool operator >(Uuid7 left, Uuid7 right) {
+        return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>
+    /// Returns true if left-hand operand is greater than right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
+    public static bool operator >(Uuid7 left, Guid right) {
+        return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>
+    /// Returns true if left-hand operand is greater than right-hand operand.
+    /// </summary>
+    /// <param name="left">Left-hand operand.</param>
+    /// <param name="right">Right-hand operand.</param>
+    public static bool operator >(Guid left, Uuid7 right) {
+        return left.CompareTo(right) > 0;
     }
 
     #endregion Operators
