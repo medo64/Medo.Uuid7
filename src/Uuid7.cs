@@ -61,6 +61,21 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         Buffer.BlockCopy(buffer, 0, Bytes, 0, 16);
     }
 
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Creates a new instance from given read-only byte span.
+    /// No check if array is version 7 UUID is made.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Span cannot be null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Span must be exactly 16 bytes in length.</exception>
+    public Uuid7(ReadOnlySpan<byte> span) {
+        if (span == null) { throw new ArgumentNullException(nameof(span), "Span cannot be null."); }
+        if (span.Length != 16) { throw new ArgumentOutOfRangeException(nameof(span), "Span must be exactly 16 bytes in length."); }
+        Bytes = new byte[16];
+        span.CopyTo(Bytes);
+    }
+#endif
+
     /// <summary>
     /// Creates a new instance from given GUID bytes.
     /// No check if GUID is version 7 UUID is made.
@@ -68,6 +83,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     public Uuid7(Guid guid) {
         Bytes = guid.ToByteArray();
     }
+
 
     /// <summary>
     /// Creates a new instance with a given byte array.
