@@ -30,6 +30,21 @@ public class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_NewFromBytes() {
+        var uuid = new Uuid7(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+        Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+    }
+
+#if NET6_0_OR_GREATER
+    [TestMethod]
+    public void Uuid7_NewFromSpan() {
+        var bytes = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuid = new Uuid7(bytes.AsSpan(1));
+        Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+    }
+#endif
+
+    [TestMethod]
     public void Uuid7_GuidAndBack() {
         var uuid1 = Uuid7.NewUuid7();
         var guid = uuid1.ToGuid();
