@@ -449,9 +449,25 @@ public class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_Equals_NullGuid() {  // https://github.com/medo64/Medo.Uuid7/issues/1
+        var x = Uuid7.NewUuid7();
+        var method = typeof(IEquatable<Guid>).GetMethod("Equals");
+        var result = method.Invoke(x, new object[] { null });
+        Assert.AreEqual(false, result);
+    }
+
+    [TestMethod]
     public void Uuid7_CompareTo_Null() {  // https://github.com/medo64/Medo.Uuid7/issues/1
         var x = Uuid7.NewUuid7();
         var method = typeof(IComparable<Uuid7>).GetMethod("CompareTo");
+        var result = method.Invoke(x, new object[] { null });
+        Assert.AreEqual(+1, result);
+    }
+
+    [TestMethod]
+    public void Uuid7_CompareTo_NullGuid() {  // https://github.com/medo64/Medo.Uuid7/issues/1
+        var x = Uuid7.NewUuid7();
+        var method = typeof(IComparable<Guid>).GetMethod("CompareTo");
         var result = method.Invoke(x, new object[] { null });
         Assert.AreEqual(+1, result);
     }
