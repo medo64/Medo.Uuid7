@@ -44,6 +44,40 @@ public class Uuid7_Tests {
     }
 #endif
 
+#if NET6_0_OR_GREATER
+    [TestMethod]
+    public void Uuid7_WriteToSpan() {
+        var uuid = Uuid7.NewUuid7();
+
+        var bytes = new byte[16];
+        Assert.IsTrue(uuid.TryWriteBytes(bytes));
+
+        Assert.IsTrue(CompareArrays(bytes, uuid.ToByteArray()));
+    }
+
+    [TestMethod]
+    public void Uuid7_WriteToLargerSpan() {
+        var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuid = new Uuid7(uuidBytes);
+
+        var bytes = new byte[17];
+        Assert.IsTrue(uuid.TryWriteBytes(bytes.AsSpan()[1..]));
+
+        Assert.AreEqual("00-01-02-03-04-05-06-07-08-09-0A-0B-0C-0D-0E-0F-10", BitConverter.ToString(bytes));
+    }
+
+    [TestMethod]
+    public void Uuid7_WriteToSmallSpan() {
+        var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuid = new Uuid7(uuidBytes);
+
+        var bytes = new byte[15];
+        Assert.IsFalse(uuid.TryWriteBytes(bytes.AsSpan()));
+
+        Assert.AreEqual("00-00-00-00-00-00-00-00-00-00-00-00-00-00-00", BitConverter.ToString(bytes));
+    }
+#endif
+
     [TestMethod]
     public void Uuid7_HashCode() {
         var uuidBytes = new byte[] { 0xFA, 0xBB, 0x0D, 0xF2, 0xCB, 0xE8, 0xDD, 0x68, 0x5D, 0xC4, 0x84, 0xD8, 0xC6, 0x27, 0xEA, 0x4A };
