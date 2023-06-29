@@ -199,6 +199,25 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
 
+    #region TryWriteBytes
+
+#if NET6_0_OR_GREATER
+
+    /// <summary>
+    /// Tries to write the current instance into a span of bytes.
+    /// </summary>
+    /// <param name="destination">Destination span.</param>
+    public bool TryWriteBytes(Span<byte> destination) {
+        if (destination.Length < 16) { return false; }  // not enough bytes
+        Bytes.CopyTo(destination);
+        return true;
+    }
+
+#endif
+
+    #endregion TryWriteBytes
+
+
     #region Id22
 
     private static readonly BigInteger Base58Modulo = 58;
