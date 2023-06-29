@@ -32,6 +32,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 #endif
 
+#if NET7_0_OR_GREATER
+using System.Runtime.Intrinsics;
+#endif
+
+
 /// <summary>
 /// Implements UUID version 7 as defined in RFC draft at
 /// https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-03.html.
@@ -808,6 +813,14 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     /// <param name="other">An object to compare to this instance.</param>
     public bool Equals(Uuid7 other) {
+#if NET7_0_OR_GREATER
+        if (other.Bytes == null) { return false; }
+        if (Vector128.IsHardwareAccelerated) {
+            var vector1 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0]);
+            var vector2 = Unsafe.ReadUnaligned<Vector128<byte>>(ref other.Bytes[0]);
+            return vector1 == vector2;
+        }
+#endif
         return CompareArrays(Bytes, other.Bytes) == 0;
     }
 
@@ -821,6 +834,13 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     /// <param name="other">An object to compare to this instance.</param>
     public bool Equals(Guid other) {
+#if NET7_0_OR_GREATER
+        if (Vector128.IsHardwareAccelerated) {
+            var vector1 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0]);
+            var vector2 = Unsafe.ReadUnaligned<Vector128<byte>>(ref other.ToByteArray()[0]);
+            return vector1 == vector2;
+        }
+#endif
         return CompareArrays(Bytes, other.ToByteArray()) == 0;
     }
 
