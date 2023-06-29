@@ -456,7 +456,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Returns a hash code for the current object.
     /// </summary>
     public override int GetHashCode() {
-        return Bytes.GetHashCode();
+        var hc = ((Bytes[3] ^ Bytes[7] ^ Bytes[11] ^ Bytes[15]) << 24)
+               | ((Bytes[2] ^ Bytes[6] ^ Bytes[10] ^ Bytes[14]) << 16)
+               | ((Bytes[1] ^ Bytes[5] ^ Bytes[9] ^ Bytes[13]) << 8)
+               | (Bytes[0] ^ Bytes[4] ^ Bytes[8] ^ Bytes[12]);
+        return hc;  // just XOR individual ints - compatible with Guid implementation on LE platform
     }
 
     /// <summary>

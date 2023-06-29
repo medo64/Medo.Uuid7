@@ -45,6 +45,24 @@ public class Uuid7_Tests {
 #endif
 
     [TestMethod]
+    public void Uuid7_HashCode() {
+        var uuidBytes = new byte[] { 0xFA, 0xBB, 0x0D, 0xF2, 0xCB, 0xE8, 0xDD, 0x68, 0x5D, 0xC4, 0x84, 0xD8, 0xC6, 0x27, 0xEA, 0x4A };
+        var uuid1 = new Uuid7(uuidBytes);
+        var uuid2 = new Uuid7(uuidBytes);
+        Assert.AreEqual(uuid1.GetHashCode(), uuid2.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Uuid7_HashCodeGuidCompatible() {
+        var uuid = Uuid7.NewUuid7();
+        var guid = uuid.ToGuid();
+        Assert.AreEqual(uuid.GetHashCode(), guid.GetHashCode());
+#if NET7_0_OR_GREATER
+        Assert.IsTrue(System.Runtime.Intrinsics.Vector128.IsHardwareAccelerated);
+#endif
+    }
+
+    [TestMethod]
     public void Uuid7_GuidAndBack() {
         var uuid1 = Uuid7.NewUuid7();
         var guid = uuid1.ToGuid();
