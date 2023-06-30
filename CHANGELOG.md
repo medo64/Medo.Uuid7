@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0] - 2023-06-29
+
+- Added TryWriteBytes method
+- Updated GetHashCode method
+- HW acceleration for Equals method
+
+
 ## [1.4.0] - 2023-06-19
 
 - Major optimizations (buffered RandomNumberGenerator calls)
@@ -74,6 +81,7 @@
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[1.5.0]: https://www.nuget.org/packages/Medo.Uuid7/1.5.0
 [1.4.0]: https://www.nuget.org/packages/Medo.Uuid7/1.4.0
 [1.3.5]: https://www.nuget.org/packages/Uuid7/1.3.5
 [1.3.4]: https://www.nuget.org/packages/Uuid7/1.3.4
