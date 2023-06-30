@@ -22,6 +22,7 @@ Features:
   compatible with .NET Framework 4.6.1 or higher.
 * High performance: Speed comparable to the optimized built-in GUID generator in
   both single-threaded and multi-threaded scenarios under Windows and Linux.
+* Hardware acceleration for Equals method
 
 You can find packaged library at [NuGet][nuget_uuid7].
 
@@ -202,5 +203,5 @@ Example:
 
 [rfc_4122bis]: https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis
 [rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-07.html#name-monotonicity-and-counters
-[nuget_uuid7]: https://www.nuget.org/packages/Uuid7/
+[nuget_uuid7]: https://www.nuget.org/packages/Medo.Uuid7/
 [git_stevesimmons_uuid7]: https://github.com/stevesimmons/uuid7-csharp/

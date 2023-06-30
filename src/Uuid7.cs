@@ -1,5 +1,8 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
+//2023-06-29: Added TryWriteBytes method
+//            Updated GetHashCode method
+//            HW acceleration for Equals method
 //2023-06-14: Added buffer for random bytes
 //2023-06-07: Minor optimizations
 //            Added NewUuid4() method
