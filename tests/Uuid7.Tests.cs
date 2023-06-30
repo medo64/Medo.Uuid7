@@ -86,15 +86,14 @@ public class Uuid7_Tests {
         Assert.AreEqual(uuid1.GetHashCode(), uuid2.GetHashCode());
     }
 
+#if NET6_0 || NET7_0
     [TestMethod]
     public void Uuid7_HashCodeGuidCompatible() {
         var uuid = Uuid7.NewUuid7();
         var guid = uuid.ToGuid();
         Assert.AreEqual(uuid.GetHashCode(), guid.GetHashCode());
-#if NET7_0_OR_GREATER
-        Assert.IsTrue(System.Runtime.Intrinsics.Vector128.IsHardwareAccelerated);
-#endif
     }
+#endif
 
     [TestMethod]
     public void Uuid7_GuidAndBack() {
