@@ -552,6 +552,35 @@ public class Uuid7_Tests {
     }
 
 
+    [TestMethod]
+    public void Uuid7_MsSqlGuid_1() {
+        var uuid = Uuid7.NewUuid7();
+        var guid = uuid.ToGuidMsSql();
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreNotEqual(guid, uuid);  // not the same binary
+            Assert.AreEqual(uuid.ToString(), guid.ToString());  // same text representation
+        } else {  // on BE platforms, they are equal both binary and in string format
+            Assert.AreEqual(guid, uuid);  // same binary
+            Assert.AreEqual(uuid.ToString(), guid.ToString());  // same text representation
+        }
+    }
+
+    [TestMethod]
+    public void Uuid7_MsSqlGuid_2() {
+        var uuid = new Uuid7(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+        var guid = uuid.ToGuidMsSql();
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreNotEqual(guid, uuid);  // not the same binary
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guid.ToString());
+        } else {  // on BE platforms, they are equal both binary and in string format
+            Assert.AreEqual(guid, uuid);  // same binary
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guid.ToString());
+        }
+    }
+
+
     #region Helpers
 
 #if NET6_0_OR_GREATER

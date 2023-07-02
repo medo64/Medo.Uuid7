@@ -193,6 +193,25 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
     /// <summary>
+    /// Returns an equivalent System.Guid of a UUID version 7 suitable for
+    /// insertion into Microsoft SQL database.
+    /// On LE platforms this will have the first 8 bytes in a different order.
+    /// </summary>
+    public Guid ToGuidMsSql() {
+        if (BitConverter.IsLittleEndian) {
+            var bytes = new byte[16];
+            Buffer.BlockCopy(Bytes, 0, bytes, 0, 16);
+            (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
+            (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
+            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
+            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
+            return new Guid(bytes);
+        } else {
+            return new Guid(Bytes);
+        }
+    }
+
+    /// <summary>
     /// Returns an array that contains UUID bytes.
     /// </summary>
     public byte[] ToByteArray() {
@@ -940,6 +959,25 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         var bytes = new byte[16];
         FillBytes7(ref bytes);
         return new Guid(bytes);
+    }
+
+    /// <summary>
+    /// Returns an equivalent System.Guid of a UUID version 7 suitable for
+    /// insertion into Microsoft SQL database.
+    /// On LE platforms this will have the first 8 bytes in a different order.
+    /// </summary>
+    public static Guid NewGuidMsSql() {
+        var bytes = new byte[16];
+        FillBytes7(ref bytes);
+        if (BitConverter.IsLittleEndian) {
+            (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
+            (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
+            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
+            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
+            return new Guid(bytes);
+        } else {  // on big endian platforms, it's all the same
+            return new Guid(bytes);
+        }
     }
 
 
