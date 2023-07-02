@@ -30,6 +30,13 @@ public class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_NewGuid() {
+        var uuid1 = Uuid7.NewGuid();
+        var uuid2 = Uuid7.NewGuid();
+        Assert.AreNotEqual(uuid1, uuid2);
+    }
+
+    [TestMethod]
     public void Uuid7_NewFromBytes() {
         var uuid = new Uuid7(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
         Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());

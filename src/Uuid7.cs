@@ -900,6 +900,15 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return new Uuid7(ref bytes);
     }
 
+    /// <summary>
+    /// Returns new UUID version 4.
+    /// </summary>
+    public static Guid NewGuid() {
+        var bytes = new byte[16];
+        FillBytes7(ref bytes);
+        return new Guid(bytes);
+    }
+
 
 #if NET6_0_OR_GREATER
     /// <summary>
