@@ -9,8 +9,8 @@ namespace Uuid7Benchmark;
 public static class TestMultiThread {
 
     public static void Run() {
-        var threadCount = Environment.ProcessorCount / 2;
-        if (threadCount < 1) { threadCount = 1; }
+        var threadCount = (Environment.ProcessorCount + 1) / 2;
+        if (threadCount < 2) { threadCount = 2; }
 
         Thread.Sleep(1000);
         {
@@ -69,7 +69,7 @@ public static class TestMultiThread {
             });
 
             sw.Stop();
-            Console.WriteLine($"Generated {totalCount:#,##0} GUIDs using {threadCount} threads in {sw.ElapsedMilliseconds:#,##0} milliseconds ({totalCount / threadCount / sw.ElapsedMilliseconds * 1000:#,##0} per second per thread)");
+            Console.WriteLine($"Generated {totalCount:#,##0} reference GUIDs using {threadCount} threads in {sw.ElapsedMilliseconds:#,##0} milliseconds ({totalCount / threadCount / sw.ElapsedMilliseconds * 1000:#,##0} per second per thread)");
         }
     }
 

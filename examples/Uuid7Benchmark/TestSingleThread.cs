@@ -41,7 +41,7 @@ public static class TestSingleThread {
                 guidCount++;
             }
             sw.Stop();
-            Console.WriteLine($"Generated {guidCount:#,##0} GUIDs in {sw.ElapsedMilliseconds:#,##0} millisecond ({guidCount / sw.ElapsedMilliseconds * 1000:#,##0} per second)");
+            Console.WriteLine($"Generated {guidCount:#,##0} reference GUIDs in {sw.ElapsedMilliseconds:#,##0} millisecond ({guidCount / sw.ElapsedMilliseconds * 1000:#,##0} per second)");
         }
     }
 

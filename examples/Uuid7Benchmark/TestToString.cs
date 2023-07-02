@@ -29,7 +29,7 @@ public static class TestToString {
                 uuidCount++;
             }
             sw.Stop();
-            Console.WriteLine($"ToString() {uuidCount:#,##0} GUIDs in {sw.ElapsedMilliseconds:#,##0} millisecond ({uuidCount / sw.ElapsedMilliseconds * 1000:#,##0} per second)");
+            Console.WriteLine($"ToString() {uuidCount:#,##0} reference GUIDs in {sw.ElapsedMilliseconds:#,##0} millisecond ({uuidCount / sw.ElapsedMilliseconds * 1000:#,##0} per second)");
         }
     }
 

@@ -23,6 +23,12 @@ internal static class App {
             }
         }
 
+#if DEBUG
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Running in DEBUG mode! Consider switching to the Release build configuration.");
+        Console.ResetColor();
+#endif
+
         Console.WriteLine();
         TestSingleThread.Run();
 
