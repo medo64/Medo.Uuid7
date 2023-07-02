@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Medo.Uuid7.EntityFrameworkCore</AssemblyName>
     <RootNamespace>Medo</RootNamespace>
+    <DefineConstants>EFCORE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -59,20 +60,16 @@
     <None Include="../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6.0.0,)" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1.0,6)" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[7.0.0,)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Medo.Uuid7.csproj" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6.0.0,)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1.0,6)" />
   </ItemGroup>
 
 </Project>

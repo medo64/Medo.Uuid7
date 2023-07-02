@@ -1,7 +1,6 @@
-using Medo;
+#if EFCORE
+namespace Medo;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
-namespace Tests;
 
 public class Uuid7ToBytesConverter  : ValueConverter<Uuid7, byte[]>
 {
@@ -15,3 +14,4 @@ public class Uuid7ToBytesConverter  : ValueConverter<Uuid7, byte[]>
     {
     }
 }
+#endif

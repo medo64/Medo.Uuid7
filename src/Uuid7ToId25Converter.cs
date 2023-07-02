@@ -1,7 +1,6 @@
-using Medo;
+#if EFCORE
+namespace Medo;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
-namespace Tests;
 
 public class Uuid7ToId25Converter  : ValueConverter<Uuid7, string>
 {
@@ -12,3 +11,4 @@ public class Uuid7ToId25Converter  : ValueConverter<Uuid7, string>
     {
     }
 }
+#endif
