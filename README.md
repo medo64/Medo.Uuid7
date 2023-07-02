@@ -22,7 +22,8 @@ Features:
   compatible with .NET Framework 4.6.1 or higher.
 * High performance: Speed comparable to the optimized built-in GUID generator in
   both single-threaded and multi-threaded scenarios under Windows and Linux.
-* Hardware acceleration for Equals method
+* Hardware acceleration: Vector128 support for Equals method.
+* Microsoft SQL Server support: Separate methods for "LE" Guid creation.
 
 You can find packaged library at [NuGet][nuget_uuid7]. Also available is
 an [Entity Framework version][nuget_uuid7_efcore].
