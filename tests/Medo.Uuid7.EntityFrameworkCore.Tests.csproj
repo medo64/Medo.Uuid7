@@ -1,23 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net7.0;</TargetFrameworks>
+  <PropertyGroup>
+    <AssemblyName>Medo.Uuid7.EntityFrameworkCore.Tests</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
+    <DefineConstants>EFCORE</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OS)' == 'Unix'">
-    <TargetFrameworks>net7.0;</TargetFrameworks>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
-    <DefineConstants>EFCORE</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <AssemblyName>Medo.Uuid7.Tests</AssemblyName>
-    <RootNamespace>Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>

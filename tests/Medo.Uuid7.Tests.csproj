@@ -1,5 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <AssemblyName>Medo.Uuid7.Tests</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
     <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
   </PropertyGroup>
@@ -12,11 +17,6 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
     <Nullable>disable</Nullable>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <AssemblyName>Medo.Uuid7.Tests</AssemblyName>
-    <RootNamespace>Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
