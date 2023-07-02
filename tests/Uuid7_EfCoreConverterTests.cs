@@ -16,6 +16,7 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.Id, user.Id);
+        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -27,6 +28,7 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsBytes, user.AsBytes);
+        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -38,6 +40,7 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsString, user.AsString);
+        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -49,6 +52,7 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsIdTwentyFive, user.AsIdTwentyFive);
+        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -60,6 +64,7 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsIdTwentyTwo, user.AsIdTwentyTwo);
+        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
