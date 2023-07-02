@@ -196,6 +196,8 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Returns an equivalent System.Guid of a UUID version 7 suitable for
     /// insertion into Microsoft SQL database.
     /// On LE platforms this will have the first 8 bytes in a different order.
+    /// This should be used only when using MS SQL Server and not any other. If
+    /// you are using Uuid7 in mixed database environment, use ToGuid() instead.
     /// </summary>
     public Guid ToGuidMsSql() {
         if (BitConverter.IsLittleEndian) {
@@ -965,6 +967,8 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Returns an equivalent System.Guid of a UUID version 7 suitable for
     /// insertion into Microsoft SQL database.
     /// On LE platforms this will have the first 8 bytes in a different order.
+    /// This should be used only when using MS SQL Server and not any other. If
+    /// you are using Uuid7 in mixed database environment, use ToGuid() instead.
     /// </summary>
     public static Guid NewGuidMsSql() {
         var bytes = new byte[16];
