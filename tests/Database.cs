@@ -1,5 +1,7 @@
+#if EFCORE
 using System;
 using Microsoft.EntityFrameworkCore;
+using Medo;
 
 namespace Tests;
 
@@ -20,3 +22,4 @@ public class Database : DbContext {
         base.OnModelCreating(modelBuilder);
     }
 }
+#endif

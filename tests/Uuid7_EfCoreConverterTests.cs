@@ -1,3 +1,4 @@
+#if EFCORE
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Medo;
@@ -83,3 +84,4 @@ public class Uuid7_EfCoreConverterTests {
 
     #endregion
 }
+#endif
