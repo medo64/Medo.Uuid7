@@ -26,7 +26,7 @@ Features:
 * Microsoft SQL Server support: Separate methods for "LE" Guid creation.
 
 You can find packaged library at [NuGet][nuget_uuid7]. Also available is
-an [Entity Framework version][nuget_uuid7_efcore].
+an [Entity Framework Core version][nuget_uuid7_efcore].
 
 
 ## Usage
