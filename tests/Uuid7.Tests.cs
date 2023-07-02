@@ -207,6 +207,27 @@ public class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_OperatorFromGuid() {
+        Guid guid = Guid.NewGuid();
+        Uuid7 uuid = guid;
+        Assert.AreEqual(uuid, guid);  // binary equality
+        if (!BitConverter.IsLittleEndian) {
+            Assert.AreEqual(guid, uuid);  // same only on BE platforms
+        }
+    }
+
+    [TestMethod]
+    public void Uuid7_OperatorToGuid() {
+        Uuid7 uuid = Uuid7.NewUuid7();
+        Guid guid = uuid;
+        Assert.AreEqual(uuid, guid);  // binary equality
+        if (!BitConverter.IsLittleEndian) {
+            Assert.AreEqual(guid, uuid);  // same only on BE platforms
+        }
+    }
+
+
+    [TestMethod]
     public void Uuid7_CompareTo() {
         var uuid1 = new Uuid7(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, });
         var uuid2 = new Uuid7(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, });

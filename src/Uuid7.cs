@@ -799,6 +799,39 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return left.CompareTo(right) > 0;
     }
 
+
+    /// <summary>
+    /// Returns binary-compatible Uuid7 from given Guid.
+    /// </summary>
+    /// <param name="value">Value.</param>
+    public static Uuid7 FromGuid(Guid value) {
+        return new Uuid7(value.ToByteArray());
+    }
+
+    /// <summary>
+    /// Returns binary-compatible Uuid7 from given Guid.
+    /// </summary>
+    /// <param name="value">Value.</param>
+    public static implicit operator Uuid7(Guid value) {
+        return FromGuid(value);
+    }
+
+    /// <summary>
+    /// Returns binary-compatible Guid from given Uuid7.
+    /// </summary>
+    /// <param name="value">Value.</param>
+    public static Guid ToGuid(Uuid7 value) {
+        return new Guid(value.Bytes);
+    }
+
+    /// <summary>
+    /// Returns UUID7 from given Guid.
+    /// </summary>
+    /// <param name="value">Value.</param>
+    public static implicit operator Guid(Uuid7 value) {
+        return ToGuid(value);
+    }
+
     #endregion Operators
 
     #region IComparable<Uuid>
@@ -901,7 +934,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
     /// <summary>
-    /// Returns a binary equivalent System.Guid of a UUID version 7
+    /// Returns a binary equivalent System.Guid of a UUID version 7.
     /// </summary>
     public static Guid NewGuid() {
         var bytes = new byte[16];
