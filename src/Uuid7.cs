@@ -901,7 +901,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
     /// <summary>
-    /// Returns new UUID version 4.
+    /// Returns a binary equivalent System.Guid of a UUID version 7
     /// </summary>
     public static Guid NewGuid() {
         var bytes = new byte[16];
