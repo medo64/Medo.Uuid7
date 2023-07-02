@@ -37,9 +37,9 @@
     <Authors>Josip Medved</Authors>
     <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
     <Company>www.medo64.com</Company>
-    <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4</PackageTags>
+    <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4,EFCore</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README-EFCore.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7.EntityFrameworkCore/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7.EntityFrameworkCore/</RepositoryUrl>
@@ -56,7 +56,7 @@
 
   <ItemGroup>
     <None Include="../ICON.png" Pack="true" PackagePath="" />
-    <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="../README-EFCore.md" Pack="true" PackagePath="" />
     <None Include="../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 

@@ -1,5 +1,5 @@
-Medo.Uuid7
-==========
+Medo.Uuid7.EntityFrameworkCore
+==============================
 
 The UUID7 library is an implementation of the UUID version 7 variant as defined
 in [the new UUID specification][rfc_4122bis], which introduces a time-ordered
@@ -24,9 +24,8 @@ Features:
   both single-threaded and multi-threaded scenarios under Windows and Linux.
 * Hardware acceleration for Equals method
 
-You can find packaged library at [NuGet][nuget_uuid7]. Also available is
-an [Entity Framework version][nuget_uuid7_efcore].
-
+You can find packaged library at [NuGet][nuget_uuid7_efcore]. Also available is
+[version without Entity Framework Core support][nuget_uuid7].
 
 ## Usage
 
