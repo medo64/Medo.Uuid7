@@ -1,0 +1,32 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7.EntityFrameworkCore", "Medo.Uuid7.EntityFrameworkCore.csproj", "{41630C83-6243-4B67-A858-54DD05A90F93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FAC17C16-E79C-447E-982E-647F536A88F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7.EntityFrameworkCore.Tests", "..\tests\Medo.Uuid7.EntityFrameworkCore.Tests.csproj", "{551AF4F0-4616-41CF-93F4-1DC5F639C4E7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{41630C83-6243-4B67-A858-54DD05A90F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41630C83-6243-4B67-A858-54DD05A90F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41630C83-6243-4B67-A858-54DD05A90F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41630C83-6243-4B67-A858-54DD05A90F93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{551AF4F0-4616-41CF-93F4-1DC5F639C4E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{551AF4F0-4616-41CF-93F4-1DC5F639C4E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{551AF4F0-4616-41CF-93F4-1DC5F639C4E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{551AF4F0-4616-41CF-93F4-1DC5F639C4E7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{551AF4F0-4616-41CF-93F4-1DC5F639C4E7} = {FAC17C16-E79C-447E-982E-647F536A88F4}
+	EndGlobalSection
+EndGlobal
