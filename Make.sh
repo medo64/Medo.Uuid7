@@ -112,6 +112,9 @@ function debug() {
 
     ATLEAST_ONE_COPY=0
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+        PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
@@ -142,6 +145,9 @@ function release() {
 
     ATLEAST_ONE_COPY=0
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+        PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
@@ -198,6 +204,9 @@ function package() {
     mkdir -p "$BASE_DIRECTORY/build/package/"
 
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+        PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
@@ -234,9 +243,11 @@ function nuget() {  # (api_key)
 
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         if [[ "$PACKAGE_VERSION" == "0.0.0" ]]; then
             echo "${ANSI_RED}No version in project file!${ANSI_RESET}" >&2
-            #return 1;
+            return 1;
         fi
     done
 
@@ -245,6 +256,7 @@ function nuget() {  # (api_key)
 
         PACKAGE_ID=`cat "$PROJECT_FILE" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
         dotnet nuget push "$BASE_DIRECTORY/dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" \
                           --source "https://api.nuget.org/v3/index.json" \
