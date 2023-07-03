@@ -54,9 +54,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../ICON.png" Pack="true" PackagePath="" />
-    <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+    <Compile Include="../Medo.Uuid7/Uuid7.cs">
+      <Link>Uuid7.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../ICON.png" Pack="true" PackagePath="" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

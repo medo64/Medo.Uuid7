@@ -55,9 +55,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../ICON.png" Pack="true" PackagePath="" />
-    <None Include="../README-EFCore.md" Pack="true" PackagePath="" />
-    <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+    <Compile Include="../Medo.Uuid7/Uuid7.cs">
+      <Link>Uuid7.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToBytesConverter.cs">
+      <Link>Uuid7ToBytesConverter.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToGuidConverter.cs">
+      <Link>Uuid7ToGuidConverter.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToId22Converter.cs">
+      <Link>Uuid7ToId22Converter.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToId25Converter.cs">
+      <Link>Uuid7ToId25Converter.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../ICON.png" Pack="true" PackagePath="" />
+    <None Include="../../README-EFCore.md" Pack="true" PackagePath="" />
+    <None Include="../../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">

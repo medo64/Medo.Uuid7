@@ -52,7 +52,7 @@ fi
 echo ".NET `dotnet --version`"
 
 FOUND_PROJECTS=0
-for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
     FOUND_PROJECTS=1
     break
 done
@@ -111,7 +111,7 @@ function debug() {
     mkdir -p "$BASE_DIRECTORY/bin/"
 
     ATLEAST_ONE_COPY=0
-    for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+    for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
@@ -120,18 +120,17 @@ function debug() {
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
 
-        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
+        rm -r $BASE_DIRECTORY/src/MultiFramework/bin 2>/dev/null
         dotnet build "$PROJECT_FILE" \
                     --configuration "Debug" \
                     --verbosity "minimal" \
                     || return 1
         for FRAMEWORK in $PACKAGE_FRAMEWORKS; do
-            cp -r "$BASE_DIRECTORY/src/bin/Debug/$FRAMEWORK/" "$BASE_DIRECTORY/bin/$BASE_NAME/" 2>/dev/null
-            if [[ $? -eq 0 ]]; then ATLEAST_ONE_COPY=1; fi
+            cp -r "$BASE_DIRECTORY/src/MultiFramework/bin/Debug/$FRAMEWORK/" "$BASE_DIRECTORY/bin/$BASE_NAME/" 2>/dev/null
+            if [[ $? -ne 0 ]]; then return 1; fi
         done
     done
 
-    if [[ "$ATLEAST_ONE_COPY" -eq 0 ]]; then return 1; fi
     echo
     echo "${ANSI_GREEN}Output in ${ANSI_CYAN}bin/${ANSI_RESET}"
 }
@@ -144,7 +143,7 @@ function release() {
     mkdir -p "$BASE_DIRECTORY/bin/"
 
     ATLEAST_ONE_COPY=0
-    for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+    for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
@@ -153,18 +152,17 @@ function release() {
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
 
-        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
+        rm -r $BASE_DIRECTORY/src/MultiFramework/bin 2>/dev/null
         dotnet build "$PROJECT_FILE" \
                     --configuration "Release" \
                     --verbosity "minimal" \
                     || return 1
         for FRAMEWORK in $PACKAGE_FRAMEWORKS; do
-            cp -r "$BASE_DIRECTORY/src/bin/Release/$FRAMEWORK/" "$BASE_DIRECTORY/bin/$BASE_NAME" 2>/dev/null
-            if [[ $? -eq 0 ]]; then ATLEAST_ONE_COPY=1; fi
+            cp -r "$BASE_DIRECTORY/src/MultiFramework/bin/Release/$FRAMEWORK/" "$BASE_DIRECTORY/bin/$BASE_NAME" 2>/dev/null
+            if [[ $? -ne 0 ]]; then return 1; fi
         done
     done
 
-    if [[ "$ATLEAST_ONE_COPY" -eq 0 ]]; then return 1; fi
     echo
     echo "${ANSI_GREEN}Output in ${ANSI_CYAN}bin/${ANSI_RESET}"
 }
@@ -172,7 +170,7 @@ function release() {
 function test() {
     echo
     FOUND_PROJECTS=0
-    for TEST_PROJECT_FILE in $(find $BASE_DIRECTORY/tests -name "*.csproj" | sort); do
+    for TEST_PROJECT_FILE in $(find $BASE_DIRECTORY/tests/MultiFramework -name "*.csproj" | sort); do
         FOUND_TEST_PROJECTS=1
         break
     done
@@ -182,7 +180,7 @@ function test() {
     fi
 
     mkdir -p "$BASE_DIRECTORY/build/test/"
-    for TEST_PROJECT_FILE in $(find $BASE_DIRECTORY/tests -name "*.csproj" | sort); do
+    for TEST_PROJECT_FILE in $(find $BASE_DIRECTORY/tests/MultiFramework -name "*.csproj" | sort); do
         echo ; echo "${ANSI_MAGENTA}$TEST_PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$TEST_PROJECT_FILE" | rev | cut -d. -f2- | rev)
@@ -203,7 +201,7 @@ function package() {
     echo
     mkdir -p "$BASE_DIRECTORY/build/package/"
 
-    for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+    for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
@@ -241,7 +239,7 @@ function nuget() {  # (api_key)
         return 1;
     fi
 
-    for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+    for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
@@ -251,7 +249,7 @@ function nuget() {  # (api_key)
         fi
     done
 
-    for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+    for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         PACKAGE_ID=`cat "$PROJECT_FILE" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`

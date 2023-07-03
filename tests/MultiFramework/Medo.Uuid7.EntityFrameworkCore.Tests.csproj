@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Medo.Uuid7.EntityFrameworkCore.Tests</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
+    <DefineConstants>EFCORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <NoWarn>CS0618,IDE0017,IDE0028,IDE0063,IDE0079</NoWarn>
+    <!-- CS0618: Member is obsolete -->
+    <!-- IDE0017: Use object initializers -->
+    <!-- IDE0028: Use collection initializers -->
+    <!-- IDE0063: Use simple 'using' statement -->
+    <!-- IDE0079: Remove unnecessary suppression -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.8" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore.Tests/Database.cs">
+      <Link>Database.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore.Tests/User.cs">
+      <Link>User.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.Tests/Uuid4.Tests.cs">
+      <Link>Uuid4.Tests.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore.Tests/Uuid7_EfCoreConverterTests.cs">
+      <Link>Uuid7_EfCoreConverterTests.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.Tests/Uuid7.Tests.cs">
+      <Link>Uuid7.Tests.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/MultiFramework/Medo.Uuid7.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>
