@@ -54,9 +54,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../Medo.Uuid7/Uuid7.cs">
-      <Link>Uuid7.cs</Link>
-    </Compile>
+    <Compile Include="../Medo.Uuid7/*.cs" />
   </ItemGroup>
 
   <ItemGroup>

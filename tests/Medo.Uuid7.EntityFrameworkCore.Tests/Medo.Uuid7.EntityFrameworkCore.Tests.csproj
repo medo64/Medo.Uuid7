@@ -36,12 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../Medo.Uuid7.Tests/Uuid4.Tests.cs">
-      <Link>Uuid4.Tests.cs</Link>
-    </Compile>
-    <Compile Include="../Medo.Uuid7.Tests/Uuid7.Tests.cs">
-      <Link>Uuid7.Tests.cs</Link>
-    </Compile>
+    <Compile Include="../Medo.Uuid7.Tests/*.cs" />
   </ItemGroup>
 
   <ItemGroup>
