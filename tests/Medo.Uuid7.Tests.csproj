@@ -5,12 +5,8 @@
     <RootNamespace>Tests</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(OS)' == 'Unix'">
-    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
