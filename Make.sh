@@ -109,7 +109,6 @@ function dist() {
 function debug() {
     echo
     mkdir -p "$BASE_DIRECTORY/bin/"
-    mkdir -p "$BASE_DIRECTORY/build/debug/"
 
     ATLEAST_ONE_COPY=0
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
@@ -117,8 +116,8 @@ function debug() {
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
-        mkdir -p "$BASE_DIRECTORY/build/debug/$BASE_NAME/"
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet build "$PROJECT_FILE" \
                     --configuration "Debug" \
                     --verbosity "minimal" \
@@ -140,7 +139,6 @@ function release() {
         echo "${ANSI_YELLOW}Uncommited changes present.${ANSI_RESET}" >&2
     fi
     mkdir -p "$BASE_DIRECTORY/bin/"
-    mkdir -p "$BASE_DIRECTORY/build/release/"
 
     ATLEAST_ONE_COPY=0
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
@@ -148,8 +146,8 @@ function release() {
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
-        mkdir -p "$BASE_DIRECTORY/build/debug/$BASE_NAME/"
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet build "$PROJECT_FILE" \
                     --configuration "Release" \
                     --verbosity "minimal" \
@@ -184,6 +182,7 @@ function test() {
         BASE_NAME=$(basename "$TEST_PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/build/test/$BASE_NAME/"
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet test "$TEST_PROJECT_FILE" \
                     --configuration "Debug" \
                     --verbosity "minimal" \
@@ -208,6 +207,7 @@ function package() {
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         PACKAGE_FRAMEWORKS=`cat "$PROJECT_FILE" | grep "<TargetFramework" | sed 's^</\?TargetFrameworks\?>^^g' | tr ';' ' ' | xargs`
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet pack "$PROJECT_FILE" \
                     --configuration "Release" \
                     --force \
