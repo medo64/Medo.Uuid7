@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Medo.Uuid7.Tests</AssemblyName>
+    <AssemblyName>Medo.Uuid7.EntityFrameworkCore.Tests</AssemblyName>
     <RootNamespace>Tests</RootNamespace>
+    <DefineConstants>EFCORE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -27,6 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
@@ -34,7 +36,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../src/Medo.Uuid7.csproj" />
+    <Compile Include="../Medo.Uuid7.Tests/Uuid4.Tests.cs">
+      <Link>Uuid4.Tests.cs</Link>
+    </Compile>
+    <Compile Include="../Medo.Uuid7.Tests/Uuid7.Tests.cs">
+      <Link>Uuid7.Tests.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Medo.Uuid7.EntityFrameworkCore/Medo.Uuid7.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

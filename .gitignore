@@ -8,5 +8,6 @@
 **/.idea/
 **/.vs/
 **/*.csproj.user
+**/*.DotSettings.user
 
 .nuget.key

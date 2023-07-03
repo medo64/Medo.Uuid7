@@ -32,6 +32,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="../Medo.Uuid7/Uuid7.cs">
+      <Link>Uuid7.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[7.0.0,)" />
   </ItemGroup>
 

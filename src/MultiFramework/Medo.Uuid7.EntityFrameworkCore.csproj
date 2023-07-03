@@ -55,19 +55,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="../Uuid7.cs">
+    <Compile Include="../Medo.Uuid7/Uuid7.cs">
       <Link>Uuid7.cs</Link>
     </Compile>
-    <Compile Include="../Uuid7ToBytesConverter.cs">
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToBytesConverter.cs">
       <Link>Uuid7ToBytesConverter.cs</Link>
     </Compile>
-    <Compile Include="../Uuid7ToGuidConverter.cs">
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToGuidConverter.cs">
       <Link>Uuid7ToGuidConverter.cs</Link>
     </Compile>
-    <Compile Include="../Uuid7ToId22Converter.cs">
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToId22Converter.cs">
       <Link>Uuid7ToId22Converter.cs</Link>
     </Compile>
-    <Compile Include="../Uuid7ToId25Converter.cs">
+    <Compile Include="../Medo.Uuid7.EntityFrameworkCore/Uuid7ToId25Converter.cs">
       <Link>Uuid7ToId25Converter.cs</Link>
     </Compile>
   </ItemGroup>
