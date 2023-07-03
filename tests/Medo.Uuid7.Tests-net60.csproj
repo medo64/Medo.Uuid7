@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Medo.Uuid7.Tests.net60</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <NoWarn>CS0618,IDE0017,IDE0028,IDE0063,IDE0079</NoWarn>
+    <!-- CS0618: Member is obsolete -->
+    <!-- IDE0017: Use object initializers -->
+    <!-- IDE0028: Use collection initializers -->
+    <!-- IDE0063: Use simple 'using' statement -->
+    <!-- IDE0079: Remove unnecessary suppression -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../src/Medo.Uuid7-net60.csproj" />
+  </ItemGroup>
+
+</Project>

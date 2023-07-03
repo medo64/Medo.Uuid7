@@ -5,6 +5,7 @@
 
 **/bin/
 **/obj/
+**/.idea/
 **/.vs/
 **/*.csproj.user
 
