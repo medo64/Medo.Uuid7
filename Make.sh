@@ -109,16 +109,18 @@ function dist() {
 function debug() {
     echo
     mkdir -p "$BASE_DIRECTORY/bin/"
-    mkdir -p "$BASE_DIRECTORY/build/debug/"
 
     ATLEAST_ONE_COPY=0
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+        PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
-        mkdir -p "$BASE_DIRECTORY/build/debug/$BASE_NAME/"
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet build "$PROJECT_FILE" \
                     --configuration "Debug" \
                     --verbosity "minimal" \
@@ -140,16 +142,18 @@ function release() {
         echo "${ANSI_YELLOW}Uncommited changes present.${ANSI_RESET}" >&2
     fi
     mkdir -p "$BASE_DIRECTORY/bin/"
-    mkdir -p "$BASE_DIRECTORY/build/release/"
 
     ATLEAST_ONE_COPY=0
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+        PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
-        mkdir -p "$BASE_DIRECTORY/build/debug/$BASE_NAME/"
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet build "$PROJECT_FILE" \
                     --configuration "Release" \
                     --verbosity "minimal" \
@@ -184,6 +188,7 @@ function test() {
         BASE_NAME=$(basename "$TEST_PROJECT_FILE" | rev | cut -d. -f2- | rev)
         mkdir -p "$BASE_DIRECTORY/build/test/$BASE_NAME/"
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet test "$TEST_PROJECT_FILE" \
                     --configuration "Debug" \
                     --verbosity "minimal" \
@@ -199,6 +204,9 @@ function package() {
     mkdir -p "$BASE_DIRECTORY/build/package/"
 
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
+        PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
         BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
@@ -208,6 +216,7 @@ function package() {
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         PACKAGE_FRAMEWORKS=`cat "$PROJECT_FILE" | grep "<TargetFramework" | sed 's^</\?TargetFrameworks\?>^^g' | tr ';' ' ' | xargs`
 
+        rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet pack "$PROJECT_FILE" \
                     --configuration "Release" \
                     --force \
@@ -234,9 +243,11 @@ function nuget() {  # (api_key)
 
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
+
         if [[ "$PACKAGE_VERSION" == "0.0.0" ]]; then
             echo "${ANSI_RED}No version in project file!${ANSI_RESET}" >&2
-            #return 1;
+            return 1;
         fi
     done
 
@@ -245,6 +256,7 @@ function nuget() {  # (api_key)
 
         PACKAGE_ID=`cat "$PROJECT_FILE" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
+        if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
         dotnet nuget push "$BASE_DIRECTORY/dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" \
                           --source "https://api.nuget.org/v3/index.json" \
