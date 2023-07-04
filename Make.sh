@@ -117,7 +117,7 @@ function debug() {
 
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
-        BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
+        BASE_NAME=$(basename "$PROJECT_FILE" | sed 's/.csproj$//')
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
 
         rm -r $BASE_DIRECTORY/src/MultiFramework/bin 2>/dev/null
@@ -149,7 +149,7 @@ function release() {
 
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
-        BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
+        BASE_NAME=$(basename "$PROJECT_FILE" | sed 's/.csproj$//')
         mkdir -p "$BASE_DIRECTORY/bin/$BASE_NAME/"
 
         rm -r $BASE_DIRECTORY/src/MultiFramework/bin 2>/dev/null
@@ -183,7 +183,7 @@ function test() {
     for TEST_PROJECT_FILE in $(find $BASE_DIRECTORY/tests/MultiFramework -name "*.csproj" | sort); do
         echo ; echo "${ANSI_MAGENTA}$TEST_PROJECT_FILE${ANSI_RESET}"
 
-        BASE_NAME=$(basename "$TEST_PROJECT_FILE" | rev | cut -d. -f2- | rev)
+        BASE_NAME=$(basename "$TEST_PROJECT_FILE" | sed 's/.csproj$//')
         mkdir -p "$BASE_DIRECTORY/build/test/$BASE_NAME/"
 
         rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
@@ -207,7 +207,7 @@ function package() {
 
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
-        BASE_NAME=$(basename "$PROJECT_FILE" | rev | cut -d. -f2- | rev)
+        BASE_NAME=$(basename "$PROJECT_FILE" | sed 's/.csproj$//')
         mkdir -p "$BASE_DIRECTORY/build/package/$BASE_NAME"
 
         PACKAGE_ID=`cat "$PROJECT_FILE" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`
