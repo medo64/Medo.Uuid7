@@ -17,7 +17,7 @@ public class Database : DbContext {
         modelBuilder.Entity<User>().Property(x => x.AsBytes).HasConversion<Uuid7ToBytesConverter>();
         modelBuilder.Entity<User>().Property(x => x.AsIdTwentyFive).HasConversion<Uuid7ToId25Converter>();
         modelBuilder.Entity<User>().Property(x => x.AsIdTwentyTwo).HasConversion<Uuid7ToId22Converter>();
-        modelBuilder.Entity<User>().Property(x => x.AsString).HasConversion<Uuid7ToId25Converter>();
+        modelBuilder.Entity<User>().Property(x => x.AsString).HasConversion<Uuid7ToStringConverter>();
         base.OnModelCreating(modelBuilder);
     }
 }
