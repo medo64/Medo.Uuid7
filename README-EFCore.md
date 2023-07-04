@@ -35,7 +35,7 @@ To generate a new database-friendly UUID v7, simply call `NewUuid7` method:
 using System;
 using Medo;
 
-var uuid = Uuid7.NewUuid7();  // or 'new Uuid7()' or 'new Guid()'
+var uuid = Uuid7.NewUuid7();  // or 'new Uuid7()' or 'Uuid7.NewGuid()'
 Console.WriteLine($"UUID : {uuid}");
 ```
 
