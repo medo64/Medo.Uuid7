@@ -21,7 +21,7 @@ public static class TestMultiThread {
                 int count = 0;
                 var threadSw = Stopwatch.StartNew();
                 while (threadSw.ElapsedMilliseconds < 5000) {
-                    _ = Uuid7.NewUuid7();
+                    _ = new Uuid7();  // only new Uuid7() offers per-thread counters
                     count++;
                 }
                 threadSw.Stop();

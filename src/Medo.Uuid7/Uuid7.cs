@@ -53,7 +53,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public Uuid7() {
         Bytes = new byte[16];
-        FillBytes7(ref Bytes);
+        FillBytes7(ref Bytes, ref PerThreadLastMillisecond, ref PerThreadMillisecondCounter, ref PerThreadMonotonicCounter);
     }
 
     /// <summary>
@@ -114,15 +114,15 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 #else
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-    private static void FillBytes7(ref byte[] bytes) {
+    private static void FillBytes7(ref byte[] bytes, ref long lastMillisecond, ref long millisecondCounter, ref uint monotonicCounter) {
         DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
         var millisecond = unchecked(ticks / TicksPerMillisecond);
-        var msCounter = MillisecondCounter;
+        var msCounter = millisecondCounter;
 
-        var newStep = (millisecond != LastMillisecond);
+        var newStep = (millisecond != lastMillisecond);
         if (newStep) {  // we need to switch millisecond (i.e. counter)
-            LastMillisecond = millisecond;
+            lastMillisecond = millisecond;
             long ms;
             ms = unchecked(millisecond - UnixEpochMilliseconds);
             if (msCounter < ms) {  // normal time progression
@@ -130,7 +130,7 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             } else {  // time went backward, just increase counter
                 unchecked { msCounter++; }
             }
-            MillisecondCounter = msCounter;
+            millisecondCounter = msCounter;
         }
 
         // Timestamp
@@ -148,11 +148,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
             monoCounter = (uint)(((bytes[6] & 0x07) << 22) | (bytes[7] << 14) | ((bytes[8] & 0x3F) << 8) | bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
             GetRandomBytes(ref bytes, 9, 7);
-            monoCounter = unchecked(MonotonicCounter + ((uint)bytes[9] >> 4) + 1);  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            monoCounter = unchecked(monotonicCounter + ((uint)bytes[9] >> 4) + 1);  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
             bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
             bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
         }
-        MonotonicCounter = monoCounter;
+        monotonicCounter = monoCounter;
 
         //Fixup
         bytes[6] = (byte)(0x70 | ((monoCounter >> 22) & 0x0F));  // set 4-bit version + bits 22:25 of monotonics counter
@@ -161,13 +161,19 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
 
 
     [ThreadStatic]
-    private static long LastMillisecond;  // real time in milliseconds since 0001-01-01
+    private static long PerThreadLastMillisecond;  // real time in milliseconds since 0001-01-01
 
     [ThreadStatic]
-    private static long MillisecondCounter;  // usually real time but doesn't go backward
+    private static long PerThreadMillisecondCounter;  // usually real time but doesn't go backward
 
     [ThreadStatic]
-    private static uint MonotonicCounter;  // counter that gets embedded into UUID
+    private static uint PerThreadMonotonicCounter;  // counter that gets embedded into UUID
+
+    private static readonly object NonThreadedSyncRoot = new();
+    private static long NonThreadedLastMillisecond;  // real time in milliseconds since 0001-01-01
+    private static long NonThreadedMillisecondCounter;  // usually real time but doesn't go backward
+    private static uint NonThreadedMonotonicCounter;  // counter that gets embedded into UUID
+
 
     #endregion Implemenation (v7)
 
@@ -942,7 +948,11 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// Returns new UUID version 7.
     /// </summary>
     public static Uuid7 NewUuid7() {
-        return new Uuid7();
+        var bytes = new byte[16];
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+        }
+        return new Uuid7(ref bytes);
     }
 
     /// <summary>
@@ -959,7 +969,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public static Guid NewGuid() {
         var bytes = new byte[16];
-        FillBytes7(ref bytes);
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+        }
         return new Guid(bytes);
     }
 
@@ -972,7 +984,9 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// </summary>
     public static Guid NewGuidMsSql() {
         var bytes = new byte[16];
-        FillBytes7(ref bytes);
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+        }
         if (BitConverter.IsLittleEndian) {
             (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
             (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
