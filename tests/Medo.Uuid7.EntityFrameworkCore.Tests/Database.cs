@@ -8,7 +8,7 @@ public class Database : DbContext {
     public DbSet<User> UuidSevens { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        optionsBuilder.UseSqlite($"DataSource={Guid.NewGuid()}");
+        optionsBuilder.UseSqlite($"DataSource={Guid.NewGuid()}.db");
         base.OnConfiguring(optionsBuilder);
     }
 
