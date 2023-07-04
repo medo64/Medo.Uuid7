@@ -1,4 +1,3 @@
-#if EFCORE
 namespace Medo;
 using System;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -12,4 +11,3 @@ public class Uuid7ToGuidConverter  : ValueConverter<Uuid7, Guid>
     {
     }
 }
-#endif

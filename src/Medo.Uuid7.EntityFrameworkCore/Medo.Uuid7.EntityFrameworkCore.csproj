@@ -3,7 +3,6 @@
   <PropertyGroup>
     <AssemblyName>Medo.Uuid7.EntityFrameworkCore</AssemblyName>
     <RootNamespace>Medo</RootNamespace>
-    <DefineConstants>EFCORE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
