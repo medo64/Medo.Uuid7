@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0] - 2023-07-02
+
+- Added Entity Framework Core version (separate NuGet package)
+- Added NewGuid() method
+- Added MS SQL Guid format support (NewGuidMsSql and ToGuidMsSql)
+- Added implicit conversion from and to Guid
+
+
 ## [1.5.0] - 2023-06-29
 
 - Added TryWriteBytes method
@@ -81,6 +89,7 @@
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[1.6.0]: https://www.nuget.org/packages/Medo.Uuid7/1.6.0
 [1.5.0]: https://www.nuget.org/packages/Medo.Uuid7/1.5.0
 [1.4.0]: https://www.nuget.org/packages/Medo.Uuid7/1.4.0
 [1.3.5]: https://www.nuget.org/packages/Uuid7/1.3.5
