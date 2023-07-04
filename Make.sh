@@ -227,7 +227,7 @@ function package() {
         cp "$BASE_DIRECTORY/build/package/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" "$BASE_DIRECTORY/dist/$BASE_NAME/" || return 1
         cp "$BASE_DIRECTORY/build/package/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.snupkg" "$BASE_DIRECTORY/dist/$BASE_NAME/" || return 1
         echo
-        echo "${ANSI_GREEN}Output at ${ANSI_CYAN}dist/$BASE_NAME/$PACKAGE_ID-$PACKAGE_VERSION.nupkg${ANSI_RESET}"
+        echo "${ANSI_GREEN}Output at ${ANSI_CYAN}dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg${ANSI_RESET}"
     done
     return 0
 }
@@ -252,16 +252,18 @@ function nuget() {  # (api_key)
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         echo ; echo "${ANSI_MAGENTA}$PROJECT_FILE${ANSI_RESET}"
 
+        BASE_NAME=$(basename "$PROJECT_FILE" | sed 's/.csproj$//')
         PACKAGE_ID=`cat "$PROJECT_FILE" | grep "<PackageId>" | sed 's^</\?PackageId>^^g' | xargs`
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
 
-        dotnet nuget push "$BASE_DIRECTORY/dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" \
+        echo "${ANSI_MAGENTA}$BASE_DIRECTORY/dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg${ANSI_RESET}"
+        dotnet nuget push "./dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" \
                           --source "https://api.nuget.org/v3/index.json" \
                           --api-key "$API_KEY" \
                           --symbol-api-key "$API_KEY" \
                           || return 1
-        echo "${ANSI_GREEN}Sent ${ANSI_CYAN}dist/$BASE_NAME/$PACKAGE_ID-$PACKAGE_VERSION.nupkg${ANSI_RESET}"
+        echo "${ANSI_GREEN}Sent ${ANSI_CYAN}dist/$BASE_NAME/$PACKAGE_ID.$PACKAGE_VERSION.nupkg${ANSI_RESET}"
     done
     return 0
 }
