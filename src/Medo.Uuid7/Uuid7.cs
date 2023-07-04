@@ -107,6 +107,93 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     private readonly byte[] Bytes;
 
 
+    #region Static
+
+    /// <summary>
+    /// A read-only instance of the Guid structure whose value is all zeros.
+    /// Please note this is not a valid UUID7 as it lacks its version bits.
+    /// </summary>
+    public static readonly Uuid7 Empty = new(new byte[16]);
+
+    /// <summary>
+    /// A read-only instance of the Guid structure whose value is all 1's.
+    /// Please note this is not a valid UUID7 as it lacks its version bits.
+    /// </summary>
+    public static readonly Uuid7 Max = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
+
+
+    /// <summary>
+    /// Returns new UUID version 7.
+    /// </summary>
+    public static Uuid7 NewUuid7() {
+        var bytes = new byte[16];
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+        }
+        return new Uuid7(ref bytes);
+    }
+
+    /// <summary>
+    /// Returns new UUID version 4.
+    /// </summary>
+    public static Uuid7 NewUuid4() {
+        var bytes = new byte[16];
+        FillBytes4(ref bytes);
+        return new Uuid7(ref bytes);
+    }
+
+    /// <summary>
+    /// Returns a binary equivalent System.Guid of a UUID version 7.
+    /// </summary>
+    public static Guid NewGuid() {
+        var bytes = new byte[16];
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+        }
+        return new Guid(bytes);
+    }
+
+    /// <summary>
+    /// Returns an equivalent System.Guid of a UUID version 7 suitable for
+    /// insertion into Microsoft SQL database.
+    /// On LE platforms this will have the first 8 bytes in a different order.
+    /// This should be used only when using MS SQL Server and not any other. If
+    /// you are using Uuid7 in mixed database environment, use ToGuid() instead.
+    /// </summary>
+    public static Guid NewGuidMsSql() {
+        var bytes = new byte[16];
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+        }
+        if (BitConverter.IsLittleEndian) {
+            (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
+            (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
+            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
+            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
+            return new Guid(bytes);
+        } else {  // on big endian platforms, it's all the same
+            return new Guid(bytes);
+        }
+    }
+
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Fills a span with UUIDs.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+    public static void Fill(Span<Uuid7> data) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+        for (var i = 0; i < data.Length; i++) {
+            data[i] = NewUuid7();
+        }
+    }
+#endif
+
+    #endregion Static
+
+
     #region Implemenation (v7)
 
 #if NET6_0_OR_GREATER
@@ -927,93 +1014,6 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
     #endregion IEquatable<Guid>
-
-
-    #region Static
-
-    /// <summary>
-    /// A read-only instance of the Guid structure whose value is all zeros.
-    /// Please note this is not a valid UUID7 as it lacks its version bits.
-    /// </summary>
-    public static readonly Uuid7 Empty = new(new byte[16]);
-
-    /// <summary>
-    /// A read-only instance of the Guid structure whose value is all 1's.
-    /// Please note this is not a valid UUID7 as it lacks its version bits.
-    /// </summary>
-    public static readonly Uuid7 Max = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
-
-
-    /// <summary>
-    /// Returns new UUID version 7.
-    /// </summary>
-    public static Uuid7 NewUuid7() {
-        var bytes = new byte[16];
-        lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
-        }
-        return new Uuid7(ref bytes);
-    }
-
-    /// <summary>
-    /// Returns new UUID version 4.
-    /// </summary>
-    public static Uuid7 NewUuid4() {
-        var bytes = new byte[16];
-        FillBytes4(ref bytes);
-        return new Uuid7(ref bytes);
-    }
-
-    /// <summary>
-    /// Returns a binary equivalent System.Guid of a UUID version 7.
-    /// </summary>
-    public static Guid NewGuid() {
-        var bytes = new byte[16];
-        lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
-        }
-        return new Guid(bytes);
-    }
-
-    /// <summary>
-    /// Returns an equivalent System.Guid of a UUID version 7 suitable for
-    /// insertion into Microsoft SQL database.
-    /// On LE platforms this will have the first 8 bytes in a different order.
-    /// This should be used only when using MS SQL Server and not any other. If
-    /// you are using Uuid7 in mixed database environment, use ToGuid() instead.
-    /// </summary>
-    public static Guid NewGuidMsSql() {
-        var bytes = new byte[16];
-        lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
-        }
-        if (BitConverter.IsLittleEndian) {
-            (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
-            (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
-            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
-            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
-            return new Guid(bytes);
-        } else {  // on big endian platforms, it's all the same
-            return new Guid(bytes);
-        }
-    }
-
-
-#if NET6_0_OR_GREATER
-    /// <summary>
-    /// Fills a span with UUIDs.
-    /// </summary>
-    /// <param name="data">The span to fill.</param>
-    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
-    public static void Fill(Span<Uuid7> data) {
-        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
-        for (var i = 0; i < data.Length; i++) {
-            data[i] = NewUuid7();
-        }
-    }
-#endif
-
-    #endregion Static
 
 
     #region Helpers
