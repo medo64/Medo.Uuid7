@@ -8,6 +8,8 @@ characteristics compared to versions 1 or 6 of the UUID standard. The inherent
 monotonicity of UUID version 7 makes it an excellent choice for utilization as a
 binary database key.
 
+If you don't need Entity Framework support, you can use [Medo.Uuid7][nuget_uuid7].
+
 Features:
 * Time-ordered value field: UUID7 utilizes the widely implemented Unix Epoch
   timestamp source to generate a time-ordered value field. This enables easy
@@ -25,8 +27,8 @@ Features:
 * Hardware acceleration: Vector128 support for Equals method.
 * Microsoft SQL Server support: Separate methods for "LE" Guid creation.
 
-You can find packaged library at [NuGet][nuget_uuid7_efcore]. Also available is
-[version without Entity Framework Core support][nuget_uuid7].
+You can find packaged library at [NuGet][nuget_uuid7_efcore].
+
 
 ## Usage
 
