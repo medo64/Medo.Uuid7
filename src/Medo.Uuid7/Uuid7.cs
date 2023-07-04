@@ -201,8 +201,12 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
     public static void Fill(Span<Uuid7> data) {
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
-        for (var i = 0; i < data.Length; i++) {
-            data[i] = NewUuid7();
+        lock (NonThreadedSyncRoot) {
+            for (var i = 0; i < data.Length; i++) {
+                var bytes = new byte[16];
+                FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+                data[i] = new Uuid7(ref bytes);
+            }
         }
     }
 #endif
