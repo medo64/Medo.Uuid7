@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.1] - 2023-07-04
+
+- Static methods use locks to allow for sequencing even when called from
+  different threads (e.g. usage with async)
+
+
 ## [1.6.0] - 2023-07-02
 
 - Added Entity Framework Core version (separate NuGet package)
@@ -89,6 +95,7 @@
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[1.6.1]: https://www.nuget.org/packages/Medo.Uuid7/1.6.1
 [1.6.0]: https://www.nuget.org/packages/Medo.Uuid7/1.6.0
 [1.5.0]: https://www.nuget.org/packages/Medo.Uuid7/1.5.0
 [1.4.0]: https://www.nuget.org/packages/Medo.Uuid7/1.4.0
