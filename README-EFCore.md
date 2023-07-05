@@ -37,7 +37,7 @@ To generate a new database-friendly UUID v7, simply call `NewUuid7` method:
 using System;
 using Medo;
 
-var uuid = Uuid7.NewUuid7();  // or 'new Uuid7()' or 'Uuid7.NewGuid()'
+var uuid = Uuid7.NewUuid7();  // or 'Uuid7.NewGuid()'
 Console.WriteLine($"UUID : {uuid}");
 ```
 
@@ -47,6 +47,16 @@ using System;
 using Medo;
 
 var uuid = Uuid7.NewUuid4();
+Console.WriteLine($"UUID : {uuid}");
+```
+
+If higher performance is needed and per-thread seqencing is sufficient, you
+can instantiate UUID directly:
+```csharp
+using System;
+using Medo;
+
+var uuid = new Uuid7();
 Console.WriteLine($"UUID : {uuid}");
 ```
 
