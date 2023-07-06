@@ -415,6 +415,8 @@ public class Uuid7_Tests {
         Assert.AreEqual("(00010203-3435-7677-b8b9-fafbfcfdfeff)", uuid.ToString("p"));
         Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", uuid.ToString("X"));
         Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", uuid.ToString("x"));
+        Assert.AreEqual("112drYSDr45nCJ6chixdxJ", uuid.ToString("2"));
+        Assert.AreEqual("000jnpiacvek52kvka6to5ogn", uuid.ToString("5"));
         Assert.ThrowsException<FormatException>(() => {
             uuid.ToString("y");
         });
@@ -436,8 +438,8 @@ public class Uuid7_Tests {
         Assert.AreEqual("(00010203-3435-7677-b8b9-fafbfcfdfeff)", $"{uuid:p}");
         Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", $"{uuid:X}");
         Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", $"{uuid:x}");
-        Assert.AreEqual("112drYSDr45nCJ6chixdxJ", "{uuid:2}");
-        Assert.AreEqual("000jnpiacvek52kvka6to5ogn", "{uuid:5}");
+        Assert.AreEqual("112drYSDr45nCJ6chixdxJ", $"{uuid:2}");
+        Assert.AreEqual("000jnpiacvek52kvka6to5ogn", $"{uuid:5}");
         Assert.ThrowsException<FormatException>(() => {
             _ = $"{uuid:y}";
         });

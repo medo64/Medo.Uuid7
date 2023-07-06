@@ -382,20 +382,7 @@ public readonly struct Uuid7
     /// using the same alphabet as bitcoin does.
     /// </summary>
     public string ToId22String() {
-#if NET6_0_OR_GREATER
-        var number = new BigInteger(Bytes, isUnsigned: true, isBigEndian: true);
-#else
-        var bytes = new byte[17];
-        Buffer.BlockCopy(Bytes, 0, bytes, 1, 16);
-        if (BitConverter.IsLittleEndian) { Array.Reverse(bytes); }
-        var number = new BigInteger(bytes);
-#endif
-        var result = new char[22];  // always the same length
-        for (var i = 21; i >= 0; i--) {
-            number = BigInteger.DivRem(number, Base58Modulo, out var remainder);
-            result[i] = Base58Alphabet[(int)remainder];
-        }
-        return new string(result);
+        return ToString(format: "2", formatProvider: null);
     }
 
     /// <summary>
@@ -471,20 +458,7 @@ public readonly struct Uuid7
     /// compatible and thus not necessarily interchangeable.
     /// </summary>
     public string ToId25String() {
-#if NET6_0_OR_GREATER
-        var number = new BigInteger(Bytes, isUnsigned: true, isBigEndian: true);
-#else
-        var bytes = new byte[17];
-        Buffer.BlockCopy(Bytes, 0, bytes, 1, 16);
-        if (BitConverter.IsLittleEndian) { Array.Reverse(bytes); }
-        var number = new BigInteger(bytes);
-#endif
-        var result = new char[25];  // always the same length
-        for (var i = 24; i >= 0; i--) {
-            number = BigInteger.DivRem(number, Base35Modulo, out var remainder);
-            result[i] = Base35Alphabet[(int)remainder];
-        }
-        return new string(result);
+        return ToString(format: "5", formatProvider: null);
     }
 
     /// <summary>
@@ -971,6 +945,16 @@ public readonly struct Uuid7
                     TryWriteAsHexadecimalString(destination, Bytes, out _);
                     return new string(destination);
                 }
+            case "2": {  // non-standard (Id22)
+                    var destination = new char[22];
+                    TryWriteAsId22(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "5": {  // non-standard (Id25)
+                    var destination = new char[25];
+                    TryWriteAsId25(destination, Bytes, out _);
+                    return new string(destination);
+                }
             default: throw new FormatException("Invalid UUID format.");
         }
     }
@@ -999,6 +983,8 @@ public readonly struct Uuid7
             'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
             'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
             'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
+            '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
+            '5' => TryWriteAsId25(destination, Bytes, out charsWritten),
             _ => throw new FormatException("Invalid UUID format."),
         };
     }
@@ -1021,6 +1007,8 @@ public readonly struct Uuid7
             'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
             'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
             'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
+            '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
+            '5' => TryWriteAsId25(destination, Bytes, out charsWritten),
             _ => throw new FormatException("Invalid UUID format."),
         };
     }
@@ -1215,6 +1203,54 @@ public readonly struct Uuid7
         }
 
         charsWritten = 68;
+        return true;
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsId22(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsId22(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 22) { charsWritten = 0; return false; }
+
+#if NET6_0_OR_GREATER
+        var number = new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
+#else
+        var bytesEx = new byte[17];
+        Buffer.BlockCopy(bytes, 0, bytesEx, 1, 16);
+        if (BitConverter.IsLittleEndian) { Array.Reverse(bytesEx); }
+        var number = new BigInteger(bytesEx);
+#endif
+        for (var i = 21; i >= 0; i--) {
+            number = BigInteger.DivRem(number, Base58Modulo, out var remainder);
+            destination[i] = Base58Alphabet[(int)remainder];
+        }
+
+        charsWritten = 22;
+        return true;
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsId25(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsId25(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 25) { charsWritten = 0; return false; }
+
+#if NET6_0_OR_GREATER
+        var number = new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
+#else
+        var bytesEx = new byte[17];
+        Buffer.BlockCopy(bytes, 0, bytesEx, 1, 16);
+        if (BitConverter.IsLittleEndian) { Array.Reverse(bytesEx); }
+        var number = new BigInteger(bytesEx);
+#endif
+        for (var i = 24; i >= 0; i--) {
+            number = BigInteger.DivRem(number, Base35Modulo, out var remainder);
+            destination[i] = Base35Alphabet[(int)remainder];
+        }
+
+        charsWritten = 25;
         return true;
     }
 
