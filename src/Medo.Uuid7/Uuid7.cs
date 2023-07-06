@@ -1,24 +1,5 @@
 /* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
-//2023-06-29: Added TryWriteBytes method
-//            Updated GetHashCode method
-//            HW acceleration for Equals method
-//2023-06-14: Added buffer for random bytes
-//2023-06-07: Minor optimizations
-//            Added NewUuid4() method
-//2023-05-17: Support for .NET Standard 2.0
-//            ToString() performance improvements
-//2023-05-16: Performance improvements
-//2023-04-12: Timestamps are monotonically increasing even if time goes backward
-//2023-01-14: Using random monotonic counter increment
-//2023-01-12: Expanded monotonic counter from 18 to 26 bits
-//            Added ToId22String and FromId22String methods
-//            Moved to semi-random increment within the same millisecond
-//2023-01-11: Expanded monotonic counter from 12 to 18 bits
-//            Added ToId25String and FromId25String methods
-//            Added FromString method
-//2022-12-31: Initial version
-
 namespace Medo;
 
 using System;
