@@ -420,6 +420,29 @@ public class Uuid7_Tests {
         });
     }
 
+    [TestMethod]
+    public void Uuid7_ISpanFormattable() {
+        var bytes = new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 };
+        var uuid = new Uuid7(bytes);
+
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", $"{uuid}");
+        Assert.AreEqual("0001020334357677b8b9fafbfcfdfeff", $"{uuid:N}");
+        Assert.AreEqual("0001020334357677b8b9fafbfcfdfeff", $"{uuid:n}");
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", $"{uuid:D}");
+        Assert.AreEqual("00010203-3435-7677-b8b9-fafbfcfdfeff", $"{uuid:d}");
+        Assert.AreEqual("{00010203-3435-7677-b8b9-fafbfcfdfeff}", $"{uuid:B}");
+        Assert.AreEqual("{00010203-3435-7677-b8b9-fafbfcfdfeff}", $"{uuid:b}");
+        Assert.AreEqual("(00010203-3435-7677-b8b9-fafbfcfdfeff)", $"{uuid:P}");
+        Assert.AreEqual("(00010203-3435-7677-b8b9-fafbfcfdfeff)", $"{uuid:p}");
+        Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", $"{uuid:X}");
+        Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", $"{uuid:x}");
+        Assert.AreEqual("112drYSDr45nCJ6chixdxJ", "{uuid:2}");
+        Assert.AreEqual("000jnpiacvek52kvka6to5ogn", "{uuid:5}");
+        Assert.ThrowsException<FormatException>(() => {
+            _ = $"{uuid:y}";
+        });
+    }
+
     [DataTestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "1111111111111111111111")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "1111111111111111111112")]
