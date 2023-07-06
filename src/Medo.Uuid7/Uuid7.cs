@@ -641,7 +641,7 @@ public readonly struct Uuid7 : IComparable<Guid>,
     /// Returns a string that represents the current object.
     /// </summary>
     public override string ToString() {
-        return ToDefaultString(Bytes);
+        return ToString(format: null, formatProvider: null);
     }
 
     #endregion Overrides
@@ -671,20 +671,41 @@ public readonly struct Uuid7 : IComparable<Guid>,
 #else
     public string ToString(string? format, IFormatProvider? formatProvider) {  // formatProvider is ignored
 #endif
-        return format switch {  // treat uppercase and lowercase the same (compatibility with Guid ToFormat)
-            "D" or "d" or "" or null => ToDefaultString(Bytes),
-            "N" or "n" => ToNoHypensString(Bytes),
-            "B" or "b" => ToBracesString(Bytes),
-            "P" or "p" => ToParenthesesString(Bytes),
-            "X" or "x" => ToHexadecimalString(Bytes),
-            _ => throw new FormatException("Invalid UUID format."),
-        };
-    }
-
-    private static string ToDefaultString(byte[] bytes) {
-        var destination = new char[36];
-        TryWriteAsDefaultString(destination, bytes, out _);
-        return new string(destination);
+        switch (format) {  // treat uppercase and lowercase the same (compatibility with Guid ToFormat)
+            case null:
+            case "":
+            case "D":
+            case "d": {
+                    var destination = new char[36];
+                    TryWriteAsDefaultString(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "N":
+            case "n": {
+                    var destination = new char[32];
+                    TryWriteAsNoHypensString(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "B":
+            case "b": {
+                    var destination = new char[38];
+                    TryWriteAsBracesString(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "P":
+            case "p": {
+                    var destination = new char[38];
+                    TryWriteAsParenthesesString(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "X":
+            case "x": {
+                    var destination = new char[68];
+                    TryWriteAsHexadecimalString(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            default: throw new FormatException("Invalid UUID format.");
+        }
     }
 
 #if NET6_0_OR_GREATER
@@ -710,12 +731,6 @@ public readonly struct Uuid7 : IComparable<Guid>,
         return true;
     }
 
-    private static string ToNoHypensString(byte[] bytes) {
-        var destination = new char[32];
-        TryWriteAsNoHypensString(destination, bytes, out _);
-        return new string(destination);
-    }
-
 #if NET6_0_OR_GREATER
     private static bool TryWriteAsNoHypensString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
@@ -732,12 +747,6 @@ public readonly struct Uuid7 : IComparable<Guid>,
 
         charsWritten = 32;
         return true;
-    }
-
-    private static string ToBracesString(byte[] bytes) {
-        var destination = new char[38];
-        TryWriteAsBracesString(destination, bytes, out _);
-        return new string(destination);
     }
 
 #if NET6_0_OR_GREATER
@@ -765,12 +774,6 @@ public readonly struct Uuid7 : IComparable<Guid>,
         return true;
     }
 
-    private static string ToParenthesesString(byte[] bytes) {
-        var destination = new char[38];
-        TryWriteAsParenthesesString(destination, bytes, out _);
-        return new string(destination);
-    }
-
 #if NET6_0_OR_GREATER
     private static bool TryWriteAsParenthesesString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
@@ -794,12 +797,6 @@ public readonly struct Uuid7 : IComparable<Guid>,
 
         charsWritten = 38;
         return true;
-    }
-
-    private static string ToHexadecimalString(byte[] bytes) {
-        var destination = new char[68];
-        TryWriteAsHexadecimalString(destination, bytes, out _);
-        return new string(destination);
     }
 
 #if NET6_0_OR_GREATER
