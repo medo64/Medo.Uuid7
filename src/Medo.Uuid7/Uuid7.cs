@@ -222,7 +222,6 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
     private static void FillBytes7(ref byte[] bytes, ref long lastMillisecond, ref long millisecondCounter, ref uint monotonicCounter) {
-        DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
         var millisecond = unchecked(ticks / TicksPerMillisecond);
         var msCounter = millisecondCounter;
