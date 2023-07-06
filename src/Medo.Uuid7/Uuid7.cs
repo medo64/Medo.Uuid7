@@ -334,14 +334,9 @@ public readonly struct Uuid7
             Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
             return copy;
         } else {  // little endian pretends the first 8 bytes are int, short, short
-            copy[0] = Bytes[3];
-            copy[1] = Bytes[2];
-            copy[2] = Bytes[1];
-            copy[3] = Bytes[0];
-            copy[4] = Bytes[5];
-            copy[5] = Bytes[4];
-            copy[6] = Bytes[7];
-            copy[7] = Bytes[6];
+            (copy[0], copy[1], copy[2], copy[3]) = (Bytes[3], Bytes[2], Bytes[1], Bytes[0]);
+            (copy[4], copy[5]) = (Bytes[5], Bytes[4]);
+            (copy[6], copy[7]) = (Bytes[7], Bytes[6]);
             Buffer.BlockCopy(Bytes, 8, copy, 8, 8);
             return copy;
         }
