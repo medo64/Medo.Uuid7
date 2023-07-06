@@ -111,6 +111,12 @@ public readonly struct Uuid7
     public static readonly Uuid7 Empty = new(new byte[16]);
 
     /// <summary>
+    /// A read-only instance of the Guid structure whose value is all zeros.
+    /// Please note this is not a valid UUID7 as it lacks the correct version bits.
+    /// </summary>
+    public static readonly Uuid7 MinValue = new(new byte[16]);
+
+    /// <summary>
     /// A read-only instance of the Guid structure whose value is all ones.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>

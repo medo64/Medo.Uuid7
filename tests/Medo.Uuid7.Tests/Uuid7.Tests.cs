@@ -629,6 +629,14 @@ public class Uuid7_Tests {
     }
 
 
+    [TestMethod]
+    public void Uuid7_MinMax() {
+        Assert.AreEqual("00000000-0000-0000-0000-000000000000", Uuid7.Empty.ToString());
+        Assert.AreEqual("00000000-0000-0000-0000-000000000000", Uuid7.MinValue.ToString());
+        Assert.AreEqual("ffffffff-ffff-ffff-ffff-ffffffffffff", Uuid7.MaxValue.ToString());
+        Assert.AreEqual(Uuid7.Empty, Uuid7.MinValue);
+    }
+
     #region Helpers
 
 #if NET6_0_OR_GREATER
