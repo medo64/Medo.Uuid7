@@ -581,6 +581,29 @@ public class Uuid7_Tests {
     }
 
 
+    [TestMethod]
+    public void Uuid7_ToByteArray() {
+        var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuid = new Uuid7(uuidBytes);
+        Assert.IsTrue(CompareArrays(uuidBytes, uuid.ToByteArray()));
+    }
+
+    [TestMethod]
+    public void Uuid7_ToByteArray_BE() {
+        var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuid = new Uuid7(uuidBytes);
+        Assert.IsTrue(CompareArrays(uuidBytes, uuid.ToByteArray(bigEndian: true)));
+    }
+
+    [TestMethod]
+    public void Uuid7_ToByteArray_LE() {
+        var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuidBytesLE = new byte[] { 4, 3, 2, 1, 6, 5, 8, 7, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var uuid = new Uuid7(uuidBytes);
+        Assert.IsTrue(CompareArrays(uuidBytesLE, uuid.ToByteArray(bigEndian: false)));
+    }
+
+
     #region Helpers
 
 #if NET6_0_OR_GREATER

@@ -315,6 +315,32 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
         return copy;
     }
 
+    /// <summary>
+    /// Returns an array that contains UUID bytes.
+    /// Enginaness of bytes refers to the first 8 bytes and their handling in
+    /// Guid structure.
+    /// </summary>
+    /// <param name="bigEndian">If true, bytes will be in big-endian (natural) order.</param>
+    public byte[] ToByteArray(bool bigEndian) {
+        var copy = new byte[16];
+        if (bigEndian) {
+            Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
+            return copy;
+        } else {  // little endian pretends the first 8 bytes are int, short, short
+            copy[0] = Bytes[3];
+            copy[1] = Bytes[2];
+            copy[2] = Bytes[1];
+            copy[3] = Bytes[0];
+            copy[4] = Bytes[5];
+            copy[5] = Bytes[4];
+            copy[6] = Bytes[7];
+            copy[7] = Bytes[6];
+            Buffer.BlockCopy(Bytes, 8, copy, 8, 8);
+            return copy;
+        }
+    }
+
+
 
     #region TryWriteBytes
 
