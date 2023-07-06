@@ -106,15 +106,15 @@ public readonly struct Uuid7
 
     /// <summary>
     /// A read-only instance of the Guid structure whose value is all zeros.
-    /// Please note this is not a valid UUID7 as it lacks its version bits.
+    /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
     public static readonly Uuid7 Empty = new(new byte[16]);
 
     /// <summary>
-    /// A read-only instance of the Guid structure whose value is all 1's.
-    /// Please note this is not a valid UUID7 as it lacks its version bits.
+    /// A read-only instance of the Guid structure whose value is all ones.
+    /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
-    public static readonly Uuid7 Max = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
+    public static readonly Uuid7 MaxValue = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
 
 
     /// <summary>
