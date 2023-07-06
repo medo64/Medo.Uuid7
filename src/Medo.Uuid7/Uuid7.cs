@@ -27,7 +27,14 @@ using System.Runtime.Intrinsics;
 /// </summary>
 [DebuggerDisplay("{ToString(),nq}")]
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable<Uuid7>, IEquatable<Guid>, IFormattable {
+public readonly struct Uuid7 : IComparable<Guid>,
+                               IComparable<Uuid7>,
+                               IEquatable<Uuid7>,
+                               IEquatable<Guid>,
+#if NET6_0_OR_GREATER
+                               ISpanFormattable,
+#endif
+                               IFormattable {
 
     /// <summary>
     /// Creates a new version 7 UUID.
@@ -675,100 +682,216 @@ public readonly struct Uuid7 : IComparable<Guid>, IComparable<Uuid7>, IEquatable
     }
 
     private static string ToDefaultString(byte[] bytes) {
-        var chars = new char[36];
+        var destination = new char[36];
+        TryWriteAsDefaultString(destination, bytes, out _);
+        return new string(destination);
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsDefaultString(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsDefaultString(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 36) { charsWritten = 0; return false; }
+
         var j = 0;
         for (var i = 0; i < 16; i++) {
-            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
             if (i is 3 or 5 or 7 or 9) {
-                chars[j + 2] = '-';
+                destination[j + 2] = '-';
                 j += 3;
             } else {
                 j += 2;
             }
         }
-        return new string(chars);
+
+        charsWritten = 36;
+        return true;
     }
 
     private static string ToNoHypensString(byte[] bytes) {
-        var chars = new char[32];
+        var destination = new char[32];
+        TryWriteAsNoHypensString(destination, bytes, out _);
+        return new string(destination);
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsNoHypensString(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsNoHypensString(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 32) { charsWritten = 0; return false; }
+
         var j = 0;
         for (var i = 0; i < 16; i++) {
-            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
             j += 2;
         }
-        return new string(chars);
+
+        charsWritten = 32;
+        return true;
     }
 
     private static string ToBracesString(byte[] bytes) {
-        var chars = new char[38];
-        chars[0] = '{';
-        chars[37] = '}';
+        var destination = new char[38];
+        TryWriteAsBracesString(destination, bytes, out _);
+        return new string(destination);
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsBracesString(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsBracesString(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 38) { charsWritten = 0; return false; }
+
+        destination[0] = '{';
+        destination[37] = '}';
         var j = 1;
         for (var i = 0; i < 16; i++) {
-            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
             if (i is 3 or 5 or 7 or 9) {
-                chars[j + 2] = '-';
+                destination[j + 2] = '-';
                 j += 3;
             } else {
                 j += 2;
             }
         }
-        return new string(chars);
+
+        charsWritten = 38;
+        return true;
     }
 
     private static string ToParenthesesString(byte[] bytes) {
-        var chars = new char[38];
-        chars[0] = '(';
-        chars[37] = ')';
+        var destination = new char[38];
+        TryWriteAsParenthesesString(destination, bytes, out _);
+        return new string(destination);
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsParenthesesString(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsParenthesesString(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 38) { charsWritten = 0; return false; }
+
+        destination[0] = '(';
+        destination[37] = ')';
         var j = 1;
         for (var i = 0; i < 16; i++) {
-            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
             if (i is 3 or 5 or 7 or 9) {
-                chars[j + 2] = '-';
+                destination[j + 2] = '-';
                 j += 3;
             } else {
                 j += 2;
             }
         }
-        return new string(chars);
+
+        charsWritten = 38;
+        return true;
     }
 
     private static string ToHexadecimalString(byte[] bytes) {
-        var chars = new char[68];
-        chars[0] = '{';
-        chars[66] = '}';
-        chars[67] = '}';
+        var destination = new char[68];
+        TryWriteAsHexadecimalString(destination, bytes, out _);
+        return new string(destination);
+    }
+
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsHexadecimalString(Span<char> destination, byte[] bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsHexadecimalString(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 68) { charsWritten = 0; return false; }
+
+        destination[0] = '{';
+        destination[66] = '}';
+        destination[67] = '}';
         var j = 1;
         for (var i = 0; i < 16; i++) {
             if (i is 0) {
-                chars[j + 0] = '0';
-                chars[j + 1] = 'x';
+                destination[j + 0] = '0';
+                destination[j + 1] = 'x';
                 j += 2;
             } else if (i is 4 or 6 or >= 9) {
-                chars[j + 2] = ',';
-                chars[j + 3] = '0';
-                chars[j + 4] = 'x';
+                destination[j + 2] = ',';
+                destination[j + 3] = '0';
+                destination[j + 4] = 'x';
                 j += 5;
             } else if (i is 8) {
-                chars[j + 2] = ',';
-                chars[j + 3] = '{';
-                chars[j + 4] = '0';
-                chars[j + 5] = 'x';
+                destination[j + 2] = ',';
+                destination[j + 3] = '{';
+                destination[j + 4] = '0';
+                destination[j + 5] = 'x';
                 j += 6;
             } else {
                 j += 2;
             }
-            chars[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            chars[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
+            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
+            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
         }
-        return new string(chars);
+
+        charsWritten = 68;
+        return true;
     }
 
     #endregion IFormattable
+
+
+    #region ISpanFormattable
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Tries to format the current instance into the provided character span.
+    /// </summary>
+    /// <param name="destination">The span in which to write.</param>
+    /// <param name="charsWritten">When this method returns, contains the number of characters written into the span.</param>
+    /// <param name="format">A read-only span containing the character representing one of the following specifiers that indicates the exact format to use when interpreting input: "N", "D", "B", "P", or "X".</param>
+    /// <param name="provider">Not used.</param>
+    /// <exception cref="NotImplementedException"></exception>
+    public bool TryFormat(Span<char> destination, out int charsWritten, [StringSyntax(StringSyntaxAttribute.GuidFormat)] ReadOnlySpan<char> format, IFormatProvider? provider) {  // formatProvider is ignored
+        if (format.Length > 1) { charsWritten = 0; return false; }
+
+        var formatChar = (format.Length == 1) ? format[0] : 'D';
+        return formatChar switch {  // treat uppercase and lowercase the same (compatibility with Guid ToFormat)
+            'D' or 'd' => TryWriteAsDefaultString(destination, Bytes, out charsWritten),
+            'N' or 'n' => TryWriteAsNoHypensString(destination, Bytes, out charsWritten),
+            'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
+            'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
+            'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
+            _ => throw new FormatException("Invalid UUID format."),
+        };
+    }
+#elif NET6_0_OR_GREATER
+    /// <summary>
+    /// Tries to format the current instance into the provided character span.
+    /// </summary>
+    /// <param name="destination">The span in which to write.</param>
+    /// <param name="charsWritten">When this method returns, contains the number of characters written into the span.</param>
+    /// <param name="format">A read-only span containing the character representing one of the following specifiers that indicates the exact format to use when interpreting input: "N", "D", "B", "P", or "X".</param>
+    /// <param name="provider">Not used.</param>
+    /// <exception cref="NotImplementedException"></exception>
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) {  // formatProvider is ignored
+        if (format.Length > 1) { charsWritten = 0; return false; }
+
+        var formatChar = (format.Length == 1) ? format[0] : 'D';
+        return formatChar switch {  // treat uppercase and lowercase the same (compatibility with Guid ToFormat)
+            'D' or 'd' => TryWriteAsDefaultString(destination, Bytes, out charsWritten),
+            'N' or 'n' => TryWriteAsNoHypensString(destination, Bytes, out charsWritten),
+            'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
+            'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
+            'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
+            _ => throw new FormatException("Invalid UUID format."),
+        };
+    }
+#endif
+
+    #endregion ISpanFormattable
 
     #region Operators
 
