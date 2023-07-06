@@ -499,7 +499,6 @@ public class Uuid7_Tests {
     }
 
 
-#if NET6_0_OR_GREATER
     [TestMethod]
     public void Uuid7_Fill() {
         var uuids = new Uuid7[10000];
@@ -512,7 +511,6 @@ public class Uuid7_Tests {
             prevUuid = uuid;
         }
     }
-#endif
 
 
     [TestMethod]

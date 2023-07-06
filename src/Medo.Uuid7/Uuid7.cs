@@ -186,14 +186,17 @@ public readonly struct Uuid7
     }
 
 
-#if NET6_0_OR_GREATER
     /// <summary>
     /// Fills a span with UUIDs.
     /// This method is thread-safe.
     /// </summary>
     /// <param name="data">The span to fill.</param>
     /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
     public static void Fill(Span<Uuid7> data) {
+#else
+    public static void Fill(Uuid7[] data) {
+#endif
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
         lock (NonThreadedSyncRoot) {
             for (var i = 0; i < data.Length; i++) {
@@ -203,7 +206,6 @@ public readonly struct Uuid7
             }
         }
     }
-#endif
 
     #endregion Static
 
