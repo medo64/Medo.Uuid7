@@ -170,8 +170,7 @@ public readonly struct Uuid7
             FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
         }
         if (BitConverter.IsLittleEndian) {
-            (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
-            (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
+            (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
             (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
             (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
             return new Guid(bytes);
@@ -304,8 +303,7 @@ public readonly struct Uuid7
         if (BitConverter.IsLittleEndian) {
             var bytes = new byte[16];
             Buffer.BlockCopy(Bytes, 0, bytes, 0, 16);
-            (bytes[0], bytes[3]) = (bytes[3], bytes[0]);
-            (bytes[1], bytes[2]) = (bytes[2], bytes[1]);
+            (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
             (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
             (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
             return new Guid(bytes);
