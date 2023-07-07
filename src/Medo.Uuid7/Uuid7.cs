@@ -762,6 +762,14 @@ public readonly struct Uuid7
 
     /// <summary>
     /// Formats the value of the current instance using the specified format.
+    /// The following format specifiers are supported:
+    /// - D: Default - 32 digits separated by hyphens, e.g. 00000000-0000-0000-0000-000000000000
+    /// - N: No hyphen - 32 digits, e.g. 00000000000000000000000000000000
+    /// - B: Braces - 	32 digits separated by hyphens, enclosed in braces, e.g. {00000000-0000-0000-0000-000000000000}
+    /// - P: Parentheses - 32 digits separated by hyphens, enclosed in parentheses, e.g. (00000000-0000-0000-0000-000000000000)
+    /// - X: Hexadecimal - Four hexadecimal values enclosed in braces, where the fourth value is a subset of eight hexadecimal values that is also enclosed in braces, e.g. {0x00000000,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}} - for the love of all that is holy do not use this format
+    /// - 5: Id25 - 25 characters from a case-insensitive 35 character alphabet, e.g. 0000000000000000000000000
+    /// - 2: Id22 - 22 characters from a 58 character alphabet, e.g. 0000000000000000000000
     /// </summary>
     /// <param name="format">The format to use.</param>
 #if NET7_0_OR_GREATER
@@ -774,6 +782,14 @@ public readonly struct Uuid7
 
     /// <summary>
     /// Formats the value of the current instance using the specified format.
+    /// The following format specifiers are supported:
+    /// - D: Default - 32 digits separated by hyphens, e.g. 00000000-0000-0000-0000-000000000000
+    /// - N: No hyphen - 32 digits, e.g. 00000000000000000000000000000000
+    /// - B: Braces - 	32 digits separated by hyphens, enclosed in braces, e.g. {00000000-0000-0000-0000-000000000000}
+    /// - P: Parentheses - 32 digits separated by hyphens, enclosed in parentheses, e.g. (00000000-0000-0000-0000-000000000000)
+    /// - X: Hexadecimal - Four hexadecimal values enclosed in braces, where the fourth value is a subset of eight hexadecimal values that is also enclosed in braces, e.g. {0x00000000,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}} - for the love of all that is holy do not use this format
+    /// - 5: Id25 - 25 characters from a case-insensitive 35 character alphabet, e.g. 0000000000000000000000000
+    /// - 2: Id22 - 22 characters from a 58 character alphabet, e.g. 0000000000000000000000
     /// </summary>
     /// <param name="format">The format to use.</param>
     /// <param name="formatProvider">Not used.</param>
