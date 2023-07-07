@@ -39,7 +39,7 @@
     <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4,EFCore</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README-EFCore.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7.EntityFrameworkCore/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7.EntityFrameworkCore/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>

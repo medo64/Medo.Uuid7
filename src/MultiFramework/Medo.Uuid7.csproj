@@ -39,7 +39,7 @@
     <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
