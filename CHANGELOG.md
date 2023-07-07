@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.0] - 2023-07-06
+
+- Improved performance
+- Added ISpanFormattable interface
+- Added ISpanParsable interface
+- Added format specifiers for Id25 ('5') and Id22 ('2')
+- Added Fill method for .NET Standard 2.0 targets
+
+
 ## [1.6.1] - 2023-07-04
 
 - Static methods use locks to allow for sequencing even when called from
@@ -95,6 +104,7 @@
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[1.7.0]: https://www.nuget.org/packages/Medo.Uuid7/1.7.0
 [1.6.1]: https://www.nuget.org/packages/Medo.Uuid7/1.6.1
 [1.6.0]: https://www.nuget.org/packages/Medo.Uuid7/1.6.0
 [1.5.0]: https://www.nuget.org/packages/Medo.Uuid7/1.5.0
