@@ -36,6 +36,9 @@ public readonly struct Uuid7
 #if NET6_0_OR_GREATER
     , ISpanFormattable
 #endif
+#if NET7_0_OR_GREATER
+    , ISpanParsable<Uuid7>
+#endif
 {
 
     /// <summary>
@@ -366,98 +369,21 @@ public readonly struct Uuid7
 #endif
 
 
-    #region Id22
-
-    private static readonly BigInteger Base58Modulo = 58;
-    private static readonly char[] Base58Alphabet = new char[] {
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
-        'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
-        'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-        'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-        'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    };
-    private static readonly Lazy<Dictionary<char, BigInteger>> Base58AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
-        for (var i = 0; i < Base58Alphabet.Length; i++) {
-            dict.Add(Base58Alphabet[i], i);
-        }
-        return dict;
-    });
-
-    /// <summary>
-    /// Returns UUID representation in Id22 format. This is base58 encoder
-    /// using the same alphabet as bitcoin does.
-    /// </summary>
-    public string ToId22String() {
-        return ToString(format: "2", formatProvider: null);
-    }
+    #region String
 
     /// <summary>
     /// Returns UUID from given text representation.
-    /// All characters not belonging to Id22 alphabet are ignored.
-    /// Input must contain exactly 22 characters.
+    /// All characters not belonging to hexadecimal alphabet are ignored.
+    /// Input must contain exactly 32 hexadecimal characters.
+    /// The following formats are supported: D, N, B, and P.
     /// </summary>
-    /// <param name="id22Text">Id22 text.</param>
+    /// <param name="text">UUID text.</param>
     /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
-    /// <exception cref="FormatException">Input must be 22 characters.</exception>
-    public static Uuid7 FromId22String(string id22Text) {
-        if (id22Text == null) { throw new ArgumentNullException(nameof(id22Text), "Text cannot be null."); }
-
-        var alphabetDict = Base58AlphabetDict.Value;
-        var count = 0;
-        var number = new BigInteger();
-        foreach (var ch in id22Text) {
-            if (alphabetDict.TryGetValue(ch, out var offset)) {
-                number = BigInteger.Multiply(number, Base58Modulo);
-                number = BigInteger.Add(number, offset);
-                count++;
-            }
-        }
-        if (count != 22) { throw new FormatException("Input must be 22 characters."); }
-
-#if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
-#else
-        byte[] numberBytes = number.ToByteArray();
-        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
-        var buffer = new byte[16];
-        if (numberBytes.Length > 16) {
-            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
-        } else {
-            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
-        }
-#endif
-        if (buffer.Length < 16) {
-            var newBuffer = new byte[16];
-            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
-            buffer = newBuffer;
-        }
-        return new Uuid7(buffer);
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 FromString(string text) {
+        return Parse(text, provider: null);
     }
 
-    #endregion Id22
-
-    #region Id25
-
-    private static readonly BigInteger Base35Modulo = 35;
-    private static readonly char[] Base35Alphabet = new char[] {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-        'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-        'v', 'w', 'x', 'y', 'z'
-    };
-    private static readonly Lazy<Dictionary<char, BigInteger>> Base35AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
-        for (var i = 0; i < Base35Alphabet.Length; i++) {
-            var ch = Base35Alphabet[i];
-            dict.Add(ch, i);
-            if (char.IsLetter(ch)) {  // case-insensitive
-                dict.Add(char.ToUpperInvariant(ch), i);
-            }
-        }
-        return dict;
-    });
 
     /// <summary>
     /// Returns UUID representation in Id25 format.
@@ -476,107 +402,43 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="id25Text">Id25 text.</param>
     /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
-    /// <exception cref="FormatException">Input must be 25 characters.</exception>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
     public static Uuid7 FromId25String(string id25Text) {
         if (id25Text == null) { throw new ArgumentNullException(nameof(id25Text), "Text cannot be null."); }
-
-        var alphabetDict = Base35AlphabetDict.Value;
-        var count = 0;
-        var number = new BigInteger();
-        foreach (var ch in id25Text) {
-            if (alphabetDict.TryGetValue(ch, out var offset)) {
-                number = BigInteger.Multiply(number, Base35Modulo);
-                number = BigInteger.Add(number, offset);
-                count++;
-            }
-        }
-        if (count != 25) { throw new FormatException("Input must be 25 characters."); }
-
-#if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
-#else
-        byte[] numberBytes = number.ToByteArray();
-        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
-        var buffer = new byte[16];
-        if (numberBytes.Length > 16) {
-            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        if (TryParseAsId25(id25Text.ToCharArray(), out var result)) {
+            return result;
         } else {
-            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+            throw new FormatException("Unrecognized UUID format.");
         }
-#endif
-        if (buffer.Length < 16) {
-            var newBuffer = new byte[16];
-            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
-            buffer = newBuffer;
-        }
-        return new Uuid7(buffer);
     }
 
-    #endregion Id25
 
-    #region FromString
-
-    private static readonly BigInteger Base16Modulo = 16;
-    private static readonly char[] Base16Alphabet = new char[] {
-        '0', '1', '2', '3', '4', '5', '6', '7',
-        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-    };
-    private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
-        for (var i = 0; i < Base16Alphabet.Length; i++) {
-            var ch = Base16Alphabet[i];
-            dict.Add(ch, i);
-            if (char.IsLetter(ch)) {  // case-insensitive
-                dict.Add(char.ToUpperInvariant(ch), i);
-            }
-        }
-        return dict;
-    });
+    /// <summary>
+    /// Returns UUID representation in Id22 format. This is base58 encoder
+    /// using the same alphabet as bitcoin does.
+    /// </summary>
+    public string ToId22String() {
+        return ToString(format: "2", formatProvider: null);
+    }
 
     /// <summary>
     /// Returns UUID from given text representation.
-    /// All characters not belonging to hexadecimal alphabet are ignored.
-    /// Input must contain exactly 32 characters.
+    /// All characters not belonging to Id22 alphabet are ignored.
+    /// Input must contain exactly 22 characters.
     /// </summary>
-    /// <param name="text">UUID text.</param>
+    /// <param name="id22Text">Id22 text.</param>
     /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
-    /// <exception cref="FormatException">Input must be 32 characters.</exception>
-    public static Uuid7 FromString(string text) {
-        if (text == null) { throw new ArgumentNullException(nameof(text), "Text cannot be null."); }
-
-        var alphabetDict = Base16AlphabetDict.Value;
-        var count = 0;
-        var number = new BigInteger();
-        foreach (var ch in text) {
-            if (alphabetDict.TryGetValue(ch, out var offset)) {
-                number = BigInteger.Multiply(number, Base16Modulo);
-                number = BigInteger.Add(number, offset);
-                count++;
-            }
-        }
-        if (count != 32) { throw new FormatException("Input must be 32 characters."); }
-
-#if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
-#else
-        byte[] numberBytes = number.ToByteArray();
-        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
-        var buffer = new byte[16];
-        if (numberBytes.Length > 16) {
-            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 FromId22String(string id22Text) {
+        if (id22Text == null) { throw new ArgumentNullException(nameof(id22Text), "Text cannot be null."); }
+        if (TryParseAsId22(id22Text.ToCharArray(), out var result)) {
+            return result;
         } else {
-            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+            throw new FormatException("Unrecognized UUID format.");
         }
-#endif
-        if (buffer.Length < 16) {
-            var newBuffer = new byte[16];
-            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
-            buffer = newBuffer;
-        }
-        return new Uuid7(buffer);
     }
 
-    #endregion FromString
+    #endregion String
 
 
     #region Overrides
@@ -953,14 +815,14 @@ public readonly struct Uuid7
                     TryWriteAsHexadecimalString(destination, Bytes, out _);
                     return new string(destination);
                 }
-            case "2": {  // non-standard (Id22)
-                    var destination = new char[22];
-                    TryWriteAsId22(destination, Bytes, out _);
-                    return new string(destination);
-                }
             case "5": {  // non-standard (Id25)
                     var destination = new char[25];
                     TryWriteAsId25(destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "2": {  // non-standard (Id22)
+                    var destination = new char[22];
+                    TryWriteAsId22(destination, Bytes, out _);
                     return new string(destination);
                 }
             default: throw new FormatException("Invalid UUID format.");
@@ -991,8 +853,8 @@ public readonly struct Uuid7
             'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
             'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
             'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
-            '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
             '5' => TryWriteAsId25(destination, Bytes, out charsWritten),
+            '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
             _ => throw new FormatException("Invalid UUID format."),
         };
     }
@@ -1015,8 +877,8 @@ public readonly struct Uuid7
             'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
             'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
             'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
-            '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
             '5' => TryWriteAsId25(destination, Bytes, out charsWritten),
+            '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
             _ => throw new FormatException("Invalid UUID format."),
         };
     }
@@ -1024,6 +886,92 @@ public readonly struct Uuid7
 
     #endregion ISpanFormattable
 
+
+    #region ISpanParsable<Uuid7>
+
+    /// <summary>
+    /// Returns UUID parsed from a given input.
+    /// The following formats are supported: D, N, B, and P.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 Parse(string s) {
+        return Parse(s, provider: null);
+    }
+
+    /// <summary>
+    /// Returns true if UUID was successfully parsed.
+    /// The following formats are supported: D, N, B, and P.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+#if NET6_0_OR_GREATER
+    public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out Uuid7 result) {
+#else
+    public static bool TryParse(string? s, out Uuid7 result) {
+#endif
+        return TryParse(s, provider: null, out result);
+    }
+
+#if NET7_0_OR_GREATER
+
+    /// <summary>
+    /// Returns UUID parsed from a given input.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 Parse(ReadOnlySpan<char> s, IFormatProvider? provider) {
+        if (TryParse(s, provider, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+
+    /// <summary>
+    /// Returns true if UUID was successfully parsed.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
+        return TryParseAsString(s, out result);
+    }
+#endif
+
+    /// <summary>
+    /// Returns UUID parsed from a given input.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <exception cref="ArgumentNullException">Input cannot be null.</exception>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 Parse(string s, IFormatProvider? provider) {
+        if (s is null) { throw new ArgumentNullException(nameof(s), "Input cannot be null."); }
+        if (TryParse(s, provider, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+
+    /// <summary>
+    /// Returns true if UUID was successfully parsed.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+#if NET6_0_OR_GREATER
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
+#else
+    public static bool TryParse(string? s, IFormatProvider? provider, out Uuid7 result) {
+#endif
+        if (s == null) { result = Empty; return false; }
+        return TryParseAsString(s.ToCharArray(), out result);
+    }
+
+    #endregion ISpanParsable<Uuid7>
 
     #region Helpers
 
@@ -1259,6 +1207,177 @@ public readonly struct Uuid7
         }
 
         charsWritten = 25;
+        return true;
+    }
+
+
+    private static readonly BigInteger Base16Modulo = 16;
+    private static readonly char[] Base16Alphabet = new char[] {
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
+    private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
+        var dict = new Dictionary<char, BigInteger>();
+        for (var i = 0; i < Base16Alphabet.Length; i++) {
+            var ch = Base16Alphabet[i];
+            dict.Add(ch, i);
+            if (char.IsLetter(ch)) { dict.Add(char.ToUpperInvariant(ch), i); }  // case-insensitive
+        }
+        return dict;
+    });
+
+#if NET6_0_OR_GREATER
+    private static bool TryParseAsString(ReadOnlySpan<char> source, out Uuid7 result) {
+#else
+    private static bool TryParseAsString(char[] source, out Uuid7 result) {
+#endif
+        var alphabetDict = Base16AlphabetDict.Value;
+        var count = 0;
+        var number = new BigInteger();
+        foreach (var ch in source) {
+            if (alphabetDict.TryGetValue(ch, out var offset)) {
+                number = BigInteger.Multiply(number, Base16Modulo);
+                number = BigInteger.Add(number, offset);
+                count++;
+            }
+        }
+        if (count != 32) { result = Uuid7.Empty; return false; }
+
+#if NET6_0_OR_GREATER
+        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+#else
+        byte[] numberBytes = number.ToByteArray();
+        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
+        var buffer = new byte[16];
+        if (numberBytes.Length > 16) {
+            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        } else {
+            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+        }
+#endif
+        if (buffer.Length < 16) {
+            var newBuffer = new byte[16];
+            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
+            buffer = newBuffer;
+        }
+
+        result = new Uuid7(buffer);
+        return true;
+    }
+
+
+    private static readonly BigInteger Base35Modulo = 35;
+    private static readonly char[] Base35Alphabet = new char[] {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+        'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+        'v', 'w', 'x', 'y', 'z'
+    };
+    private static readonly Lazy<Dictionary<char, BigInteger>> Base35AlphabetDict = new(() => {
+        var dict = new Dictionary<char, BigInteger>();
+        for (var i = 0; i < Base35Alphabet.Length; i++) {
+            var ch = Base35Alphabet[i];
+            dict.Add(ch, i);
+            if (char.IsLetter(ch)) {  // case-insensitive
+                dict.Add(char.ToUpperInvariant(ch), i);
+            }
+        }
+        return dict;
+    });
+
+#if NET6_0_OR_GREATER
+    private static bool TryParseAsId25(ReadOnlySpan<char> source, out Uuid7 result) {
+#else
+    private static bool TryParseAsId25(char[] source, out Uuid7 result) {
+#endif
+        var alphabetDict = Base35AlphabetDict.Value;
+        var count = 0;
+        var number = new BigInteger();
+        foreach (var ch in source) {
+            if (alphabetDict.TryGetValue(ch, out var offset)) {
+                number = BigInteger.Multiply(number, Base35Modulo);
+                number = BigInteger.Add(number, offset);
+                count++;
+            }
+        }
+        if (count != 25) { result = Empty; return false; }
+
+#if NET6_0_OR_GREATER
+        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+#else
+        byte[] numberBytes = number.ToByteArray();
+        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
+        var buffer = new byte[16];
+        if (numberBytes.Length > 16) {
+            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        } else {
+            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+        }
+#endif
+        if (buffer.Length < 16) {
+            var newBuffer = new byte[16];
+            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
+            buffer = newBuffer;
+        }
+
+        result = new Uuid7(buffer);
+        return true;
+    }
+
+
+    private static readonly BigInteger Base58Modulo = 58;
+    private static readonly char[] Base58Alphabet = new char[] {
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
+        'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
+        'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+        'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+        'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+    };
+    private static readonly Lazy<Dictionary<char, BigInteger>> Base58AlphabetDict = new(() => {
+        var dict = new Dictionary<char, BigInteger>();
+        for (var i = 0; i < Base58Alphabet.Length; i++) {
+            dict.Add(Base58Alphabet[i], i);
+        }
+        return dict;
+    });
+
+#if NET6_0_OR_GREATER
+    private static bool TryParseAsId22(ReadOnlySpan<char> source, out Uuid7 result) {
+#else
+    private static bool TryParseAsId22(char[] source, out Uuid7 result) {
+#endif
+        var alphabetDict = Base58AlphabetDict.Value;
+        var count = 0;
+        var number = new BigInteger();
+        foreach (var ch in source) {
+            if (alphabetDict.TryGetValue(ch, out var offset)) {
+                number = BigInteger.Multiply(number, Base58Modulo);
+                number = BigInteger.Add(number, offset);
+                count++;
+            }
+        }
+        if (count != 22) { result = Empty; return false; }
+
+#if NET6_0_OR_GREATER
+        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+#else
+        byte[] numberBytes = number.ToByteArray();
+        if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
+        var buffer = new byte[16];
+        if (numberBytes.Length > 16) {
+            Buffer.BlockCopy(numberBytes, numberBytes.Length - 16, buffer, 0, 16);
+        } else {
+            Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
+        }
+#endif
+        if (buffer.Length < 16) {
+            var newBuffer = new byte[16];
+            Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
+            buffer = newBuffer;
+        }
+
+        result = new Uuid7(buffer);
         return true;
     }
 
