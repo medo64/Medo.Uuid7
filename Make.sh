@@ -201,7 +201,7 @@ function package() {
     echo
     mkdir -p "$BASE_DIRECTORY/build/package/"
 
-    RELEASE_NOTES=$(sed -n "/## \\[$PACKAGE_VERSION\\]/"', /##/{/##/!p}' CHANGELOG.md | sed '/^$/d')
+    RELEASE_NOTES=$(cat CHANGELOG.md)
     if [[ "$RELEASE_NOTES" == "" ]]; then
         if [[ "$PACKAGE_VERSION" == "0.0.0" ]]; then  # allow creating package; won't be pushed anyhow
             echo "${ANSI_YELLOW}No changelog!${ANSI_RESET}" >&2
