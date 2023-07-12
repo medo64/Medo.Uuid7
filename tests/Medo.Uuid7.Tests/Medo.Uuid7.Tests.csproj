@@ -1,15 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <IsPackable>false</IsPackable>
-    <Nullable>disable</Nullable>
+    <AssemblyName>Medo.Uuid7.Tests</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyName>Medo.Uuid7.Tests</AssemblyName>
-    <RootNamespace>Tests</RootNamespace>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -31,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../src/Medo.Uuid7.csproj" />
+    <ProjectReference Include="../../src/Medo.Uuid7/Medo.Uuid7.csproj" />
   </ItemGroup>
 
 </Project>

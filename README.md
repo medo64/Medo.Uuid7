@@ -1,11 +1,17 @@
 Medo.Uuid7
 ==========
 
-The UUID7 library is an implementation of the [UUID version 7 specification][rfc_4122bis],
-which introduces a time-ordered value field derived from the timestamp source.
-It offers improved entropy characteristics compared to versions 1 or 6 of the
-UUID standard. The inherent monotonicity of UUID version 7 makes it an excellent
-choice for utilization as a database key.
+**This package has been deprecated and replaced with the [Medo.Uuid7][nuget_uuid7]
+package. I am keeping it here just as a reference.**
+
+---
+
+The UUID7 library is an implementation of the UUID version 7 variant as defined
+in [the new UUID specification][rfc_4122bis], which introduces a time-ordered
+value field derived from the timestamp source. It offers improved entropy
+characteristics compared to versions 1 or 6 of the UUID standard. The inherent
+monotonicity of UUID version 7 makes it an excellent choice for utilization as a
+binary database key.
 
 Newer optimized versions are available in [Medo.Uuid7](https://www.nuget.org/packages/Medo.Uuid7)
 package.
@@ -22,6 +28,10 @@ Features:
   formatting, library also offers ID22 and ID25 string conversions.
 * Wide compatibility: Support for .NET Standard 2.0 makes this library
   compatible with .NET Framework 4.6.1 or higher.
+* High performance: Speed comparable to the optimized built-in GUID generator in
+  both single-threaded and multi-threaded scenarios under Windows and Linux.
+* Hardware acceleration: Vector128 support for Equals method.
+* Microsoft SQL Server support: Separate methods for "LE" Guid creation.
 
 You can find packaged library at [NuGet][nuget_uuid7].
 
@@ -33,7 +43,7 @@ To generate a new database-friendly UUID v7, simply call `NewUuid7` method:
 using System;
 using Medo;
 
-var uuid = Uuid7.NewUuid7();  // or 'new Uuid7()'
+var uuid = Uuid7.NewUuid7();  // or 'Uuid7.NewGuid()'
 Console.WriteLine($"UUID : {uuid}");
 ```
 
@@ -45,6 +55,34 @@ using Medo;
 var uuid = Uuid7.NewUuid4();
 Console.WriteLine($"UUID : {uuid}");
 ```
+
+If higher performance is needed and per-thread seqencing is sufficient, you
+can instantiate UUID directly:
+```csharp
+using System;
+using Medo;
+
+var uuid = new Uuid7();
+Console.WriteLine($"UUID : {uuid}");
+```
+
+
+### Configuration
+
+#### Disable RNG Buffering
+
+Buffering of random numbers significantly increases performance at the cost of
+less frequent but bigger requests toward random number generator. If buffering
+is not desired (e.g. only a small count of UUIDs is needed), you can disable it
+using `UUID7_NO_RANDOM_BUFFER` preprocessor constant.
+
+```plain
+<PropertyGroup>
+    <DefineConstants>UUID7_NO_RANDOM_BUFFER</DefineConstants>
+</PropertyGroup>
+```
+
+Note that this will decrease performance significantly.
 
 
 ## UUID Format
@@ -182,7 +220,7 @@ Example:
 
 
 
-[rfc_4122bis]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-03.html
-[rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-03.html#name-monotonicity-and-counters
-[nuget_uuid7]: https://www.nuget.org/packages/Uuid7/
+[rfc_4122bis]: https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis
+[rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-07.html#name-monotonicity-and-counters
+[nuget_uuid7]: https://www.nuget.org/packages/Medo.Uuid7/
 [git_stevesimmons_uuid7]: https://github.com/stevesimmons/uuid7-csharp/

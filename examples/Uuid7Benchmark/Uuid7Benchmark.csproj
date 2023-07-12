@@ -13,7 +13,7 @@
     </PropertyGroup>
   
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Medo.Uuid7.csproj" />
+      <ProjectReference Include="../../src/Medo.Uuid7/Medo.Uuid7.csproj" />
     </ItemGroup>
   
   </Project>

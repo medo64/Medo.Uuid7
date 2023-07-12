@@ -32,26 +32,35 @@
 
   <PropertyGroup>
     <PackageId>Uuid7</PackageId>
-    <Version>1.3.5</Version>
+    <Version>1.7.0</Version>
     <Authors>Josip Medved</Authors>
     <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
     <Company>www.medo64.com</Company>
-    <PackageTags>UUID,UUID7,UUIDv7</PackageTags>
+    <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <Description>
-        This is a C# implementation of UUIDv7 generation algorithm.
+        A library that enables fast generation of version 7 (time-ordered)
+        UUIDs, designed for efficient utilization in databases and resource
+        indexing. It provides conversions to and from GUIDs, multiple string
+        representations, and wide compatibility with .NET 7 and higher,
+        including .NET 4.6.1 and higher (.NET Standard 2.0). Additionally,
+        it supports version 4 (fully random) UUIDs.
     </Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../ICON.png" Pack="true" PackagePath="" />
-    <None Include="../README.md" Pack="true" PackagePath="" />
-    <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+    <Compile Include="../Medo.Uuid7/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../ICON.png" Pack="true" PackagePath="" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <None Include="../../LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

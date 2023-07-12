@@ -1,15 +1,14 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7", "Medo.Uuid7.csproj", "{D143B5D9-B94A-4786-833B-21E2F04B00FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7", "Medo.Uuid7/Medo.Uuid7.csproj", "{D143B5D9-B94A-4786-833B-21E2F04B00FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7.Tests", "..\tests\Medo.Uuid7.Tests.csproj", "{9491E824-4704-4423-9DDD-24473BB652C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7.Tests", "../tests/Medo.Uuid7.Tests/Medo.Uuid7.Tests.csproj", "{9491E824-4704-4423-9DDD-24473BB652C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uuid7Generator", "..\examples\Uuid7Generator\Uuid7Generator.csproj", "{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uuid7Generator", "../examples/Uuid7Generator/Uuid7Generator.csproj", "{F64E609E-86B4-4F7D-9C4D-C656CFDDB27F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uuid7Benchmark", "..\examples\Uuid7Benchmark\Uuid7Benchmark.csproj", "{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uuid7Benchmark", "../examples/Uuid7Benchmark/Uuid7Benchmark.csproj", "{60B240BE-D8CA-4B2A-A1F4-E0F21B425C8E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{854054C8-5DA5-4AF9-99FF-55E25D1414B5}"
 EndProject
