@@ -9,5 +9,6 @@
 **/.vs/
 **/*.csproj.user
 **/*.DotSettings.user
+**/BenchmarkDotNet.Artifacts
 
 .nuget.key
