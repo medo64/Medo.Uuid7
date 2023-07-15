@@ -1049,11 +1049,10 @@ public readonly struct Uuid7
     }
 
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsDefaultString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsDefaultString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 36) { charsWritten = 0; return false; }
@@ -1083,11 +1082,10 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsNoHypensString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsNoHypensString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 32) { charsWritten = 0; return false; }
@@ -1113,11 +1111,10 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsBracesString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsBracesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 38) { charsWritten = 0; return false; }
@@ -1149,11 +1146,10 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsParenthesesString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsParenthesesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 38) { charsWritten = 0; return false; }
@@ -1185,11 +1181,10 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsHexadecimalString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsHexadecimalString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 68) { charsWritten = 0; return false; }
@@ -1227,11 +1222,10 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsId22(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsId22(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 22) { charsWritten = 0; return false; }
@@ -1253,11 +1247,10 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsId25(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsId25(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 25) { charsWritten = 0; return false; }
