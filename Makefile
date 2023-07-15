@@ -1,4 +1,4 @@
-.PHONY: all clean distclean dist debug release package test
+.PHONY: all clean distclean dist debug release package test benchmark
 
 all: release
 
@@ -25,3 +25,6 @@ nuget:
 
 test: debug
 	@bash ./Make.sh test
+
+benchmark:
+	@bash ./Make.sh benchmark

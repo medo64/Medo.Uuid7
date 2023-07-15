@@ -197,6 +197,14 @@ function test() {
     echo "${ANSI_GREEN}Testing completed${ANSI_RESET}"
 }
 
+function benchmark() {
+    echo
+    pushd $BASE_DIRECTORY/tests/Medo.Uuid7.Benchmark/ >/dev/null || return 1
+    dotnet run --configuration "Release" \
+        || return 1
+    popd $BASE_DIRECTORY/tests/Medo.Uuid7.Benchmark/ >/dev/null || return 1
+}
+
 function package() {
     echo
     mkdir -p "$BASE_DIRECTORY/build/package/"
@@ -289,7 +297,8 @@ while [ $# -gt 0 ]; do
         dist)       dist || break ;;
         debug)      clean && debug || break ;;
         release)    clean && release || break ;;
-        test)       clean && test || break ;;
+        test)       test || break ;;
+        benchmark)  benchmark || break ;;
         package)    clean && test && package || break ;;
         nuget)      clean && test && package && nuget || break ;;
 
