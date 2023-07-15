@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Medo;
 
-public class ToStringN {
+public class ToString_N {
 
     private Guid ExampleGuid =  Guid.NewGuid();
     private Uuid7 ExampleUuid7 =  Uuid7.NewUuid7();
@@ -13,12 +13,12 @@ public class ToStringN {
 
 
     [Benchmark(Baseline = true)]
-    public string ToStringGuidN() => ExampleGuid.ToString("N");
+    public string Guid_ToString() => ExampleGuid.ToString("N");
 
     [Benchmark]
-    public string ToStringUuid7N() => ExampleUuid7.ToString("N");
+    public string Uuid7_ToString() => ExampleUuid7.ToString("N");
 
     [Benchmark]
-    public string ToStringUuid4N() => ExampleUuid4.ToString("N");
+    public string Uuid4_ToString() => ExampleUuid4.ToString("N");
 
 }

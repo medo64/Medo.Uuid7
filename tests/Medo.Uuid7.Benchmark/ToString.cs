@@ -13,12 +13,12 @@ public class ToString {
 
 
     [Benchmark(Baseline = true)]
-    public string ToStringGuid() => ExampleGuid.ToString();
+    public string Guid_ToString() => ExampleGuid.ToString();
 
     [Benchmark]
-    public string ToStringUuid7() => ExampleUuid7.ToString();
+    public string Uuid7_ToString() => ExampleUuid7.ToString();
 
     [Benchmark]
-    public string ToStringUuid4() => ExampleUuid4.ToString();
+    public string Uuid4_ToString() => ExampleUuid4.ToString();
 
 }
