@@ -6,6 +6,6 @@ using BenchmarkDotNet.Running;
 
 public class App {
     public static void Main(string[] args) {
-        var summary = BenchmarkRunner.Run(typeof(App).Assembly);
+        BenchmarkSwitcher.FromAssembly(typeof(App).Assembly).Run(args);
     }
 }
