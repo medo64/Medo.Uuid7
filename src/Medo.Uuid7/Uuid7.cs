@@ -1239,7 +1239,6 @@ public readonly struct Uuid7
             dict.Add(ch, i);
             if (char.IsLetter(ch)) { dict.Add(char.ToUpperInvariant(ch), i); }  // case-insensitive
         }
-        dict.TrimExcess();
         return dict;
     });
 
@@ -1299,7 +1298,6 @@ public readonly struct Uuid7
                 dict.Add(char.ToUpperInvariant(ch), i);
             }
         }
-        dict.TrimExcess();
         return dict;
     });
 
@@ -1357,7 +1355,6 @@ public readonly struct Uuid7
         for (var i = 0; i < Base58Alphabet.Length; i++) {
             dict.Add(Base58Alphabet[i], i);
         }
-        dict.TrimExcess();
         return dict;
     });
 
