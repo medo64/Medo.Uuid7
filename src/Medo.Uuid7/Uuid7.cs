@@ -1050,137 +1050,188 @@ public readonly struct Uuid7
 
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsDefaultString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsDefaultString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 36) { charsWritten = 0; return false; }
 
-        var j = 0;
-        for (var i = 0; i < 16; i++) {
-            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
-            if (i is 3 or 5 or 7 or 9) {
-                destination[j + 2] = '-';
-                j += 3;
-            } else {
-                j += 2;
-            }
-        }
+        (destination[0], destination[1]) = ToTwoHexBytes(bytes[0]);
+        (destination[2], destination[3]) = ToTwoHexBytes(bytes[1]);
+        (destination[4], destination[5]) = ToTwoHexBytes(bytes[2]);
+        (destination[6], destination[7]) = ToTwoHexBytes(bytes[3]);
+        destination[8] = '-';
+        (destination[9], destination[10]) = ToTwoHexBytes(bytes[4]);
+        (destination[11], destination[12]) = ToTwoHexBytes(bytes[5]);
+        destination[13] = '-';
+        (destination[14], destination[15]) = ToTwoHexBytes(bytes[6]);
+        (destination[16], destination[17]) = ToTwoHexBytes(bytes[7]);
+        destination[18] = '-';
+        (destination[19], destination[20]) = ToTwoHexBytes(bytes[8]);
+        (destination[21], destination[22]) = ToTwoHexBytes(bytes[9]);
+        destination[23] = '-';
+        (destination[24], destination[25]) = ToTwoHexBytes(bytes[10]);
+        (destination[26], destination[27]) = ToTwoHexBytes(bytes[11]);
+        (destination[28], destination[29]) = ToTwoHexBytes(bytes[12]);
+        (destination[30], destination[31]) = ToTwoHexBytes(bytes[13]);
+        (destination[32], destination[33]) = ToTwoHexBytes(bytes[14]);
+        (destination[34], destination[35]) = ToTwoHexBytes(bytes[15]);
 
         charsWritten = 36;
         return true;
     }
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsNoHypensString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsNoHypensString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 32) { charsWritten = 0; return false; }
 
-        var j = 0;
-        for (var i = 0; i < 16; i++) {
-            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
-            j += 2;
-        }
+        (destination[0], destination[1]) = ToTwoHexBytes(bytes[0]);
+        (destination[2], destination[3]) = ToTwoHexBytes(bytes[1]);
+        (destination[4], destination[5]) = ToTwoHexBytes(bytes[2]);
+        (destination[6], destination[7]) = ToTwoHexBytes(bytes[3]);
+        (destination[8], destination[9]) = ToTwoHexBytes(bytes[4]);
+        (destination[10], destination[11]) = ToTwoHexBytes(bytes[5]);
+        (destination[12], destination[13]) = ToTwoHexBytes(bytes[6]);
+        (destination[14], destination[15]) = ToTwoHexBytes(bytes[7]);
+        (destination[16], destination[17]) = ToTwoHexBytes(bytes[8]);
+        (destination[18], destination[19]) = ToTwoHexBytes(bytes[9]);
+        (destination[20], destination[21]) = ToTwoHexBytes(bytes[10]);
+        (destination[22], destination[23]) = ToTwoHexBytes(bytes[11]);
+        (destination[24], destination[25]) = ToTwoHexBytes(bytes[12]);
+        (destination[26], destination[27]) = ToTwoHexBytes(bytes[13]);
+        (destination[28], destination[29]) = ToTwoHexBytes(bytes[14]);
+        (destination[30], destination[31]) = ToTwoHexBytes(bytes[15]);
 
         charsWritten = 32;
         return true;
     }
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsBracesString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsBracesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 38) { charsWritten = 0; return false; }
 
         destination[0] = '{';
+        (destination[1], destination[2]) = ToTwoHexBytes(bytes[0]);
+        (destination[3], destination[4]) = ToTwoHexBytes(bytes[1]);
+        (destination[5], destination[6]) = ToTwoHexBytes(bytes[2]);
+        (destination[7], destination[8]) = ToTwoHexBytes(bytes[3]);
+        destination[9] = '-';
+        (destination[10], destination[11]) = ToTwoHexBytes(bytes[4]);
+        (destination[12], destination[13]) = ToTwoHexBytes(bytes[5]);
+        destination[14] = '-';
+        (destination[15], destination[16]) = ToTwoHexBytes(bytes[6]);
+        (destination[17], destination[18]) = ToTwoHexBytes(bytes[7]);
+        destination[19] = '-';
+        (destination[20], destination[21]) = ToTwoHexBytes(bytes[8]);
+        (destination[22], destination[23]) = ToTwoHexBytes(bytes[9]);
+        destination[24] = '-';
+        (destination[25], destination[26]) = ToTwoHexBytes(bytes[10]);
+        (destination[27], destination[28]) = ToTwoHexBytes(bytes[11]);
+        (destination[29], destination[30]) = ToTwoHexBytes(bytes[12]);
+        (destination[31], destination[32]) = ToTwoHexBytes(bytes[13]);
+        (destination[33], destination[34]) = ToTwoHexBytes(bytes[14]);
+        (destination[35], destination[36]) = ToTwoHexBytes(bytes[15]);
         destination[37] = '}';
-        var j = 1;
-        for (var i = 0; i < 16; i++) {
-            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
-            if (i is 3 or 5 or 7 or 9) {
-                destination[j + 2] = '-';
-                j += 3;
-            } else {
-                j += 2;
-            }
-        }
 
         charsWritten = 38;
         return true;
     }
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsParenthesesString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsParenthesesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 38) { charsWritten = 0; return false; }
 
         destination[0] = '(';
+        (destination[1], destination[2]) = ToTwoHexBytes(bytes[0]);
+        (destination[3], destination[4]) = ToTwoHexBytes(bytes[1]);
+        (destination[5], destination[6]) = ToTwoHexBytes(bytes[2]);
+        (destination[7], destination[8]) = ToTwoHexBytes(bytes[3]);
+        destination[9] = '-';
+        (destination[10], destination[11]) = ToTwoHexBytes(bytes[4]);
+        (destination[12], destination[13]) = ToTwoHexBytes(bytes[5]);
+        destination[14] = '-';
+        (destination[15], destination[16]) = ToTwoHexBytes(bytes[6]);
+        (destination[17], destination[18]) = ToTwoHexBytes(bytes[7]);
+        destination[19] = '-';
+        (destination[20], destination[21]) = ToTwoHexBytes(bytes[8]);
+        (destination[22], destination[23]) = ToTwoHexBytes(bytes[9]);
+        destination[24] = '-';
+        (destination[25], destination[26]) = ToTwoHexBytes(bytes[10]);
+        (destination[27], destination[28]) = ToTwoHexBytes(bytes[11]);
+        (destination[29], destination[30]) = ToTwoHexBytes(bytes[12]);
+        (destination[31], destination[32]) = ToTwoHexBytes(bytes[13]);
+        (destination[33], destination[34]) = ToTwoHexBytes(bytes[14]);
+        (destination[35], destination[36]) = ToTwoHexBytes(bytes[15]);
         destination[37] = ')';
-        var j = 1;
-        for (var i = 0; i < 16; i++) {
-            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
-            if (i is 3 or 5 or 7 or 9) {
-                destination[j + 2] = '-';
-                j += 3;
-            } else {
-                j += 2;
-            }
-        }
 
         charsWritten = 38;
         return true;
     }
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsHexadecimalString(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsHexadecimalString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 68) { charsWritten = 0; return false; }
 
-        destination[0] = '{';
-        destination[66] = '}';
-        destination[67] = '}';
-        var j = 1;
-        for (var i = 0; i < 16; i++) {
-            if (i is 0) {
-                destination[j + 0] = '0';
-                destination[j + 1] = 'x';
-                j += 2;
-            } else if (i is 4 or 6 or >= 9) {
-                destination[j + 2] = ',';
-                destination[j + 3] = '0';
-                destination[j + 4] = 'x';
-                j += 5;
-            } else if (i is 8) {
-                destination[j + 2] = ',';
-                destination[j + 3] = '{';
-                destination[j + 4] = '0';
-                destination[j + 5] = 'x';
-                j += 6;
-            } else {
-                j += 2;
-            }
-            destination[j + 0] = Base16Alphabet[bytes[i] >> 4];
-            destination[j + 1] = Base16Alphabet[bytes[i] & 0x0F];
-        }
+        (destination[0], destination[1], destination[2]) = ('{', '0', 'x');
+        (destination[3], destination[4]) = ToTwoHexBytes(bytes[0]);
+        (destination[5], destination[6]) = ToTwoHexBytes(bytes[1]);
+        (destination[7], destination[8]) = ToTwoHexBytes(bytes[2]);
+        (destination[9], destination[10]) = ToTwoHexBytes(bytes[3]);
+        (destination[11], destination[12], destination[13]) = (',', '0', 'x');
+        (destination[14], destination[15]) = ToTwoHexBytes(bytes[4]);
+        (destination[16], destination[17]) = ToTwoHexBytes(bytes[5]);
+        (destination[18], destination[19], destination[20]) = (',', '0', 'x');
+        (destination[21], destination[22]) = ToTwoHexBytes(bytes[6]);
+        (destination[23], destination[24]) = ToTwoHexBytes(bytes[7]);
+        (destination[25], destination[26], destination[27], destination[28]) = (',', '{', '0', 'x');
+        (destination[29], destination[30]) = ToTwoHexBytes(bytes[8]);
+        (destination[31], destination[32], destination[33]) = (',', '0', 'x');
+        (destination[34], destination[35]) = ToTwoHexBytes(bytes[9]);
+        (destination[36], destination[37], destination[38]) = (',', '0', 'x');
+        (destination[39], destination[40]) = ToTwoHexBytes(bytes[10]);
+        (destination[41], destination[42], destination[43]) = (',', '0', 'x');
+        (destination[44], destination[45]) = ToTwoHexBytes(bytes[11]);
+        (destination[46], destination[47], destination[48]) = (',', '0', 'x');
+        (destination[49], destination[50]) = ToTwoHexBytes(bytes[12]);
+        (destination[51], destination[52], destination[53]) = (',', '0', 'x');
+        (destination[54], destination[55]) = ToTwoHexBytes(bytes[13]);
+        (destination[56], destination[57], destination[58]) = (',', '0', 'x');
+        (destination[59], destination[60]) = ToTwoHexBytes(bytes[14]);
+        (destination[61], destination[62], destination[63]) = (',', '0', 'x');
+        (destination[64], destination[65]) = ToTwoHexBytes(bytes[15]);
+        (destination[66], destination[67]) = ('}', '}');
 
         charsWritten = 68;
         return true;
     }
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsId22(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsId22(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 22) { charsWritten = 0; return false; }
@@ -1203,8 +1254,10 @@ public readonly struct Uuid7
     }
 
 #if NET6_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static bool TryWriteAsId25(Span<char> destination, byte[] bytes, out int charsWritten) {
 #else
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryWriteAsId25(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 25) { charsWritten = 0; return false; }
@@ -1395,6 +1448,12 @@ public readonly struct Uuid7
 
         result = new Uuid7(buffer);
         return true;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static (char, char) ToTwoHexBytes(byte b) {
+        return (Base16Alphabet[b >> 4], Base16Alphabet[b & 0x0F]);
     }
 
     #endregion Helpers
