@@ -202,7 +202,7 @@ function benchmark() {
     pushd $BASE_DIRECTORY/tests/Medo.Uuid7.Benchmark/ >/dev/null || return 1
     dotnet run --configuration "Release" \
         || return 1
-    popd $BASE_DIRECTORY/tests/Medo.Uuid7.Benchmark/ >/dev/null || return 1
+    popd >/dev/null || return 1
 }
 
 function package() {
