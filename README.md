@@ -215,7 +215,7 @@ Example:
 
 
 [rfc_4122bis]: https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis
-[rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-07.html#name-monotonicity-and-counters
+[rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-09.html#name-monotonicity-and-counters
 [nuget_uuid7]: https://www.nuget.org/packages/Medo.Uuid7/
 [nuget_uuid7_efcore]: https://www.nuget.org/packages/Medo.Uuid7.EntityFrameworkCore/
 [git_stevesimmons_uuid7]: https://github.com/stevesimmons/uuid7-csharp/
