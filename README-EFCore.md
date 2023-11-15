@@ -26,6 +26,7 @@ Features:
   both single-threaded and multi-threaded scenarios under Windows and Linux.
 * Hardware acceleration: Vector128 support for Equals method.
 * Microsoft SQL Server support: Separate methods for "LE" Guid creation.
+* .NET 8 AOT support
 
 You can find packaged library at [NuGet][nuget_uuid7_efcore].
 
