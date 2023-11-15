@@ -1,5 +1,10 @@
 ## Changelog
 
+### [1.8.0] - 2023-11-15
+
+- Added .NET 8 AOT compilation support
+
+
 ### [1.7.0] - 2023-07-06
 
 - Improved performance
