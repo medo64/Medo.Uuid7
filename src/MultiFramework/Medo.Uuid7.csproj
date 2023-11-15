@@ -4,11 +4,14 @@
     <AssemblyName>Medo.Uuid7</AssemblyName>
     <RootNamespace>Medo</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PublishAot>true</PublishAot>
+  </PropertyGroup>
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net7.0;net6.0;netstandard2.0</TargetFrameworks>
-    <LangVersion>11.0</LangVersion>
+    <TargetFrameworks>net8.0;net7.0;net6.0;netstandard2.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
