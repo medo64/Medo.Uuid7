@@ -1,7 +1,7 @@
 namespace Uuid7Benchmark;
 using System;
 using System.Numerics;
-using System.Security.Cryptography;
+using System.Runtime.Intrinsics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Medo;
@@ -23,6 +23,22 @@ public class Integer {
         return new UInt128(a, b);
     }
 
+    [Benchmark()]
+    public void ToVector128() {
+        var bytes = ExampleUuid7.ToByteArray();
+        if (BitConverter.IsLittleEndian) {
+            var _ = Vector128.Create(bytes[15], bytes[14], bytes[13], bytes[12],
+                                     bytes[11], bytes[10], bytes[9],  bytes[8],
+                                     bytes[7],  bytes[6],  bytes[5],  bytes[4],
+                                     bytes[3],  bytes[2],  bytes[1],  bytes[0]);
+        } else {
+            var _ = Vector128.Create(bytes[0],  bytes[1],  bytes[2],  bytes[3],
+                                     bytes[4],  bytes[5],  bytes[6],  bytes[7],
+                                     bytes[8],  bytes[9],  bytes[10], bytes[11],
+                                     bytes[12], bytes[13], bytes[14], bytes[15]);
+        }
+    }
+
 
     [Benchmark]
     public void BigIntegerToId22() {
@@ -34,6 +50,12 @@ public class Integer {
     public void UInt128ToId22() {
         var destination = new char[22];
         UInt128Test.TryWriteAsId22(destination, ExampleUuid7.ToByteArray(), out _);
+    }
+
+    [Benchmark]
+    public void Vector128ToId22() {
+        var destination = new char[22];
+        Vector128Test.TryWriteAsId22(destination, ExampleUuid7.ToByteArray(), out _);
     }
 
 
@@ -73,6 +95,38 @@ public class Integer {
             var number = new UInt128(a, b);
             for (var i = 21; i >= 0; i--) {
                 (number, var remainder) = UInt128.DivRem(number, Base58Modulo);
+                destination[i] = Base58Alphabet[(int)remainder];
+            }
+
+            charsWritten = 22;
+            return true;
+        }
+
+        private static readonly UInt128 Base58Modulo = 58;
+        private static readonly char[] Base58Alphabet = new char[] {
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
+            'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
+            'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+            'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+            'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        };
+    }
+
+    private static class Vector128Test {
+
+        // does not really work - just partial implementation to see how it compares to BigInteger
+        internal static bool TryWriteAsId22(Span<char> destination, byte[] bytes, out int charsWritten) {
+            if (destination.Length < 22) { charsWritten = 0; return false; }
+
+            var number = Vector128.Create(bytes[15], bytes[14], bytes[13], bytes[12],
+                                          bytes[11], bytes[10], bytes[9],  bytes[8],
+                                          bytes[7],  bytes[6],  bytes[5],  bytes[4],
+                                          bytes[3],  bytes[2],  bytes[1],  bytes[0]);
+
+            for (var i = 21; i >= 0; i--) {
+                number = Vector128.Divide(number, number);
+                var remainder = 0;
                 destination[i] = Base58Alphabet[(int)remainder];
             }
 
