@@ -1,5 +1,10 @@
 CHANGE LOG
 
+[1.8.2] (2023-11-24)
+
+- Added ToDateTime and ToDateTimeOffset methods
+
+
 [1.8.1] (2023-11-15)
 
 - Fixed .NET 8 AOT compilation support
@@ -115,6 +120,7 @@ CHANGE LOG
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[1.8.2]: https://www.nuget.org/packages/Medo.Uuid7/1.8.2
 [1.8.1]: https://www.nuget.org/packages/Medo.Uuid7/1.8.1
 [1.8.0]: https://www.nuget.org/packages/Medo.Uuid7/1.8.0
 [1.7.0]: https://www.nuget.org/packages/Medo.Uuid7/1.7.0
