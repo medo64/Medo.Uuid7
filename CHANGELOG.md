@@ -1,4 +1,5 @@
-CHANGE LOG
+CHANGELOG
+
 
 [1.8.2] (2023-11-24)
 
