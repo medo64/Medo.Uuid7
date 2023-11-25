@@ -520,6 +520,37 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(Uuid7.Empty, Uuid7.MinValue);
     }
 
+
+    [TestMethod]
+    public void Uuid7_ToDateTime() {
+        var uuid = Uuid7.Parse("018c051e-b87a-7404-ae7f-50e3be711102");
+        var uuidTime = uuid.ToDateTime();
+        Assert.AreEqual(new DateTime(2023, 11, 25, 06, 15, 48, 602, DateTimeKind.Utc), uuidTime);
+        Assert.AreEqual(true, uuidTime.Kind == DateTimeKind.Utc);
+    }
+
+    [TestMethod]
+    public void Uuid7_ToDateTimeOffset() {
+        var uuid = Uuid7.Parse("018c051e-b87a-7404-ae7f-50e3be711102");
+        var uuidTime = uuid.ToDateTimeOffset();
+        Assert.AreEqual(new DateTimeOffset(2023, 11, 25, 06, 15, 48, 602, TimeSpan.Zero), uuidTime);
+        Assert.AreEqual(TimeSpan.Zero, uuidTime.Offset);
+    }
+
+
+    [TestMethod]
+    public void Uuid7_ToDateTimeInvalidVersion() {
+        var uuid = Uuid7.Parse("018c051e-b87a-6404-ae7f-50e3be711102");
+        Assert.ThrowsException<InvalidOperationException>(() => uuid.ToDateTimeOffset());
+    }
+
+    [TestMethod]
+    public void Uuid7_ToDateTimeOffsetInvalidVersion() {
+        var uuid = Uuid7.Parse("018c051e-b87a-6404-ae7f-50e3be711102");
+        Assert.ThrowsException<InvalidOperationException>(() => uuid.ToDateTimeOffset());
+    }
+
+
     #region Helpers
 
 #if NET6_0_OR_GREATER

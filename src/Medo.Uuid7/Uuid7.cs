@@ -353,6 +353,30 @@ public readonly struct Uuid7
         }
     }
 
+    /// <summary>
+    /// Returns DateTime based on UUID v7 timestamp.
+    /// Please note that only timestamp has only 1 millisecond resolution and random bits are lost.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">UUID is not version 7.</exception>
+    public DateTime ToDateTime() {
+        if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
+        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
+        var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
+        return new DateTime(ticks, DateTimeKind.Utc);
+    }
+
+    /// <summary>
+    /// Returns DateTimeOffset based on UUID v7 timestamp.
+    /// Please note that only timestamp has only 1 millisecond resolution and random bits are lost.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">UUID is not version 7.</exception>
+    public DateTimeOffset ToDateTimeOffset() {
+        if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
+        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
+        var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
+        return new DateTimeOffset(ticks, TimeSpan.Zero);
+    }
+
 
 #if NET6_0_OR_GREATER
 
