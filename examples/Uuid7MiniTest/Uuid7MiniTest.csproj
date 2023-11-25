@@ -18,9 +18,3 @@
     </ItemGroup>
 
 </Project>
-
-<!--
-Test with:
-
-    dotnet run --configuration:Release
--->
