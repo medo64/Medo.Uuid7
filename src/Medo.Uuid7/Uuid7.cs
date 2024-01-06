@@ -1350,7 +1350,6 @@ public readonly struct Uuid7
         return true;
     }
 
-
     private static readonly BigInteger Base16Modulo = 16;
     private static readonly char[] Base16Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7',
@@ -1443,7 +1442,15 @@ public readonly struct Uuid7
         if (count != 25) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+        int byteCount = number.GetByteCount(isUnsigned: true);
+        Span<byte> buffer = stackalloc byte[byteCount];
+        number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
+
+        if (buffer.Length < 16) {
+            Span<byte> newBuffer = stackalloc byte[16];
+            buffer.CopyTo(newBuffer[(16 - buffer.Length)..]);
+            buffer = newBuffer;
+        }
 #else
         byte[] numberBytes = number.ToByteArray();
         if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
@@ -1453,17 +1460,17 @@ public readonly struct Uuid7
         } else {
             Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
         }
-#endif
+
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
             Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
+#endif
 
         result = new Uuid7(buffer);
         return true;
     }
-
 
     private static readonly BigInteger Base58Modulo = 58;
     private static readonly char[] Base58Alphabet = [
@@ -1500,7 +1507,15 @@ public readonly struct Uuid7
         if (count != 22) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+        int byteCount = number.GetByteCount(isUnsigned: true);
+        Span<byte> buffer = stackalloc byte[byteCount];
+        number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
+
+        if (buffer.Length < 16) {
+            Span<byte> newBuffer = stackalloc byte[16];
+            buffer.CopyTo(newBuffer[(16 - buffer.Length)..]);
+            buffer = newBuffer;
+        }
 #else
         byte[] numberBytes = number.ToByteArray();
         if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
@@ -1510,12 +1525,13 @@ public readonly struct Uuid7
         } else {
             Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
         }
-#endif
+
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
             Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
+#endif
 
         result = new Uuid7(buffer);
         return true;
