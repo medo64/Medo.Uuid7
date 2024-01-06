@@ -1356,7 +1356,7 @@ public readonly struct Uuid7
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
+        var dict = new Dictionary<char, BigInteger>(Base16Alphabet.Length);
         for (var i = 0; i < Base16Alphabet.Length; i++) {
             var ch = Base16Alphabet[i];
             dict.Add(ch, i);
@@ -1413,7 +1413,7 @@ public readonly struct Uuid7
         'v', 'w', 'x', 'y', 'z'
     ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base35AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
+        var dict = new Dictionary<char, BigInteger>(Base35Alphabet.Length);
         for (var i = 0; i < Base35Alphabet.Length; i++) {
             var ch = Base35Alphabet[i];
             dict.Add(ch, i);
@@ -1482,7 +1482,7 @@ public readonly struct Uuid7
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
     ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base58AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
+        var dict = new Dictionary<char, BigInteger>(Base58Alphabet.Length);
         for (var i = 0; i < Base58Alphabet.Length; i++) {
             dict.Add(Base58Alphabet[i], i);
         }
