@@ -424,9 +424,7 @@ public readonly struct Uuid7
     /// Input must contain exactly 25 characters.
     /// </summary>
     /// <param name="id25Text">Id25 text.</param>
-    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>
-
 #if NET6_0_OR_GREATER
     public static Uuid7 FromId25String(ReadOnlySpan<char> id25Text) {
         if (TryParseAsId25(id25Text, out var result)) {
@@ -461,7 +459,6 @@ public readonly struct Uuid7
     /// Input must contain exactly 22 characters.
     /// </summary>
     /// <param name="id22Text">Id22 text.</param>
-    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>
 #if NET6_0_OR_GREATER
     public static Uuid7 FromId22String(ReadOnlySpan<char> id22Text) {
