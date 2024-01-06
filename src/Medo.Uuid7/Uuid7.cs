@@ -76,7 +76,6 @@ public readonly struct Uuid7
     /// <exception cref="ArgumentNullException">Span cannot be null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Span must be exactly 16 bytes in length.</exception>
     public Uuid7(ReadOnlySpan<byte> span) {
-        if (span == null) { throw new ArgumentNullException(nameof(span), "Span cannot be null."); }
         if (span.Length != 16) { throw new ArgumentOutOfRangeException(nameof(span), "Span must be exactly 16 bytes in length."); }
         Bytes = new byte[16];
         span.CopyTo(Bytes);
@@ -199,8 +198,8 @@ public readonly struct Uuid7
     public static void Fill(Span<Uuid7> data) {
 #else
     public static void Fill(Uuid7[] data) {
-#endif
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
         lock (NonThreadedSyncRoot) {
             for (var i = 0; i < data.Length; i++) {
                 var bytes = new byte[16];
@@ -427,6 +426,16 @@ public readonly struct Uuid7
     /// <param name="id25Text">Id25 text.</param>
     /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+
+#if NET6_0_OR_GREATER
+    public static Uuid7 FromId25String(ReadOnlySpan<char> id25Text) {
+        if (TryParseAsId25(id25Text, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#else
     public static Uuid7 FromId25String(string id25Text) {
         if (id25Text == null) { throw new ArgumentNullException(nameof(id25Text), "Text cannot be null."); }
         if (TryParseAsId25(id25Text.ToCharArray(), out var result)) {
@@ -435,6 +444,7 @@ public readonly struct Uuid7
             throw new FormatException("Unrecognized UUID format.");
         }
     }
+#endif
 
 
     /// <summary>
@@ -453,6 +463,15 @@ public readonly struct Uuid7
     /// <param name="id22Text">Id22 text.</param>
     /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+#if NET6_0_OR_GREATER
+    public static Uuid7 FromId22String(ReadOnlySpan<char> id22Text) {
+        if (TryParseAsId22(id22Text, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#else
     public static Uuid7 FromId22String(string id22Text) {
         if (id22Text == null) { throw new ArgumentNullException(nameof(id22Text), "Text cannot be null."); }
         if (TryParseAsId22(id22Text.ToCharArray(), out var result)) {
@@ -461,6 +480,7 @@ public readonly struct Uuid7
             throw new FormatException("Unrecognized UUID format.");
         }
     }
+#endif
 
     #endregion String
 
@@ -618,7 +638,6 @@ public readonly struct Uuid7
     public static bool operator <=(Guid left, Uuid7 right) {
         return left.CompareTo(right) is < 0 or 0;
     }
-
 
     /// <summary>
     /// Returns true if left-hand operand is greater than or equal to right-hand operand.
