@@ -76,7 +76,6 @@ public readonly struct Uuid7
     /// <exception cref="ArgumentNullException">Span cannot be null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Span must be exactly 16 bytes in length.</exception>
     public Uuid7(ReadOnlySpan<byte> span) {
-        if (span == null) { throw new ArgumentNullException(nameof(span), "Span cannot be null."); }
         if (span.Length != 16) { throw new ArgumentOutOfRangeException(nameof(span), "Span must be exactly 16 bytes in length."); }
         Bytes = new byte[16];
         span.CopyTo(Bytes);
@@ -199,8 +198,8 @@ public readonly struct Uuid7
     public static void Fill(Span<Uuid7> data) {
 #else
     public static void Fill(Uuid7[] data) {
-#endif
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
         lock (NonThreadedSyncRoot) {
             for (var i = 0; i < data.Length; i++) {
                 var bytes = new byte[16];
@@ -425,8 +424,16 @@ public readonly struct Uuid7
     /// Input must contain exactly 25 characters.
     /// </summary>
     /// <param name="id25Text">Id25 text.</param>
-    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+#if NET6_0_OR_GREATER
+    public static Uuid7 FromId25String(ReadOnlySpan<char> id25Text) {
+        if (TryParseAsId25(id25Text, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#else
     public static Uuid7 FromId25String(string id25Text) {
         if (id25Text == null) { throw new ArgumentNullException(nameof(id25Text), "Text cannot be null."); }
         if (TryParseAsId25(id25Text.ToCharArray(), out var result)) {
@@ -435,6 +442,7 @@ public readonly struct Uuid7
             throw new FormatException("Unrecognized UUID format.");
         }
     }
+#endif
 
 
     /// <summary>
@@ -451,8 +459,16 @@ public readonly struct Uuid7
     /// Input must contain exactly 22 characters.
     /// </summary>
     /// <param name="id22Text">Id22 text.</param>
-    /// <exception cref="ArgumentNullException">Text cannot be null.</exception>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+#if NET6_0_OR_GREATER
+    public static Uuid7 FromId22String(ReadOnlySpan<char> id22Text) {
+        if (TryParseAsId22(id22Text, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#else
     public static Uuid7 FromId22String(string id22Text) {
         if (id22Text == null) { throw new ArgumentNullException(nameof(id22Text), "Text cannot be null."); }
         if (TryParseAsId22(id22Text.ToCharArray(), out var result)) {
@@ -461,6 +477,7 @@ public readonly struct Uuid7
             throw new FormatException("Unrecognized UUID format.");
         }
     }
+#endif
 
     #endregion String
 
@@ -618,7 +635,6 @@ public readonly struct Uuid7
     public static bool operator <=(Guid left, Uuid7 right) {
         return left.CompareTo(right) is < 0 or 0;
     }
-
 
     /// <summary>
     /// Returns true if left-hand operand is greater than or equal to right-hand operand.
@@ -827,43 +843,78 @@ public readonly struct Uuid7
             case "":
             case "D":
             case "d": {
+#if NET6_0_OR_GREATER
+                    return string.Create(36, Bytes, (destination, bytes)
+                        => TryWriteAsDefaultString(destination, bytes, out _));
+#else
                     var destination = new char[36];
                     TryWriteAsDefaultString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "N":
             case "n": {
+#if NET6_0_OR_GREATER
+                    return string.Create(32, Bytes, (destination, bytes)
+                        => TryWriteAsNoHypensString(destination, bytes, out _));
+#else
                     var destination = new char[32];
                     TryWriteAsNoHypensString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "B":
             case "b": {
+#if NET6_0_OR_GREATER
+                    return string.Create(38, Bytes, (destination, bytes)
+                        => TryWriteAsBracesString(destination, bytes, out _));
+#else
                     var destination = new char[38];
                     TryWriteAsBracesString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "P":
             case "p": {
+#if NET6_0_OR_GREATER
+                    return string.Create(38, Bytes, (destination, bytes)
+                        => TryWriteAsParenthesesString(destination, bytes, out _));
+#else
                     var destination = new char[38];
                     TryWriteAsParenthesesString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "X":
             case "x": {
+#if NET6_0_OR_GREATER
+                    return string.Create(68, Bytes, (destination, bytes)
+                        => TryWriteAsHexadecimalString(destination, bytes, out _));
+#else
                     var destination = new char[68];
                     TryWriteAsHexadecimalString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "5": {  // non-standard (Id25)
+#if NET6_0_OR_GREATER
+                    return string.Create(25, Bytes, (destination, bytes)
+                        => TryWriteAsId25(destination, bytes, out _));
+#else
                     var destination = new char[25];
                     TryWriteAsId25(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "2": {  // non-standard (Id22)
+#if NET6_0_OR_GREATER
+                    return string.Create(22, Bytes, (destination, bytes)
+                        => TryWriteAsId22(destination, bytes, out _));
+#else
                     var destination = new char[22];
                     TryWriteAsId22(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             default: throw new FormatException("Invalid UUID format.");
         }
@@ -1075,7 +1126,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsDefaultString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsDefaultString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsDefaultString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1108,7 +1159,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsNoHypensString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsNoHypensString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsNoHypensString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1137,7 +1188,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsBracesString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsBracesString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsBracesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1172,7 +1223,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsParenthesesString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsParenthesesString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsParenthesesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1207,7 +1258,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsHexadecimalString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsHexadecimalString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsHexadecimalString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1248,7 +1299,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsId22(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsId22(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsId22(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1273,7 +1324,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsId25(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsId25(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsId25(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1296,14 +1347,13 @@ public readonly struct Uuid7
         return true;
     }
 
-
     private static readonly BigInteger Base16Modulo = 16;
-    private static readonly char[] Base16Alphabet = new char[] {
+    private static readonly char[] Base16Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7',
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-    };
+    ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
+        var dict = new Dictionary<char, BigInteger>(Base16Alphabet.Length);
         for (var i = 0; i < Base16Alphabet.Length; i++) {
             var ch = Base16Alphabet[i];
             dict.Add(ch, i);
@@ -1351,16 +1401,15 @@ public readonly struct Uuid7
         return true;
     }
 
-
     private static readonly BigInteger Base35Modulo = 35;
-    private static readonly char[] Base35Alphabet = new char[] {
+    private static readonly char[] Base35Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
         'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
         'v', 'w', 'x', 'y', 'z'
-    };
+    ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base35AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
+        var dict = new Dictionary<char, BigInteger>(Base35Alphabet.Length);
         for (var i = 0; i < Base35Alphabet.Length; i++) {
             var ch = Base35Alphabet[i];
             dict.Add(ch, i);
@@ -1389,7 +1438,15 @@ public readonly struct Uuid7
         if (count != 25) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+        int byteCount = number.GetByteCount(isUnsigned: true);
+        Span<byte> buffer = stackalloc byte[byteCount];
+        number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
+
+        if (buffer.Length < 16) {
+            Span<byte> newBuffer = stackalloc byte[16];
+            buffer.CopyTo(newBuffer[(16 - buffer.Length)..]);
+            buffer = newBuffer;
+        }
 #else
         byte[] numberBytes = number.ToByteArray();
         if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
@@ -1399,29 +1456,29 @@ public readonly struct Uuid7
         } else {
             Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
         }
-#endif
+
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
             Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
+#endif
 
         result = new Uuid7(buffer);
         return true;
     }
 
-
     private static readonly BigInteger Base58Modulo = 58;
-    private static readonly char[] Base58Alphabet = new char[] {
+    private static readonly char[] Base58Alphabet = [
         '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
         'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
         'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
         'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    };
+    ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base58AlphabetDict = new(() => {
-        var dict = new Dictionary<char, BigInteger>();
+        var dict = new Dictionary<char, BigInteger>(Base58Alphabet.Length);
         for (var i = 0; i < Base58Alphabet.Length; i++) {
             dict.Add(Base58Alphabet[i], i);
         }
@@ -1446,7 +1503,15 @@ public readonly struct Uuid7
         if (count != 22) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+        int byteCount = number.GetByteCount(isUnsigned: true);
+        Span<byte> buffer = stackalloc byte[byteCount];
+        number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
+
+        if (buffer.Length < 16) {
+            Span<byte> newBuffer = stackalloc byte[16];
+            buffer.CopyTo(newBuffer[(16 - buffer.Length)..]);
+            buffer = newBuffer;
+        }
 #else
         byte[] numberBytes = number.ToByteArray();
         if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
@@ -1456,12 +1521,13 @@ public readonly struct Uuid7
         } else {
             Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
         }
-#endif
+
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
             Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
+#endif
 
         result = new Uuid7(buffer);
         return true;
