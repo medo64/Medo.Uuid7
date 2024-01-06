@@ -7,6 +7,13 @@ namespace Tests;
 
 public partial class Uuid7_Tests {
 
+    private const bool IsModernDotNet =
+#if NET6_0_OR_GREATER
+        true;
+#else
+        false;
+#endif
+
 
     [TestMethod]
     public void Uuid7_FormatParse_StringFormat() {
@@ -128,7 +135,8 @@ public partial class Uuid7_Tests {
     [DataRow("usz5x bbiqs fq7s7 27n0p zr2x")]  // too short
     [DataRow("usz5x bbiqs fq7s7 27n0p zr2xaa")]  // too long
     public void Uuid7_FormatParse_Id25Errors(string text) {
-        if (text == null) {
+        if (text == null && !IsModernDotNet) {
+            // Only NetStandard 2.0 throws ArgumentNullException
             Assert.ThrowsException<ArgumentNullException>(() => {
                 Uuid7.FromId25String(text);
             });
@@ -173,7 +181,8 @@ public partial class Uuid7_Tests {
     [DataRow("YcVfx kQb6JR zqk5k F2tNL")]  // too short
     [DataRow("YcVfx kQb6JR zqk5k F2tNLvv")]  // too long
     public void Uuid7_FormatParse_Id22Errors(string text) {
-        if (text == null) {
+        if (text == null && !IsModernDotNet) {
+            // Only NetStandard 2.0 throws ArgumentNullException
             Assert.ThrowsException<ArgumentNullException>(() => {
                 Uuid7.FromId22String(text);
             });
