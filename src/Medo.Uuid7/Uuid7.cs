@@ -1129,7 +1129,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsDefaultString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsDefaultString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsDefaultString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1162,7 +1162,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsNoHypensString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsNoHypensString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsNoHypensString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1191,7 +1191,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsBracesString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsBracesString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsBracesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1226,7 +1226,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsParenthesesString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsParenthesesString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsParenthesesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1261,7 +1261,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsHexadecimalString(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsHexadecimalString(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsHexadecimalString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1302,7 +1302,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsId22(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsId22(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsId22(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1327,7 +1327,7 @@ public readonly struct Uuid7
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if NET6_0_OR_GREATER
-    private static bool TryWriteAsId25(Span<char> destination, byte[] bytes, out int charsWritten) {
+    private static bool TryWriteAsId25(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
 #else
     private static bool TryWriteAsId25(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
@@ -1403,7 +1403,6 @@ public readonly struct Uuid7
         result = new Uuid7(buffer);
         return true;
     }
-
 
     private static readonly BigInteger Base35Modulo = 35;
     private static readonly char[] Base35Alphabet = [
