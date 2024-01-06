@@ -827,43 +827,78 @@ public readonly struct Uuid7
             case "":
             case "D":
             case "d": {
+#if NET6_0_OR_GREATER
+                    return string.Create(36, Bytes, (destination, bytes)
+                        => TryWriteAsDefaultString(destination, bytes, out _));
+#else
                     var destination = new char[36];
                     TryWriteAsDefaultString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "N":
             case "n": {
+#if NET6_0_OR_GREATER
+                    return string.Create(32, Bytes, (destination, bytes)
+                        => TryWriteAsNoHypensString(destination, bytes, out _));
+#else
                     var destination = new char[32];
                     TryWriteAsNoHypensString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "B":
             case "b": {
+#if NET6_0_OR_GREATER
+                    return string.Create(38, Bytes, (destination, bytes)
+                        => TryWriteAsBracesString(destination, bytes, out _));
+#else
                     var destination = new char[38];
                     TryWriteAsBracesString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "P":
             case "p": {
+#if NET6_0_OR_GREATER
+                    return string.Create(38, Bytes, (destination, bytes)
+                        => TryWriteAsParenthesesString(destination, bytes, out _));
+#else
                     var destination = new char[38];
                     TryWriteAsParenthesesString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "X":
             case "x": {
+#if NET6_0_OR_GREATER
+                    return string.Create(68, Bytes, (destination, bytes)
+                        => TryWriteAsHexadecimalString(destination, bytes, out _));
+#else
                     var destination = new char[68];
                     TryWriteAsHexadecimalString(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "5": {  // non-standard (Id25)
+#if NET6_0_OR_GREATER
+                    return string.Create(25, Bytes, (destination, bytes)
+                        => TryWriteAsId25(destination, bytes, out _));
+#else
                     var destination = new char[25];
                     TryWriteAsId25(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             case "2": {  // non-standard (Id22)
+#if NET6_0_OR_GREATER
+                    return string.Create(22, Bytes, (destination, bytes)
+                        => TryWriteAsId22(destination, bytes, out _));
+#else
                     var destination = new char[22];
                     TryWriteAsId22(destination, Bytes, out _);
                     return new string(destination);
+#endif
                 }
             default: throw new FormatException("Invalid UUID format.");
         }
@@ -1298,10 +1333,10 @@ public readonly struct Uuid7
 
 
     private static readonly BigInteger Base16Modulo = 16;
-    private static readonly char[] Base16Alphabet = new char[] {
+    private static readonly char[] Base16Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7',
         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-    };
+    ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base16AlphabetDict = new(() => {
         var dict = new Dictionary<char, BigInteger>();
         for (var i = 0; i < Base16Alphabet.Length; i++) {
@@ -1353,12 +1388,12 @@ public readonly struct Uuid7
 
 
     private static readonly BigInteger Base35Modulo = 35;
-    private static readonly char[] Base35Alphabet = new char[] {
+    private static readonly char[] Base35Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
         'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
         'v', 'w', 'x', 'y', 'z'
-    };
+    ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base35AlphabetDict = new(() => {
         var dict = new Dictionary<char, BigInteger>();
         for (var i = 0; i < Base35Alphabet.Length; i++) {
@@ -1412,14 +1447,14 @@ public readonly struct Uuid7
 
 
     private static readonly BigInteger Base58Modulo = 58;
-    private static readonly char[] Base58Alphabet = new char[] {
+    private static readonly char[] Base58Alphabet = [
         '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
         'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L',
         'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
         'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r',
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    };
+    ];
     private static readonly Lazy<Dictionary<char, BigInteger>> Base58AlphabetDict = new(() => {
         var dict = new Dictionary<char, BigInteger>();
         for (var i = 0; i < Base58Alphabet.Length; i++) {
