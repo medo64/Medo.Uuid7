@@ -844,7 +844,7 @@ public readonly struct Uuid7
             case "D":
             case "d": {
 #if NET6_0_OR_GREATER
-                    return string.Create(36, Bytes, (destination, bytes)
+                    return string.Create(36, Bytes, static (destination, bytes)
                         => TryWriteAsDefaultString(destination, bytes, out _));
 #else
                     var destination = new char[36];
@@ -855,7 +855,7 @@ public readonly struct Uuid7
             case "N":
             case "n": {
 #if NET6_0_OR_GREATER
-                    return string.Create(32, Bytes, (destination, bytes)
+                    return string.Create(32, Bytes, static (destination, bytes)
                         => TryWriteAsNoHypensString(destination, bytes, out _));
 #else
                     var destination = new char[32];
@@ -866,7 +866,7 @@ public readonly struct Uuid7
             case "B":
             case "b": {
 #if NET6_0_OR_GREATER
-                    return string.Create(38, Bytes, (destination, bytes)
+                    return string.Create(38, Bytes, static (destination, bytes)
                         => TryWriteAsBracesString(destination, bytes, out _));
 #else
                     var destination = new char[38];
@@ -877,7 +877,7 @@ public readonly struct Uuid7
             case "P":
             case "p": {
 #if NET6_0_OR_GREATER
-                    return string.Create(38, Bytes, (destination, bytes)
+                    return string.Create(38, Bytes, static (destination, bytes)
                         => TryWriteAsParenthesesString(destination, bytes, out _));
 #else
                     var destination = new char[38];
@@ -888,7 +888,7 @@ public readonly struct Uuid7
             case "X":
             case "x": {
 #if NET6_0_OR_GREATER
-                    return string.Create(68, Bytes, (destination, bytes)
+                    return string.Create(68, Bytes, static (destination, bytes)
                         => TryWriteAsHexadecimalString(destination, bytes, out _));
 #else
                     var destination = new char[68];
@@ -898,7 +898,7 @@ public readonly struct Uuid7
                 }
             case "5": {  // non-standard (Id25)
 #if NET6_0_OR_GREATER
-                    return string.Create(25, Bytes, (destination, bytes)
+                    return string.Create(25, Bytes, static (destination, bytes)
                         => TryWriteAsId25(destination, bytes, out _));
 #else
                     var destination = new char[25];
@@ -908,7 +908,7 @@ public readonly struct Uuid7
                 }
             case "2": {  // non-standard (Id22)
 #if NET6_0_OR_GREATER
-                    return string.Create(22, Bytes, (destination, bytes)
+                    return string.Create(22, Bytes, static (destination, bytes)
                         => TryWriteAsId22(destination, bytes, out _));
 #else
                     var destination = new char[22];
@@ -1055,12 +1055,15 @@ public readonly struct Uuid7
     /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
 #if NET6_0_OR_GREATER
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
+        if (s == null) { result = Empty; return false; }
+        return TryParseAsString(s.AsSpan(), out result);
+    }
 #else
     public static bool TryParse(string? s, IFormatProvider? provider, out Uuid7 result) {
-#endif
         if (s == null) { result = Empty; return false; }
         return TryParseAsString(s.ToCharArray(), out result);
     }
+#endif
 
     #endregion ISpanParsable<Uuid7>
 
@@ -1071,7 +1074,18 @@ public readonly struct Uuid7
 
 #if NET6_0_OR_GREATER
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
+    private static int CompareArrays(ReadOnlySpan<byte> buffer1, ReadOnlySpan<byte> buffer2) {
+        if (buffer1.Length == 16 && buffer2.Length == 16) {
+            return buffer1.SequenceCompareTo(buffer2);
+        } else if (buffer1.Length != 16) {
+            return -1;
+        } else if (buffer2.Length != 16) {
+            return +1;
+        }
+
+        return 0;  // object are equal
+    }
+#else
     private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
         if ((buffer1 != null) && (buffer2 != null) && (buffer1.Length == 16) && (buffer2.Length == 16)) {  // protecting against EF or similar API that uses reflection (https://github.com/medo64/Medo.Uuid7/issues/1)
             var comparer = Comparer<byte>.Default;
@@ -1087,7 +1101,7 @@ public readonly struct Uuid7
 
         return 0;  // object are equal
     }
-
+#endif
 
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
 #if !UUID7_NO_RANDOM_BUFFER
@@ -1380,7 +1394,15 @@ public readonly struct Uuid7
         if (count != 32) { result = Uuid7.Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        var buffer = number.ToByteArray(isUnsigned: true, isBigEndian: true);
+        int byteCount = number.GetByteCount(isUnsigned: true);
+        Span<byte> buffer = stackalloc byte[byteCount];
+        number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
+
+        if (buffer.Length < 16) {
+            Span<byte> newBuffer = stackalloc byte[16];
+            buffer.CopyTo(newBuffer[(16 - buffer.Length)..]);
+            buffer = newBuffer;
+        }
 #else
         byte[] numberBytes = number.ToByteArray();
         if (BitConverter.IsLittleEndian) { Array.Reverse(numberBytes); }
@@ -1390,12 +1412,12 @@ public readonly struct Uuid7
         } else {
             Buffer.BlockCopy(numberBytes, 0, buffer, 16 - numberBytes.Length, numberBytes.Length);
         }
-#endif
         if (buffer.Length < 16) {
             var newBuffer = new byte[16];
             Buffer.BlockCopy(buffer, 0, newBuffer, 16 - buffer.Length, buffer.Length);
             buffer = newBuffer;
         }
+#endif
 
         result = new Uuid7(buffer);
         return true;
