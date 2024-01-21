@@ -1,5 +1,10 @@
 CHANGELOG
 
+[1.9.1] (2024-01-21)
+
+- More parsing performance improvement - courtesy of [Joel Mueller](https://github.com/jtmueller)
+
+
 [1.9.0] (2024-01-06)
 
 - Parsing performance improvement - courtesy of [Joel Mueller](https://github.com/jtmueller)
