@@ -131,6 +131,7 @@ CHANGELOG
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[1.9.1]: https://www.nuget.org/packages/Medo.Uuid7/1.9.1
 [1.9.0]: https://www.nuget.org/packages/Medo.Uuid7/1.9.0
 [1.8.2]: https://www.nuget.org/packages/Medo.Uuid7/1.8.2
 [1.8.1]: https://www.nuget.org/packages/Medo.Uuid7/1.8.1
