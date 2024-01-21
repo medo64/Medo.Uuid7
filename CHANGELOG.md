@@ -2,8 +2,8 @@ CHANGELOG
 
 [1.9.0] (2024-01-06)
 
-- Parsing performance improvement
-- Improved ToString performance
+- Parsing performance improvement - courtesy of [Joel Mueller](https://github.com/jtmueller)
+- Improved ToString performance - courtesy of [Joel Mueller](https://github.com/jtmueller)
 
 
 [1.8.2] (2023-11-24)
