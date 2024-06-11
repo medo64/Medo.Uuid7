@@ -61,6 +61,28 @@ var uuid = new Uuid7();
 Console.WriteLine($"UUID : {uuid}");
 ```
 
+### Entity Framework Core
+
+You can configure Entity Framework Core to support mapping of the `Uuid7` type with the `Medo.Uuid7.EntityFrameworkCore` package.
+
+In your DbContext, override the `ConfigureConventions` method and use the `Uuid7` type in your entity model.
+
+```csharp
+public class ExampleContext(DbContextOptions<ExampleContext> options) : DbContext(options)
+{
+    public DbSet<Product> Product => Set<Product>();
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<Uuid7>().HaveConversion<Uuid7ToGuidConverter>(); // or 'Uuid7ToBytesConverter', 'Uuid7ToId22Converter', 'Uuid7ToId25Converter', 'Uuid7ToStringConverter'
+    }
+}
+
+public class Product
+{
+    public Uuid7 Id { get; set; } = Uuid7.NewUuid7();
+}
+```
 
 ### Configuration
 
