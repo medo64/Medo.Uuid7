@@ -67,7 +67,7 @@ Console.WriteLine($"UUID : {uuid}");
 
 In order to use the `Uuid7` type in your models, you must configure your DbContext in Entity Framework Core.
 
-You may choose from various converters from the `Medo.Uuid7.EntityFrameworkCore` package. These are used for your EF database provider to read from or write to a property's associated DB column type:
+You can choose from various converters from the `Medo.Uuid7.EntityFrameworkCore` package. These are used for your EF database provider to read from or write to a property's associated DB column type:
 * Uuid7ToGuidConverter
 * Uuid7ToStringConverter
 * Uuid7ToBytesConverter
@@ -76,8 +76,7 @@ You may choose from various converters from the `Medo.Uuid7.EntityFrameworkCore`
 
 To set a converter globally for all properties of type `Uuid7`, override the `ConfigureConventions` method:
 ```csharp
-protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-{
+protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) {
     configurationBuilder.Properties<Uuid7>().HaveConversion<Uuid7ToGuidConverter>();
 }
 ```
