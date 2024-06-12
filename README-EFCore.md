@@ -74,7 +74,7 @@ You may choose from various converters from the `Medo.Uuid7.EntityFrameworkCore`
 * Uuid7ToId22Converter
 * Uuid7ToId25Converter
 
-If you wish to enable this mapping globally, override the `ConfigureConventions` method:
+To set a converter globally for all properties of type `Uuid7`, override the `ConfigureConventions` method:
 ```csharp
 protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
 {

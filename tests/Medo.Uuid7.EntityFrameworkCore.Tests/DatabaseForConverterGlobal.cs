@@ -5,6 +5,12 @@ using Medo;
 namespace Tests;
 
 public class DatabaseForConverterGlobal : DbContext {
+    private readonly Type ConverterType;
+
+    public DatabaseForConverterGlobal(Type converterType) {
+        ConverterType = converterType;
+    }
+
     public DbSet<User> UuidSevens { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
@@ -12,8 +18,7 @@ public class DatabaseForConverterGlobal : DbContext {
         base.OnConfiguring(optionsBuilder);
     }
 
-    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-    {
-        configurationBuilder.Properties<Uuid7>().HaveConversion<Uuid7ToGuidConverter>();
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) {
+        configurationBuilder.Properties<Uuid7>().HaveConversion(ConverterType);
     }
 }
