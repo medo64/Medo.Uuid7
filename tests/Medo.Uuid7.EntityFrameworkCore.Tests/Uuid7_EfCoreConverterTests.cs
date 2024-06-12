@@ -10,8 +10,20 @@ namespace Tests;
 public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
+    public void Uuid7_Uuid7ToGuidConverter_Global() {
+        using var db = CreateDatabaseForConverterGlobal();
+        User user = CreateUser();
+        db.UuidSevens.Add(user);
+        db.SaveChanges();
+        User dbUser = db.UuidSevens.First();
+        Assert.AreEqual(dbUser.Id, user.Id);
+        db.Database.CloseConnection();
+        db.Database.EnsureDeleted();
+    }
+
+    [TestMethod]
     public void Uuid7_Uuid7ToGuidConverter() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser();
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -23,7 +35,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToBytesConverter() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser();
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -35,7 +47,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToStringConverter() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser();
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -47,7 +59,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToId25Converter() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser();
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -59,7 +71,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToId22Converter() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser();
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -74,7 +86,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToGuidConverter_Fixed() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser(DummyUuidBytes);
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -92,7 +104,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToBytesConverter_Fixed() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser(DummyUuidBytes);
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -106,7 +118,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToStringConverter_Fixed() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser(DummyUuidBytes);
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -120,7 +132,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToId25Converter_Fixed() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser(DummyUuidBytes);
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -134,7 +146,7 @@ public class Uuid7_EfCoreConverterTests {
 
     [TestMethod]
     public void Uuid7_Uuid7ToId22Converter_Fixed() {
-        using var db = CreateDatabase();
+        using var db = CreateDatabaseForConverterByEntity();
         User user = CreateUser(DummyUuidBytes);
         db.UuidSevens.Add(user);
         db.SaveChanges();
@@ -149,8 +161,15 @@ public class Uuid7_EfCoreConverterTests {
 
     #region Helpers
 
-    private static Database CreateDatabase() {
-        var database = new Database();
+    private static DatabaseForConverterByEntity CreateDatabaseForConverterByEntity() {
+        var database = new DatabaseForConverterByEntity();
+        database.Database.OpenConnection();
+        database.Database.EnsureCreated();
+        return database;
+    }
+
+    private static DatabaseForConverterGlobal CreateDatabaseForConverterGlobal() {
+        var database = new DatabaseForConverterGlobal();
         database.Database.OpenConnection();
         database.Database.EnsureCreated();
         return database;
