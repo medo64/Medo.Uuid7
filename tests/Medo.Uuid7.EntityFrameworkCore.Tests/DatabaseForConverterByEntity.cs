@@ -4,7 +4,7 @@ using Medo;
 
 namespace Tests;
 
-public class Database : DbContext {
+public class DatabaseForConverterByEntity : DbContext {
     public DbSet<User> UuidSevens { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
