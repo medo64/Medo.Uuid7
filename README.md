@@ -62,6 +62,56 @@ Console.WriteLine($"UUID : {uuid}");
 ```
 
 
+## Converting to Guid
+
+Converting to and from `System.Guid` is a complicated story. There are two ways
+it can be done. One is by preserving binary equivalency and that is what I
+selected by default. Any time a conversion into `System.Guid` is done, all raw
+bytes are the same but a textual representation between `Medo.Uuid7` and
+`System.Guid` on little-endian platforms will differ.
+
+For example, this code will retain binary compatibility during conversion.
+```csharp
+using Medo;
+
+var uuid = Uuid7.NewUuid7();
+Console.WriteLine($"{uuid}");
+
+var guid = (Guid)uuid;
+Console.WriteLine($"{guid}");
+```
+
+However, that means that textual respresentations look different since Microsoft
+prints logically numeric Guid elements in little-endian order instead of
+arguably more common big-endian order.
+```plain
+01904d33-d262-7531-b71c-05555c63df91
+334d9001-62d2-3175-b71c-05555c63df91
+```
+
+If we want to preserve textual representation, we need to actually use `ToGuidMsSql`
+function as this one takes internal endianess into account.
+```csharp
+using Medo;
+
+var uuid = Uuid7.NewUuid7();
+Console.WriteLine($"{uuid}");
+
+var guid = uuid.ToGuidMsSql();
+Console.WriteLine($"{guid}");
+```
+
+Textual output in this case would be equal but at the cost of raw binary bytes
+differing.
+```plain
+01904d33-d262-7531-b71c-05555c63df91
+01904d33-d262-7531-b71c-05555c63df91
+```
+
+I view this as a damn-if-you-do-damn-if-you-don't scenario and I decided to be
+damned in binary format.
+
+
 ### Configuration
 
 #### Disable RNG Buffering
