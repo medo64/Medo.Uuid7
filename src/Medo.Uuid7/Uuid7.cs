@@ -177,14 +177,8 @@ public readonly struct Uuid7
         lock (NonThreadedSyncRoot) {
             FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
         }
-        if (BitConverter.IsLittleEndian) {
-            (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
-            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
-            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
-            return new Guid(bytes);
-        } else {  // on big endian platforms, it's all the same
-            return new Guid(bytes);
-        }
+        AdjustGuidEndianess(ref bytes);
+        return new Guid(bytes);
     }
 
 
@@ -212,7 +206,7 @@ public readonly struct Uuid7
     #endregion Static
 
 
-    #region Implemenation (v7)
+    #region Implementation (v7)
 
 #if NET6_0_OR_GREATER
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -278,10 +272,10 @@ public readonly struct Uuid7
     private static long NonThreadedMillisecondCounter;  // usually real time but doesn't go backward
     private static uint NonThreadedMonotonicCounter;  // counter that gets embedded into UUID
 
-    #endregion Implemenation (v7)
+    #endregion Implementation (v7)
 
 
-    #region Implemenation (v4)
+    #region Implementation (v4)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void FillBytes4(ref byte[] bytes) {
@@ -292,7 +286,22 @@ public readonly struct Uuid7
         bytes[8] = (byte)(0x20 | (bytes[8] & 0x3F));  // set 2-bit variant
     }
 
-    #endregion Implemenation
+    #endregion Implementation (v4)
+
+
+    #region Endianess
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void AdjustGuidEndianess(ref byte[] bytes) {
+        if (BitConverter.IsLittleEndian) {  // swap a few bytes on little-endian
+            (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
+            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
+            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
+        }
+    }
+
+
+    #endregion Endianess
 
 
     /// <summary>
@@ -310,16 +319,10 @@ public readonly struct Uuid7
     /// you are using Uuid7 in mixed database environment, use ToGuid() instead.
     /// </summary>
     public Guid ToGuidMsSql() {
-        if (BitConverter.IsLittleEndian) {
-            var bytes = new byte[16];
-            Buffer.BlockCopy(Bytes, 0, bytes, 0, 16);
-            (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
-            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
-            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
-            return new Guid(bytes);
-        } else {
-            return new Guid(Bytes);
-        }
+        var bytes = new byte[16];
+        Buffer.BlockCopy(Bytes, 0, bytes, 0, 16);
+        AdjustGuidEndianess(ref bytes);
+        return new Guid(bytes);
     }
 
 
