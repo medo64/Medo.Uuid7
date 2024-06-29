@@ -396,6 +396,7 @@ public partial class Uuid7_Tests {
 
     [TestMethod]
     public void Uuid7_Fill() {
+        var initialTime = DateTimeOffset.FromUnixTimeMilliseconds(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());  // has to be millisecond precision only
         var uuids = new Uuid7[10000];
         Uuid7.Fill(uuids);
 
@@ -404,12 +405,13 @@ public partial class Uuid7_Tests {
             var bytes = uuid.ToByteArray();
             Assert.AreNotEqual(bytes[0] + bytes[1] + bytes[2] + bytes[3], 0);  // not full of zeros
 
+            Assert.IsTrue(uuid.ToDateTimeOffset().Ticks >= initialTime.Ticks);
+
             Assert.AreNotEqual(Uuid7.Empty, uuid);
             Assert.IsTrue(uuid > prevUuid);
             prevUuid = uuid;
         }
     }
-
 
     [TestMethod]
     public void Uuid7_FillAtTimestamp() {
