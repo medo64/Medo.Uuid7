@@ -52,7 +52,7 @@ public readonly struct Uuid7
     /// </summary>
     public Uuid7() {
         Bytes = new byte[16];
-        FillBytes7(ref Bytes, ref PerThreadLastMillisecond, ref PerThreadMillisecondCounter, ref PerThreadMonotonicCounter);
+        FillBytes7(ref Bytes, DateTime.UtcNow.Ticks, ref PerThreadLastMillisecond, ref PerThreadMillisecondCounter, ref PerThreadMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
     }
 
     /// <summary>
@@ -136,8 +136,22 @@ public readonly struct Uuid7
     public static Uuid7 NewUuid7() {
         var bytes = new byte[16];
         lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+            FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
         }
+        return new Uuid7(ref bytes);
+    }
+
+    /// <summary>
+    /// Returns a new UUID version 7 with a specific timestamp.
+    /// This is not recommended for general use since it doesn't offer the same collision protections as the default NewUuid7() method.
+    /// This method is thread-safe.
+    /// </summary>
+    public static Uuid7 NewUuid7(DateTimeOffset timestamp) {
+        var bytes = new byte[16];
+        long lastMillisecond = 0;
+        long millisecondCounter = 0;
+        uint monotonicCounter = 0;
+        FillBytes7(ref bytes, timestamp.UtcTicks, ref lastMillisecond, ref millisecondCounter, ref monotonicCounter);
         return new Uuid7(ref bytes);
     }
 
@@ -158,7 +172,7 @@ public readonly struct Uuid7
     public static Guid NewGuid() {
         var bytes = new byte[16];
         lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+            FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
         }
         return new Guid(bytes);
     }
@@ -175,7 +189,7 @@ public readonly struct Uuid7
     public static Guid NewGuidMsSql() {
         var bytes = new byte[16];
         lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+            FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
         }
         AdjustGuidEndianess(ref bytes);
         return new Guid(bytes);
@@ -197,9 +211,33 @@ public readonly struct Uuid7
         lock (NonThreadedSyncRoot) {
             for (var i = 0; i < data.Length; i++) {
                 var bytes = new byte[16];
-                FillBytes7(ref bytes, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);
+                FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
                 data[i] = new Uuid7(ref bytes);
             }
+        }
+    }
+
+    /// <summary>
+    /// Fills a span with UUIDs.
+    /// All UUIDs are created with the same timestamp.
+    /// This method is thread-safe.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <param name="timestamp">Millisecond time for when UUIDs are to be created.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
+    public static void Fill(Span<Uuid7> data, DateTimeOffset timestamp) {
+#else
+    public static void Fill(Uuid7[] data, DateTimeOffset timestamp) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
+        long lastMillisecond = 0;
+        long millisecondCounter = 0;
+        uint monotonicCounter = 0;
+        for (var i = 0; i < data.Length; i++) {
+            var bytes = new byte[16];
+            FillBytes7(ref bytes, timestamp.UtcTicks, ref lastMillisecond, ref millisecondCounter, ref monotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+            data[i] = new Uuid7(ref bytes);
         }
     }
 
@@ -213,8 +251,7 @@ public readonly struct Uuid7
 #else
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-    private static void FillBytes7(ref byte[] bytes, ref long lastMillisecond, ref long millisecondCounter, ref uint monotonicCounter) {
-        var ticks = DateTime.UtcNow.Ticks;  // DateTime is a smidgen faster than DateTimeOffset
+    private static void FillBytes7(ref byte[] bytes, long ticks, ref long lastMillisecond, ref long millisecondCounter, ref uint monotonicCounter) {
         var millisecond = unchecked(ticks / TicksPerMillisecond);
         var msCounter = millisecondCounter;
 
@@ -267,7 +304,7 @@ public readonly struct Uuid7
     [ThreadStatic]
     private static uint PerThreadMonotonicCounter;  // counter that gets embedded into UUID
 
-    private static readonly object NonThreadedSyncRoot = new();
+    private static readonly object NonThreadedSyncRoot = new();  // sync root for all static counters
     private static long NonThreadedLastMillisecond;  // real time in milliseconds since 0001-01-01
     private static long NonThreadedMillisecondCounter;  // usually real time but doesn't go backward
     private static uint NonThreadedMonotonicCounter;  // counter that gets embedded into UUID

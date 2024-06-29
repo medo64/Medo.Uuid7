@@ -30,6 +30,16 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_NewAtTimestamp() {
+        var timestamp = new DateTimeOffset(1979, 07, 20, 20, 17, 00, TimeSpan.Zero);
+        var uuid1 = Uuid7.NewUuid7(timestamp);
+        var uuid2 = Uuid7.NewUuid7(timestamp);
+        Assert.AreNotEqual(uuid1, uuid2);
+        Assert.AreEqual(timestamp, uuid1.ToDateTimeOffset());
+        Assert.AreEqual(timestamp, uuid2.ToDateTimeOffset());
+    }
+
+    [TestMethod]
     public void Uuid7_NewGuid() {
         var uuid1 = Uuid7.NewGuid();
         var uuid2 = Uuid7.NewGuid();
@@ -391,6 +401,30 @@ public partial class Uuid7_Tests {
 
         var prevUuid = Uuid7.Empty;
         foreach (var uuid in uuids) {
+            var bytes = uuid.ToByteArray();
+            Assert.AreNotEqual(bytes[0] + bytes[1] + bytes[2] + bytes[3], 0);  // not full of zeros
+
+            Assert.AreNotEqual(Uuid7.Empty, uuid);
+            Assert.IsTrue(uuid > prevUuid);
+            prevUuid = uuid;
+        }
+    }
+
+
+    [TestMethod]
+    public void Uuid7_FillAtTimestamp() {
+        var timestamp = new DateTimeOffset(1979, 07, 20, 20, 17, 00, TimeSpan.Zero);
+        var uuids = new Uuid7[10000];
+        Uuid7.Fill(uuids, timestamp);
+
+        var firstUuid = uuids[0];
+        var prevUuid = Uuid7.Empty;
+        foreach (var uuid in uuids) {
+            var bytes = uuid.ToByteArray();
+            Assert.AreNotEqual(bytes[0] + bytes[1] + bytes[2] + bytes[3], 0);  // not full of zeros
+
+            Assert.AreEqual(timestamp, uuid.ToDateTimeOffset());
+
             Assert.AreNotEqual(Uuid7.Empty, uuid);
             Assert.IsTrue(uuid > prevUuid);
             prevUuid = uuid;
