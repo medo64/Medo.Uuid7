@@ -1,12 +1,11 @@
 Medo.Uuid7
 ==========
 
-The UUID7 library is an implementation of the UUID version 7 variant as defined
-in [the new UUID specification][rfc_4122bis], which introduces a time-ordered
-value field derived from the timestamp source. It offers improved entropy
-characteristics compared to versions 1 or 6 of the UUID standard. The inherent
-monotonicity of UUID version 7 makes it an excellent choice for utilization as a
-binary database key.
+The UUID7 library is an implementation of the UUID version 7 and 4 as defined
+in [the RFC 9562][rfc9562], which introduces a time-ordered value field derived
+from the timestamp source. It offers improved entropy characteristics compared
+to versions 1 or 6 of the UUID standard. The inherent monotonicity of UUID
+version 7 makes it an excellent choice for utilization as a binary database key.
 
 Features:
 * Time-ordered value field: UUID7 utilizes the widely implemented Unix Epoch
@@ -23,7 +22,9 @@ Features:
 * High performance: Speed comparable to the optimized built-in GUID generator in
   both single-threaded and multi-threaded scenarios under Windows and Linux.
 * Hardware acceleration: Vector128 support for Equals method.
-* Microsoft SQL Server support: Separate methods for "LE" Guid creation.
+* Microsoft SQL Server support (`NewMsSqlUniqueIdentifier()`).
+* Support for UUID version 4 (fully random UUID)
+* Conversion from and to System.Guid
 * .NET 8 AOT support
 * Also available as [Entity Framework Core library][nuget_uuid7_efcore].
 
@@ -165,7 +166,7 @@ Additional 62 bits of pseudo-random data.
 ### Implementation
 
 As monotonicity is important for UUID version 7 generation, this implementation
-implements most of [monotonic random counter][rfc_4122bis#counters]
+implements most of [monotonic random counter][rfc9562#counters]
 recommendations.
 
 Implementation uses randomly seeded 26 bit monotonic counter (25 random bits + 1
@@ -265,8 +266,8 @@ Example:
 
 
 
-[rfc_4122bis]: https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis
-[rfc_4122bis#counters]: https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-09.html#name-monotonicity-and-counters
+[rfc9562]: https://www.rfc-editor.org/rfc/rfc9562.html
+[rfc9562#counters]: https://www.rfc-editor.org/rfc/rfc9562.html#name-monotonicity-and-counters
 [nuget_uuid7]: https://www.nuget.org/packages/Medo.Uuid7/
 [nuget_uuid7_efcore]: https://www.nuget.org/packages/Medo.Uuid7.EntityFrameworkCore/
 [git_stevesimmons_uuid7]: https://github.com/stevesimmons/uuid7-csharp/
