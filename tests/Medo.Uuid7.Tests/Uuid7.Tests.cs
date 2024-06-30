@@ -439,6 +439,18 @@ public partial class Uuid7_Tests {
         }
     }
 
+    [TestMethod]
+    public void Uuid7_FillMsSqlUniqueIdentifier() {
+        var guids = new Guid[10000];
+        Uuid7.FillMsSqlUniqueIdentifier(guids);
+
+        var prevGuid = Guid.Empty;
+        foreach (var guid in guids) {
+            Assert.IsTrue(CompareMsSqlUniqueIdentifiers(prevGuid, guid) < 0);
+            prevGuid = guid;
+        }
+    }
+
 
     [TestMethod]
     public void Uuid7_MarshalBytes() {

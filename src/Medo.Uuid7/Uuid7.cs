@@ -253,6 +253,31 @@ public readonly struct Uuid7
         }
     }
 
+    /// <summary>
+    /// Fills a span with version 7 UUIDs converted to System.Guid and suitable
+    /// for insertion into a Microsoft SQL database. This should be used only
+    /// when working with MS SQL Server and not with any other databases as byte
+    /// ordering is different than usual. If you are using Uuid7 in a mixed
+    /// database environment, use the FillUuid7() method instead.
+    /// This method is thread-safe.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
+    public static void FillMsSqlUniqueIdentifier(Span<Guid> data) {
+#else
+    public static void FillMsSqlUniqueIdentifier(Guid[] data) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
+        lock (NonThreadedSyncRoot) {
+            for (var i = 0; i < data.Length; i++) {
+                var bytes = new byte[16];
+                FillBytes7MsSql(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+                data[i] = new Guid(bytes);
+            }
+        }
+    }
+
     #endregion Static
 
 
@@ -267,11 +292,11 @@ public readonly struct Uuid7
         //   0                   1                   2                   3
         //   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        //  |                       unix_ts_ms[0:31]                        |
+        //  |                       unix_ts_ms[47:16]                       |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        //  |       unix_ts_ms[32:47]       |  ver  |     counter[0:11]     |
+        //  |       unix_ts_ms[15:0]        |  ver  |    counter[25:14]     |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        //  |var|      counter[12:25]       |            random             |
+        //  |var|       counter[13:0]       |            random             |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         //  |                            random                             |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -329,11 +354,11 @@ public readonly struct Uuid7
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         //  |                            random                             |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        //  |            random             |  ver  |     counter[14:25]    |
+        //  |            random             |  ver  |     counter[11:0]     |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        //  |var|       counter[0:13]       |       unix_ts_ms[0:15]        |
+        //  |var|      counter[25:12]       |       unix_ts_ms[47:32]       |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-        //  |                       unix_ts_ms[16:47]                       |
+        //  |                       unix_ts_ms[31:0]                        |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         var millisecond = unchecked(ticks / TicksPerMillisecond);
@@ -364,18 +389,18 @@ public readonly struct Uuid7
         uint monoCounter;
         if (newStep) {
             GetRandomBytes(ref bytes, 0, 10);
-            monoCounter = (uint)(((bytes[6] & 0x07) << 22) | (bytes[7] << 14) | ((bytes[8] & 0x3F) << 8) | bytes[9]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
+            monoCounter = (uint)(((bytes[8] & 0x1F) << 20) | (bytes[9] << 12) | ((bytes[6] & 0x0F) << 8) | bytes[7]);  // to use as monotonic random for future calls; total of 26 bits but only 25 are used initially with upper 1 bit reserved for rollover guard
         } else {
             GetRandomBytes(ref bytes, 0, 7);
-            monoCounter = unchecked(monotonicCounter + ((uint)bytes[9] >> 4) + 1);  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
-            bytes[7] = (byte)(monoCounter >> 14);    // bits 14:21 of monotonics counter
-            bytes[9] = (byte)(monoCounter);          // bits 0:7 of monotonics counter
+            monoCounter = unchecked(monotonicCounter + ((uint)bytes[7] >> 4) + 1);  // 4 bit random increment will reduce overall counter space by 3 bits on average (to 2^22 combinations)
+            bytes[9] = (byte)(monoCounter >> 12);  // bits 12:19 of monotonics counter
+            bytes[7] = (byte)(monoCounter);        // bits 0:7 of monotonics counter
         }
         monotonicCounter = monoCounter;
 
         //Fixup
-        bytes[6] = (byte)(0x70 | ((monoCounter >> 22) & 0x0F));  // set 4-bit version + bits 22:25 of monotonics counter
-        bytes[8] = (byte)(0x80 | ((monoCounter >> 8) & 0x3F));   // set 2-bit variant + bits 8:13 of monotonics counter
+        bytes[6] = (byte)(0x70 | ((monoCounter >> 8) & 0x0F));   // set 4-bit version + bits 8:11 of monotonics counter
+        bytes[8] = (byte)(0x80 | ((monoCounter >> 20) & 0x3F));  // set 2-bit variant + bits 20:25 of monotonics counter
     }
 
 
