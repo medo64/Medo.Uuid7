@@ -1,11 +1,11 @@
 Medo.Uuid7.EntityFrameworkCore
 ==============================
 
-The UUID7 library is an implementation of the UUID version 7 and 4 as defined
-in [the RFC 9562][rfc9562], which introduces a time-ordered value field derived
-from the timestamp source. It offers improved entropy characteristics compared
-to versions 1 or 6 of the UUID standard. The inherent monotonicity of UUID
-version 7 makes it an excellent choice for utilization as a binary database key.
+The UUID7 library is an implementation of the UUID version 7 (time-ordered) and
+version 4 (fully random) as defined in [the RFC 9562][rfc9562]. It offers
+improved entropy characteristics compared to versions 1 or 6 of the UUID
+standard. The inherent monotonicity of UUID version 7 makes it an excellent
+choice for utilization as a binary database key.
 
 Features:
 * Time-ordered value field: UUID7 utilizes the widely implemented Unix Epoch
@@ -51,8 +51,8 @@ var uuid = Uuid7.NewUuid4();
 Console.WriteLine($"UUID : {uuid}");
 ```
 
-If higher performance is needed and per-thread seqencing is sufficient, you
-can instantiate UUID directly:
+If higher multi-thread performance is needed and per-thread seqencing is
+sufficient, you can instantiate UUID directly:
 ```csharp
 using System;
 using Medo;
