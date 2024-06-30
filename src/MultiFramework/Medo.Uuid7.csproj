@@ -40,7 +40,7 @@
     <Authors>Josip Medved</Authors>
     <Copyright>Copyright (c) 2022 Josip Medved</Copyright>
     <Company>www.medo64.com</Company>
-    <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4</PackageTags>
+    <PackageTags>RFC9562,UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4,UniqueIdentifier</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
