@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34916.146
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Issue14", "Issue14.csproj", "{1C978320-8A46-4BA4-8B2D-FC3726AC93D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo.Uuid7", "..\..\src\Medo.Uuid7\Medo.Uuid7.csproj", "{046B5278-A212-4A2F-BD10-F7906949380B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1C978320-8A46-4BA4-8B2D-FC3726AC93D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C978320-8A46-4BA4-8B2D-FC3726AC93D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C978320-8A46-4BA4-8B2D-FC3726AC93D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C978320-8A46-4BA4-8B2D-FC3726AC93D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046B5278-A212-4A2F-BD10-F7906949380B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046B5278-A212-4A2F-BD10-F7906949380B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046B5278-A212-4A2F-BD10-F7906949380B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046B5278-A212-4A2F-BD10-F7906949380B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DEA23530-48DE-4D41-883A-1D1D46D18CF4}
+	EndGlobalSection
+EndGlobal
