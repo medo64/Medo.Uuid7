@@ -86,8 +86,25 @@ public readonly struct Uuid7
     /// Creates a new instance from given GUID bytes.
     /// No check if GUID is version 7 UUID is made.
     /// </summary>
+    /// <param name="guid">Guid.</param>
     public Uuid7(Guid guid) {
         Bytes = guid.ToByteArray();
+    }
+
+    /// <summary>
+    /// Creates a new instance from given GUID bytes.
+    /// No check if GUID is version 7 UUID is made.
+    /// </summary>
+    /// <param name="guid">Guid.</param>
+    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
+    public Uuid7(Guid guid, bool matchGuidEndianness) {
+        if (matchGuidEndianness) {
+            var bytes = guid.ToByteArray();
+            AdjustGuidEndianess(ref bytes);
+            Bytes = bytes;
+        } else {
+            Bytes = guid.ToByteArray();
+        }
     }
 
 
@@ -107,19 +124,19 @@ public readonly struct Uuid7
     #region Static
 
     /// <summary>
-    /// A read-only instance of the Guid structure whose value is all zeros.
+    /// A read-only instance of the Uuid7 structure whose value is all zeros.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
     public static readonly Uuid7 MinValue = new(new byte[16]);
 
     /// <summary>
-    /// A read-only instance of the Guid structure whose value is all ones.
+    /// A read-only instance of the Uuid7 structure whose value is all ones.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
     public static readonly Uuid7 MaxValue = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
 
     /// <summary>
-    /// A read-only instance of the Guid structure whose value is all zeros.
+    /// A read-only instance of the Uuid7 structure whose value is all zeros.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
     public static readonly Uuid7 Empty = MinValue;
@@ -178,17 +195,27 @@ public readonly struct Uuid7
     }
 
     /// <summary>
-    /// Returns Guid that follows system ordering.
-    /// NOT suitable for MS SQL.
+    /// Returns a binary equivalent System.Guid of a UUID version 7.
+    /// This method is thread-safe.
     /// </summary>
-    [Obsolete("For UniqueIdentifier Use NewMsSqlUniqueIdentifier instead", true)]
-    public static Guid NewGuidMsSql() {
+    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
+    public static Guid NewGuid(bool matchGuidEndianness) {
         var bytes = new byte[16];
         lock (NonThreadedSyncRoot) {
             FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
         }
-        AdjustGuidEndianess(ref bytes);
+        if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
         return new Guid(bytes);
+    }
+
+
+    /// <summary>
+    /// Returns Guid with endianess matching one of the system.
+    /// NOT suitable for insertion into Microsoft SQL database.
+    /// </summary>
+    [Obsolete("For UniqueIdentifier Use NewMsSqlUniqueIdentifier() or NewGuid(matchGuidEndianness: true) instead, depending on desired behavior.", error: true)]
+    public static Guid NewGuidMsSql() {
+        return NewGuid(matchGuidEndianness: true);
     }
 
     /// <summary>
@@ -450,22 +477,33 @@ public readonly struct Uuid7
 
 
     /// <summary>
-    /// Returns current UUID version 7 as binary equivalent System.Guid.
+    /// Returns current UUID as binary equivalent System.Guid.
     /// </summary>
     public Guid ToGuid() {
         return new Guid(Bytes);
     }
 
     /// <summary>
-    /// Returns an equivalent System.Guid of a UUID version 7 suitable for
-    /// insertion into Microsoft SQL database.
-    /// On LE platforms this will have the first 8 bytes in a different order.
-    /// This should be used only when using MS SQL Server and not any other. If
-    /// you are using Uuid7 in mixed database environment, use ToGuid() instead.
+    /// Returns current UUID as either binary or text equivalent System.Guid.
     /// </summary>
-    [Obsolete("Use NewGuidMsSql instead")]
+    /// <param name="matchGuidEndianness">If true, result will also have endianess adjusted so that textual representation matches System.Guid.</param>
+    public Guid ToGuid(bool matchGuidEndianness) {
+        if (matchGuidEndianness) {
+            var bytes = ToByteArray();
+            AdjustGuidEndianess(ref bytes);
+            return new Guid(bytes);
+        } else {
+            return new Guid(Bytes);
+        }
+    }
+
+    /// <summary>
+    /// Returns Guid with endianess matching one of the system.
+    /// NOT suitable for insertion into Microsoft SQL database.
+    /// </summary>
+    [Obsolete("Use NewMsSqlUniqueIdentifier() or ToGuid(matchGuidEndianness: true) instead, depending on desired behavior.", error: true)]
     public Guid ToGuidMsSql() {
-        throw new NotSupportedException("Conversion is no longer supported.");
+        return ToGuid(matchGuidEndianness: true);
     }
 
 
@@ -486,16 +524,13 @@ public readonly struct Uuid7
     /// <param name="bigEndian">If true, bytes will be in big-endian (natural) order.</param>
     public byte[] ToByteArray(bool bigEndian) {
         var copy = new byte[16];
+        Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
         if (bigEndian) {
-            Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
             return copy;
-        } else {  // little endian pretends the first 8 bytes are int, short, short
-            (copy[0], copy[1], copy[2], copy[3]) = (Bytes[3], Bytes[2], Bytes[1], Bytes[0]);
-            (copy[4], copy[5]) = (Bytes[5], Bytes[4]);
-            (copy[6], copy[7]) = (Bytes[7], Bytes[6]);
-            Buffer.BlockCopy(Bytes, 8, copy, 8, 8);
-            return copy;
+        } else {
+            AdjustGuidEndianess(ref copy);
         }
+        return copy;
     }
 
     /// <summary>
@@ -847,6 +882,17 @@ public readonly struct Uuid7
     }
 
     /// <summary>
+    /// Returns binary or text compatible Uuid7 from given Guid.
+    /// </summary>
+    /// <param name="value">Value.</param>
+    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
+    public static Uuid7 FromGuid(Guid value, bool matchGuidEndianness) {
+        var bytes = value.ToByteArray();
+        if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+        return new Uuid7(bytes);
+    }
+
+    /// <summary>
     /// Returns binary-compatible Uuid7 from given Guid.
     /// </summary>
     /// <param name="value">Value.</param>
@@ -860,6 +906,18 @@ public readonly struct Uuid7
     /// <param name="value">Value.</param>
     public static Guid ToGuid(Uuid7 value) {
         return new Guid(value.Bytes);
+    }
+
+    /// <summary>
+    /// Returns binary or text compatible Guid from given Uuid7.
+    /// </summary>
+    /// <param name="value">Value.</param>
+    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
+    public static Guid ToGuid(Uuid7 value, bool matchGuidEndianness) {
+        var bytes = new byte[16];
+        Buffer.BlockCopy(value.Bytes, 0, bytes, 0, 16);
+        if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+        return new Guid(bytes);
     }
 
     /// <summary>

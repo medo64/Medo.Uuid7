@@ -25,10 +25,9 @@ Features:
 * Hardware acceleration: Vector128 support for Equals method.
 * Microsoft SQL Server support: Separate methods for "LE" Guid creation.
 * .NET 8 AOT support
+* Also available as [Entity Framework Core library][nuget_uuid7_efcore].
 
 You can find packaged library at [NuGet][nuget_uuid7].
-
-Also available is an [Entity Framework Core version][nuget_uuid7_efcore].
 
 
 ## Usage
@@ -89,15 +88,16 @@ arguably more common big-endian order.
 334d9001-62d2-3175-b71c-05555c63df91
 ```
 
-If we want to preserve textual representation, we need to actually use `ToGuidMsSql`
-function as this one takes internal endianess into account.
+If we want to preserve textual representation, we need to actually use
+`ToGuid(matchGuidEndianness)` function overload as this one takes internal
+Guid endianess into account.
 ```csharp
 using Medo;
 
 var uuid = Uuid7.NewUuid7();
 Console.WriteLine($"{uuid}");
 
-var guid = uuid.ToGuidMsSql();
+var guid = uuid.ToGuid(matchGuidEndianness: true);
 Console.WriteLine($"{guid}");
 ```
 
