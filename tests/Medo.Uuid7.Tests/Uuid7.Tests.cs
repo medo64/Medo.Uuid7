@@ -57,7 +57,7 @@ public partial class Uuid7_Tests {
     public void Uuid7_NewGuidNonMatched() {
         var guid = Uuid7.NewGuid(matchGuidEndianness: false);
         var uuid = (Uuid7)guid;
-        Assert.IsTrue(CompareArrays(guid.ToByteArray(), uuid.ToByteArray()));
+        Assert.IsTrue(CompareArrays(guid.ToByteArray(), uuid.ToByteArray()) == 0);
     }
 
     [TestMethod]
@@ -76,7 +76,7 @@ public partial class Uuid7_Tests {
 
     [TestMethod]
     public void Uuid7_NewFromGuid() {
-        var guid= new Guid(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
+        var guid = new Guid(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
         var uuid = new Uuid7(guid);
         Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
     }
@@ -112,7 +112,7 @@ public partial class Uuid7_Tests {
         var bytes = new byte[16];
         Assert.IsTrue(uuid.TryWriteBytes(bytes));
 
-        Assert.IsTrue(CompareArrays(bytes, uuid.ToByteArray()));
+        Assert.IsTrue(CompareArrays(bytes, uuid.ToByteArray()) == 0);
     }
 
     [TestMethod]
@@ -535,6 +535,46 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_FillGuid() {
+        var guids = new Guid[10000];
+        Uuid7.FillGuid(guids);
+
+        var prevGuid = Guid.Empty;
+        foreach (var guid in guids) {
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
+            prevGuid = guid;
+        }
+    }
+
+    [TestMethod]
+    public void Uuid7_FillGuidNonMatched() {
+        var guids = new Guid[10000];
+        Uuid7.FillGuid(guids, matchGuidEndianness: false);
+
+        var prevGuid = Guid.Empty;
+        foreach (var guid in guids) {
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
+            var uuid = Uuid7.FromGuid(guid, matchGuidEndianness: true);
+            Assert.AreEqual(uuid.ToString(), guid.ToString());
+            prevGuid = guid;
+        }
+    }
+
+    [TestMethod]
+    public void Uuid7_FillGuidMatched() {
+        var guids = new Guid[10000];
+        Uuid7.FillGuid(guids, matchGuidEndianness: true);
+
+        var prevGuid = Guid.Empty;
+        foreach (var guid in guids) {
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
+            var uuid = Uuid7.FromGuid(guid, matchGuidEndianness: true);
+            Assert.AreEqual(uuid.ToString(), guid.ToString());
+            prevGuid = guid;
+        }
+    }
+
+    [TestMethod]
     public void Uuid7_FillMsSqlUniqueIdentifier() {
         var guids = new Guid[10000];
         Uuid7.FillMsSqlUniqueIdentifier(guids);
@@ -560,7 +600,7 @@ public partial class Uuid7_Tests {
         Marshal.Copy(ptr, bytes, 0, size);
         Marshal.FreeHGlobal(ptr);  // it's a test, no need for try/finally block
 
-        Assert.IsTrue(CompareArrays(uuid.ToByteArray(), bytes));
+        Assert.IsTrue(CompareArrays(uuid.ToByteArray(), bytes) == 0);
     }
 
     [TestMethod]
@@ -572,7 +612,7 @@ public partial class Uuid7_Tests {
         var uuid = (Uuid7)Marshal.PtrToStructure(ptr, typeof(Uuid7));
         Marshal.FreeHGlobal(ptr);
 
-        Assert.IsTrue(CompareArrays(bytes, uuid.ToByteArray()));
+        Assert.IsTrue(CompareArrays(bytes, uuid.ToByteArray()) == 0);
     }
 
 
@@ -612,14 +652,14 @@ public partial class Uuid7_Tests {
     public void Uuid7_ToByteArray() {
         var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
         var uuid = new Uuid7(uuidBytes);
-        Assert.IsTrue(CompareArrays(uuidBytes, uuid.ToByteArray()));
+        Assert.IsTrue(CompareArrays(uuidBytes, uuid.ToByteArray()) == 0);
     }
 
     [TestMethod]
     public void Uuid7_ToByteArray_BE() {
         var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
         var uuid = new Uuid7(uuidBytes);
-        Assert.IsTrue(CompareArrays(uuidBytes, uuid.ToByteArray(bigEndian: true)));
+        Assert.IsTrue(CompareArrays(uuidBytes, uuid.ToByteArray(bigEndian: true)) == 0);
     }
 
     [TestMethod]
@@ -627,7 +667,7 @@ public partial class Uuid7_Tests {
         var uuidBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
         var uuidBytesLE = new byte[] { 4, 3, 2, 1, 6, 5, 8, 7, 9, 10, 11, 12, 13, 14, 15, 16 };
         var uuid = new Uuid7(uuidBytes);
-        Assert.IsTrue(CompareArrays(uuidBytesLE, uuid.ToByteArray(bigEndian: false)));
+        Assert.IsTrue(CompareArrays(uuidBytesLE, uuid.ToByteArray(bigEndian: false)) == 0);
     }
 
 
@@ -688,15 +728,13 @@ public partial class Uuid7_Tests {
     }
 #endif
 
-    private static bool CompareArrays(byte[] buffer1, byte[] buffer2) {
-        var comparer = EqualityComparer<byte>.Default;
-        if (buffer1.Length != buffer2.Length) { return false; }  // should not really happen
+    private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
+        if (buffer1.Length != buffer2.Length) { throw new InvalidOperationException(); }  // should not really happen
         for (int i = 0; i < buffer1.Length; i++) {
-            if (!comparer.Equals(buffer1[i], buffer2[i])) {
-                return false;
-            }
+            if (buffer1[i] < buffer2[i]) { return -1; }
+            if (buffer1[i] > buffer2[i]) { return +1; }
         }
-        return true;
+        return 0;
     }
 
     private static int CompareMsSqlUniqueIdentifiers(Guid guid1, Guid guid2) {

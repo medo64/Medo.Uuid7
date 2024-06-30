@@ -300,6 +300,50 @@ public readonly struct Uuid7
     }
 
     /// <summary>
+    /// Fills a span with binary-compatible System.Guid elements.
+    /// This method is thread-safe.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
+    public static void FillGuid(Span<Guid> data) {
+#else
+    public static void FillGuid(Guid[] data) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
+        lock (NonThreadedSyncRoot) {
+            for (var i = 0; i < data.Length; i++) {
+                var bytes = new byte[16];
+                FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+                data[i] = new Guid(bytes);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Fills a span with binary-compatible System.Guid elements.
+    /// This method is thread-safe.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
+    public static void FillGuid(Span<Guid> data, bool matchGuidEndianness) {
+#else
+    public static void FillGuid(Guid[] data, bool matchGuidEndianness) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
+        lock (NonThreadedSyncRoot) {
+            for (var i = 0; i < data.Length; i++) {
+                var bytes = new byte[16];
+                FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+                if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+                data[i] = new Guid(bytes);
+            }
+        }
+    }
+
+    /// <summary>
     /// Fills a span with version 7 UUIDs converted to System.Guid and suitable
     /// for insertion into a Microsoft SQL database. This should be used only
     /// when working with MS SQL Server and not with any other databases as byte

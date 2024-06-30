@@ -28,6 +28,24 @@ public class Fill {
     }
 
     [Benchmark]
+    public void FillGuid() {
+        var elements = new Guid[1000];
+        Uuid7.FillGuid(elements);
+    }
+
+    [Benchmark]
+    public void FillGuidNonMatched() {
+        var elements = new Guid[1000];
+        Uuid7.FillGuid(elements, matchGuidEndianness: false);
+    }
+
+    [Benchmark]
+    public void FillGuidMatched() {
+        var elements = new Guid[1000];
+        Uuid7.FillGuid(elements, matchGuidEndianness: true);
+    }
+
+    [Benchmark]
     public void FillMsSqlUniqueIdentifier() {
         var elements = new Guid[1000];
         Uuid7.FillMsSqlUniqueIdentifier(elements);
