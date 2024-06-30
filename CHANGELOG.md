@@ -1,5 +1,13 @@
 CHANGELOG
 
+[2.0.0]
+
+- Compatible with the final [RFC 9562](https://datatracker.ietf.org/doc/rfc9562/)
+- Fixed compatibility with Microsoft SQL Server UniqueIdentifier
+- Added support for Guid endianness when converting from and to System.Guid
+- Added support for creating Uuid7 with custom timestamp
+
+
 [1.9.1] (2024-01-21)
 
 - More parsing performance improvement - courtesy of [Joel Mueller](https://github.com/jtmueller)
