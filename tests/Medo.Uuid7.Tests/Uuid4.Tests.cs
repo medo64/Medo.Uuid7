@@ -52,4 +52,14 @@ public class Uuid4_Tests {
         });
     }
 
+    [TestMethod]
+    public void Uuid4_Fill() {
+        var uuids = new Uuid7[10000];
+        Uuid7.FillUuid4(uuids);
+
+        foreach (var uuid in uuids) {
+            Assert.AreNotEqual(Uuid7.Empty, uuid);
+        }
+    }
+
 }

@@ -236,7 +236,7 @@ public readonly struct Uuid7
 
 
     /// <summary>
-    /// Fills a span with UUIDs.
+    /// Fills a span with version 7 UUIDs.
     /// This method is thread-safe.
     /// </summary>
     /// <param name="data">The span to fill.</param>
@@ -257,7 +257,7 @@ public readonly struct Uuid7
     }
 
     /// <summary>
-    /// Fills a span with UUIDs.
+    /// Fills a span with version 7 UUIDs.
     /// All UUIDs are created with the same timestamp.
     /// This method is thread-safe.
     /// </summary>
@@ -276,6 +276,25 @@ public readonly struct Uuid7
         for (var i = 0; i < data.Length; i++) {
             var bytes = new byte[16];
             FillBytes7(ref bytes, timestamp.UtcTicks, ref lastMillisecond, ref millisecondCounter, ref monotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+            data[i] = new Uuid7(ref bytes);
+        }
+    }
+
+    /// <summary>
+    /// Fills a span with version 4 UUIDs.
+    /// This method is thread-safe.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
+    public static void FillUuid4(Span<Uuid7> data) {
+#else
+    public static void FillUuid4(Uuid7[] data) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
+        for (var i = 0; i < data.Length; i++) {
+            var bytes = new byte[16];
+            FillBytes4(ref bytes);
             data[i] = new Uuid7(ref bytes);
         }
     }
