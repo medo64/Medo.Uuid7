@@ -178,15 +178,28 @@ public readonly struct Uuid7
     }
 
     /// <summary>
-    /// Returns an equivalent System.Guid of a UUID version 7 suitable for
-    /// insertion into a Microsoft SQL database. On little-endian (LE)
-    /// platforms, the first 8 bytes will be in a different order.
-    /// This should be used only when working with MS SQL Server and not with
-    /// any other databases. If you are using Uuid7 in a mixed database
+    /// Returns Guid that follows system ordering.
+    /// NOT suitable for MS SQL.
+    /// </summary>
+    [Obsolete("For UniqueIdentifier Use NewMsSqlUniqueIdentifier instead", true)]
+    public static Guid NewGuidMsSql() {
+        var bytes = new byte[16];
+        lock (NonThreadedSyncRoot) {
+            FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+        }
+        AdjustGuidEndianess(ref bytes);
+        return new Guid(bytes);
+    }
+
+    /// <summary>
+    /// Returns a System.Guid of a UUID version 7 suitable for insertion into a
+    /// Microsoft SQL database. This should be used only when working with MS
+    /// SQL Server and not with any other databases as byte ordering is
+    /// different than usual. If you are using Uuid7 in a mixed database
     /// environment, use the NewUuid7() method instead.
     /// This method is thread-safe.
     /// </summary>
-    public static Guid NewGuidMsSql() {
+    public static Guid NewMsSqlUniqueIdentifier() {
         var bytes = new byte[16];
         lock (NonThreadedSyncRoot) {
             FillBytes7MsSql(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
@@ -322,7 +335,6 @@ public readonly struct Uuid7
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         //  |                       unix_ts_ms[16:47]                       |
         //  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
 
         var millisecond = unchecked(ticks / TicksPerMillisecond);
         var msCounter = millisecondCounter;

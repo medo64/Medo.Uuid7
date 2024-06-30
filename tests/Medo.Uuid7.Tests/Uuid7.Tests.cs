@@ -40,6 +40,13 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
+    public void Uuid7_NewMsSqlUniqueIdentifier() {
+        var guid1 = Uuid7.NewMsSqlUniqueIdentifier();
+        var guid2 = Uuid7.NewMsSqlUniqueIdentifier();
+        Assert.IsTrue(CompareMsSqlUniqueIdentifiers(guid1, guid2) < 0);
+    }
+
+    [TestMethod]
     public void Uuid7_NewGuid() {
         var uuid1 = Uuid7.NewGuid();
         var uuid2 = Uuid7.NewGuid();
@@ -419,7 +426,6 @@ public partial class Uuid7_Tests {
         var uuids = new Uuid7[10000];
         Uuid7.Fill(uuids, timestamp);
 
-        var firstUuid = uuids[0];
         var prevUuid = Uuid7.Empty;
         foreach (var uuid in uuids) {
             var bytes = uuid.ToByteArray();
@@ -494,36 +500,6 @@ public partial class Uuid7_Tests {
         var result = method.Invoke(x, new object[] { null });
         Assert.AreEqual(+1, result);
     }
-
-
-    [TestMethod]
-    public void Uuid7_MsSqlGuid_1() {
-        var uuid = Uuid7.NewUuid7();
-        var guid = uuid.ToGuidMsSql();
-        if (BitConverter.IsLittleEndian) {
-            Assert.AreNotEqual(guid, uuid);  // not the same binary
-            Assert.AreEqual(uuid.ToString(), guid.ToString());  // same text representation
-        } else {  // on BE platforms, they are equal both binary and in string format
-            Assert.AreEqual(guid, uuid);  // same binary
-            Assert.AreEqual(uuid.ToString(), guid.ToString());  // same text representation
-        }
-    }
-
-    [TestMethod]
-    public void Uuid7_MsSqlGuid_2() {
-        var uuid = new Uuid7(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
-        var guid = uuid.ToGuidMsSql();
-        if (BitConverter.IsLittleEndian) {
-            Assert.AreNotEqual(guid, uuid);  // not the same binary
-            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
-            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guid.ToString());
-        } else {  // on BE platforms, they are equal both binary and in string format
-            Assert.AreEqual(guid, uuid);  // same binary
-            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
-            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guid.ToString());
-        }
-    }
-
 
     [TestMethod]
     public void Uuid7_ToByteArray() {
@@ -614,6 +590,16 @@ public partial class Uuid7_Tests {
             }
         }
         return true;
+    }
+
+    private static int CompareMsSqlUniqueIdentifiers(Guid guid1, Guid guid2) {
+        var bytes1 = guid1.ToByteArray();
+        var bytes2 = guid2.ToByteArray();
+        foreach (var i in new[] { 10, 11, 12, 13, 14, 15, 8, 9, 6, 7, 4, 5, 0, 1, 2, 3 }) {  // https://web.archive.org/web/20120628234912/http://blogs.msdn.com/b/sqlprogrammability/archive/2006/11/06/how-are-guids-compared-in-sql-server-2005.aspx
+            if (bytes1[i] < bytes2[i]) { return -1; }
+            if (bytes1[i] > bytes2[i]) { return +1; }
+        }
+        return 0;
     }
 
     #endregion Helpers

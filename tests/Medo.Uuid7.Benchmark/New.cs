@@ -14,6 +14,9 @@ public class New {
     public void NewUuid7() => Uuid7.NewUuid7();
 
     [Benchmark]
+    public void NewMsSqlUniqueIdentifier() => Uuid7.NewMsSqlUniqueIdentifier();
+
+    [Benchmark]
     public void NewUuid4() => Uuid7.NewUuid4();
 
 }
