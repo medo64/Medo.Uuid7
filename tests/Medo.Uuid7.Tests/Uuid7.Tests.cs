@@ -586,6 +586,20 @@ public partial class Uuid7_Tests {
         }
     }
 
+    [TestMethod]
+    public void Uuid7_FillMsSqlUniqueIdentifierAtTimestamp() {
+        var timestamp = new DateTimeOffset(1979, 07, 20, 20, 17, 00, TimeSpan.Zero);
+
+        var guids = new Guid[10000];
+        Uuid7.FillMsSqlUniqueIdentifier(guids, timestamp);
+
+        var prevGuid = Guid.Empty;
+        foreach (var guid in guids) {
+            Assert.IsTrue(CompareMsSqlUniqueIdentifiers(prevGuid, guid) < 0);
+            prevGuid = guid;
+        }
+    }
+
 
     [TestMethod]
     public void Uuid7_MarshalBytes() {

@@ -368,6 +368,33 @@ public readonly struct Uuid7
         }
     }
 
+    /// <summary>
+    /// Fills a span with version 7 UUIDs converted to System.Guid and suitable
+    /// for insertion into a Microsoft SQL database. This should be used only
+    /// when working with MS SQL Server and not with any other databases as byte
+    /// ordering is different than usual. If you are using Uuid7 in a mixed
+    /// database environment, use the FillUuid7() method instead.
+    /// All UUIDs are created with the same timestamp.
+    /// This method is thread-safe.
+    /// </summary>
+    /// <param name="data">The span to fill.</param>
+    /// <param name="timestamp">Millisecond time for when UUIDs are to be created.</param>
+    /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
+#if NET6_0_OR_GREATER
+    public static void FillMsSqlUniqueIdentifier(Span<Guid> data, DateTimeOffset timestamp) {
+#else
+    public static void FillMsSqlUniqueIdentifier(Guid[] data, DateTimeOffset timestamp) {
+        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
+#endif
+        lock (NonThreadedSyncRoot) {
+            for (var i = 0; i < data.Length; i++) {
+                var bytes = new byte[16];
+                FillBytes7MsSql(ref bytes, timestamp.UtcTicks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+                data[i] = new Guid(bytes);
+            }
+        }
+    }
+
     #endregion Static
 
 
