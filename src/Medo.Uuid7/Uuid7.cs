@@ -1400,7 +1400,13 @@ public readonly struct Uuid7
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
 #if !UUID7_NO_RANDOM_BUFFER
     private const int RandomBufferSize = 2048;
-    private static readonly ThreadLocal<byte[]> RandomBuffer = new(() => new byte[RandomBufferSize]);
+    private static readonly ThreadLocal<byte[]> RandomBuffer = new(() => {
+#if !NETSTANDARD
+        return GC.AllocateArray<byte>(RandomBufferSize, pinned: true);
+#else  // no pinning in case of .NET Standard (legacy support)
+        return new byte[RandomBufferSize];
+#endif
+    });
     private static readonly ThreadLocal<int> RandomBufferIndex = new(() => RandomBufferSize);  // first call needs to fill buffer no matter what
 #endif
 
