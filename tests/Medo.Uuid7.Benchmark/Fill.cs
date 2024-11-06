@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Medo;
 
+[MemoryDiagnoser]
 public class Fill {
 
     [Benchmark(Baseline = true)]

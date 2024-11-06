@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Medo;
 
+[MemoryDiagnoser]
 public class New {
 
     [Benchmark(Baseline = true)]
