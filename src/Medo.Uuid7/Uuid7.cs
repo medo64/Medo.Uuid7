@@ -656,7 +656,11 @@ public readonly struct Uuid7
     /// <param name="destination">Destination span.</param>
     public bool TryWriteBytes(Span<byte> destination) {
         if (destination.Length < 16) { return false; }  // not enough bytes
-        Bytes.CopyTo(destination);
+        if (Bytes != null) {
+            Bytes.CopyTo(destination);
+        } else {
+            MinValue.Bytes.CopyTo(destination);
+        }
         return true;
     }
 
@@ -1452,6 +1456,8 @@ public readonly struct Uuid7
 #endif
         if (destination.Length < 36) { charsWritten = 0; return false; }
 
+        if (bytes == null) { bytes = MinValue.Bytes; }
+
         (destination[0], destination[1]) = ToTwoHexBytes(bytes[0]);
         (destination[2], destination[3]) = ToTwoHexBytes(bytes[1]);
         (destination[4], destination[5]) = ToTwoHexBytes(bytes[2]);
@@ -1485,6 +1491,8 @@ public readonly struct Uuid7
 #endif
         if (destination.Length < 32) { charsWritten = 0; return false; }
 
+        if (bytes == null) { bytes = MinValue.Bytes; }
+
         (destination[0], destination[1]) = ToTwoHexBytes(bytes[0]);
         (destination[2], destination[3]) = ToTwoHexBytes(bytes[1]);
         (destination[4], destination[5]) = ToTwoHexBytes(bytes[2]);
@@ -1513,6 +1521,8 @@ public readonly struct Uuid7
     private static bool TryWriteAsBracesString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 38) { charsWritten = 0; return false; }
+
+        if (bytes == null) { bytes = MinValue.Bytes; }
 
         destination[0] = '{';
         (destination[1], destination[2]) = ToTwoHexBytes(bytes[0]);
@@ -1549,6 +1559,8 @@ public readonly struct Uuid7
 #endif
         if (destination.Length < 38) { charsWritten = 0; return false; }
 
+        if (bytes == null) { bytes = MinValue.Bytes; }
+
         destination[0] = '(';
         (destination[1], destination[2]) = ToTwoHexBytes(bytes[0]);
         (destination[3], destination[4]) = ToTwoHexBytes(bytes[1]);
@@ -1583,6 +1595,8 @@ public readonly struct Uuid7
     private static bool TryWriteAsHexadecimalString(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 68) { charsWritten = 0; return false; }
+
+        if (bytes == null) { bytes = MinValue.Bytes; }
 
         (destination[0], destination[1], destination[2]) = ('{', '0', 'x');
         (destination[3], destination[4]) = ToTwoHexBytes(bytes[0]);
@@ -1625,6 +1639,8 @@ public readonly struct Uuid7
 #endif
         if (destination.Length < 22) { charsWritten = 0; return false; }
 
+        if (bytes == null) { bytes = MinValue.Bytes; }
+
 #if NET6_0_OR_GREATER
         var number = new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
 #else
@@ -1649,6 +1665,8 @@ public readonly struct Uuid7
     private static bool TryWriteAsId25(char[] destination, byte[] bytes, out int charsWritten) {
 #endif
         if (destination.Length < 25) { charsWritten = 0; return false; }
+
+        if (bytes == null) { bytes = MinValue.Bytes; }
 
 #if NET6_0_OR_GREATER
         var number = new BigInteger(bytes, isUnsigned: true, isBigEndian: true);
