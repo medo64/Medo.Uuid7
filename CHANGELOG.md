@@ -1,5 +1,12 @@
 CHANGELOG
 
+[2.1.0]
+
+- Added timestamp support for FillMsSqlUniqueIdentifier
+- Removed explicit .NET 7 support
+- Fixed handling of non-initialized struct
+
+
 [2.0.0]
 
 - Compatible with the final [RFC 9562](https://datatracker.ietf.org/doc/rfc9562/)
