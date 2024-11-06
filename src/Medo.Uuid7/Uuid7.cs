@@ -1372,33 +1372,36 @@ public readonly struct Uuid7
 #if NET6_0_OR_GREATER
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static int CompareArrays(ReadOnlySpan<byte> buffer1, ReadOnlySpan<byte> buffer2) {
-        if (buffer1.Length == 16 && buffer2.Length == 16) {
+        if ((buffer1 != null) && (buffer2 != null)) {  // protecting against EF or similar API that uses reflection (https://github.com/medo64/Medo.Uuid7/issues/1)
             return buffer1.SequenceCompareTo(buffer2);
-        } else if (buffer1.Length != 16) {
-            return -1;
-        } else if (buffer2.Length != 16) {
-            return +1;
-        }
-
-        return 0;  // object are equal
-    }
 #else
     private static int CompareArrays(byte[] buffer1, byte[] buffer2) {
-        if ((buffer1 != null) && (buffer2 != null) && (buffer1.Length == 16) && (buffer2.Length == 16)) {  // protecting against EF or similar API that uses reflection (https://github.com/medo64/Medo.Uuid7/issues/1)
+        if ((buffer1 != null) && (buffer2 != null)) {
             var comparer = Comparer<byte>.Default;
             for (int i = 0; i < buffer1.Length; i++) {
                 if (comparer.Compare(buffer1[i], buffer2[i]) < 0) { return -1; }
                 if (comparer.Compare(buffer1[i], buffer2[i]) > 0) { return +1; }
             }
-        } else if ((buffer1 == null) || (buffer1.Length != 16)) {
-            return -1;
-        } else if ((buffer2 == null) || (buffer2.Length != 16)) {
-            return +1;
+#endif
+#if NET8_0_OR_GREATER
+        } else if (buffer1 != null) {
+            if (buffer1.IndexOfAnyExcept((byte)0) >= 0) { return +1; }
+        } else if (buffer2 != null) {
+            if (buffer2.IndexOfAnyExcept((byte)0) >= 0) { return -1; }
         }
-
+#else
+        } else if (buffer1 != null) {
+            for (int i = 0; i < buffer1.Length; i++) {
+                if (buffer1[i] != 0) { return +1; }
+            }
+        } else if (buffer2 != null) {
+            for (int i = 0; i < buffer2.Length; i++) {
+                if (buffer2[i] != 0) { return -1; }
+            }
+        }
+#endif
         return 0;  // object are equal
     }
-#endif
 
     private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();  // needed due to .NET Standard 2.0
 #if !UUID7_NO_RANDOM_BUFFER
