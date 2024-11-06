@@ -5,7 +5,7 @@ Welcome and thank you for your interest in contributing!
 
 ### Compiling Code
 
-Project uses .NET Core 6.0 and 7.0 and it can be debugged using either Visual
+Project uses .NET Core 6.0 and 8.0 and it can be debugged using either Visual
 Studio 2022 or from within Visual Studio Code with C# extensions.
 
 
