@@ -1079,11 +1079,14 @@ public readonly struct Uuid7
     /// <param name="other">An object to compare to this instance.</param>
     public bool Equals(Uuid7 other) {
 #if NET7_0_OR_GREATER
-        if (other.Bytes == null) { return false; }
         if (Vector128.IsHardwareAccelerated) {
             var vector1 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0]);
-            var vector2 = Unsafe.ReadUnaligned<Vector128<byte>>(ref other.Bytes[0]);
-            return vector1 == vector2;
+            if (other.Bytes == null) {
+                return vector1 == Vector128<byte>.Zero;
+            } else {
+                var vector2 = Unsafe.ReadUnaligned<Vector128<byte>>(ref other.Bytes[0]);
+                return vector1 == vector2;
+            }
         }
 #endif
         return CompareArrays(Bytes, other.Bytes) == 0;
