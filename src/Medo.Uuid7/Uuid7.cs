@@ -602,7 +602,7 @@ public readonly struct Uuid7
     /// </summary>
     public byte[] ToByteArray() {
         var copy = new byte[16];
-        Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
+        if (Bytes != null) { Buffer.BlockCopy(Bytes, 0, copy, 0, 16); }
         return copy;
     }
 
