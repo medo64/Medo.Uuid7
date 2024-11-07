@@ -338,6 +338,25 @@ public partial class Uuid7_Tests {
         }
     }
 
+    [TestMethod]
+    public void Guid_NoConstructor() {
+        var list = new Guid[1];
+
+        Assert.AreEqual(Guid.Empty, list[0]);
+    }
+
+    [TestMethod]
+    public void Uuid7_NoConstructor() {
+        var list = new Uuid7[1];
+
+        Assert.IsTrue(Uuid7.Empty.Equals(list[0]));
+        Assert.AreEqual(list[0], Uuid7.Empty);
+        Assert.AreEqual(Uuid7.Empty, list[0]);
+        Assert.AreEqual(list[0].ToString(), Guid.Empty.ToString());
+        Assert.AreEqual(Guid.Empty.ToString(), list[0].ToString());
+
+    }
+
 
     [TestMethod]
     public void Uuid7_CompareTo() {
