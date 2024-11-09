@@ -346,15 +346,30 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
-    public void Uuid7_NoConstructor() {
+    public void Uuid7_NoConstructor_Equals() {
         var list = new Uuid7[1];
 
+        Assert.IsTrue(list[0].Equals(Uuid7.Empty));
         Assert.IsTrue(Uuid7.Empty.Equals(list[0]));
         Assert.AreEqual(list[0], Uuid7.Empty);
         Assert.AreEqual(Uuid7.Empty, list[0]);
-        Assert.AreEqual(list[0].ToString(), Guid.Empty.ToString());
-        Assert.AreEqual(Guid.Empty.ToString(), list[0].ToString());
+    }
 
+    [TestMethod]
+    public void Uuid7_NoConstructor_EqualsGuid() {
+        var list = new Uuid7[1];
+
+        Assert.IsTrue(list[0].Equals(Guid.Empty));
+        Assert.AreEqual(list[0], Guid.Empty);
+        if (!BitConverter.IsLittleEndian) {
+            Assert.AreEqual(Guid.Empty, list[0]);
+            Assert.AreEqual(Guid.Empty, Uuid7.ToGuid(list[0], true));
+            Assert.AreEqual(Guid.Empty, list[0].ToGuid(true));
+        } else {
+            Assert.AreEqual(Guid.Empty, Uuid7.ToGuid(list[0], false));
+            Assert.AreEqual(Guid.Empty, list[0].ToGuid(false));
+        }
+        Assert.AreEqual(Guid.Empty.ToString(), list[0].ToString());
     }
 
 

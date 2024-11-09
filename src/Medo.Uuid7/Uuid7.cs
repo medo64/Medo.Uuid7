@@ -51,8 +51,8 @@ public readonly struct Uuid7
     /// NewUuid7() method that guarantees this behavior.
     /// </summary>
     public Uuid7() {
-        Bytes = new byte[16];
-        FillBytes7(ref Bytes, DateTime.UtcNow.Ticks, ref PerThreadLastMillisecond, ref PerThreadMillisecondCounter, ref PerThreadMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
+        _bytes = new byte[16];
+        FillBytes7(ref _bytes, DateTime.UtcNow.Ticks, ref PerThreadLastMillisecond, ref PerThreadMillisecondCounter, ref PerThreadMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public readonly struct Uuid7
     public Uuid7(byte[] buffer) {
         if (buffer == null) { throw new ArgumentNullException(nameof(buffer), "Buffer cannot be null."); }
         if (buffer.Length != 16) { throw new ArgumentOutOfRangeException(nameof(buffer), "Buffer must be exactly 16 bytes in length."); }
-        Bytes = new byte[16];
+        _bytes = new byte[16];
         Buffer.BlockCopy(buffer, 0, Bytes, 0, 16);
     }
 
@@ -77,7 +77,7 @@ public readonly struct Uuid7
     /// <exception cref="ArgumentOutOfRangeException">Span must be exactly 16 bytes in length.</exception>
     public Uuid7(ReadOnlySpan<byte> span) {
         if (span.Length != 16) { throw new ArgumentOutOfRangeException(nameof(span), "Span must be exactly 16 bytes in length."); }
-        Bytes = new byte[16];
+        _bytes = new byte[16];
         span.CopyTo(Bytes);
     }
 #endif
@@ -88,7 +88,7 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="guid">Guid.</param>
     public Uuid7(Guid guid) {
-        Bytes = guid.ToByteArray();
+        _bytes = guid.ToByteArray();
     }
 
     /// <summary>
@@ -101,9 +101,9 @@ public readonly struct Uuid7
         if (matchGuidEndianness) {
             var bytes = guid.ToByteArray();
             AdjustGuidEndianess(ref bytes);
-            Bytes = bytes;
+            _bytes = bytes;
         } else {
-            Bytes = guid.ToByteArray();
+            _bytes = guid.ToByteArray();
         }
     }
 
@@ -114,11 +114,13 @@ public readonly struct Uuid7
     /// No check for array length is made.
     /// </summary>
     private Uuid7(ref byte[] buffer) {
-        Bytes = buffer;
+        _bytes = buffer;
     }
 
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-    private readonly byte[] Bytes;
+    private readonly byte[] _bytes;
+
+    private byte[] Bytes => _bytes ?? Empty._bytes;
 
 
     #region Static
