@@ -583,7 +583,11 @@ public readonly struct Uuid7
             AdjustGuidEndianess(ref bytes);
             return new Guid(bytes);
         } else {
-            return new Guid(Bytes);
+            if (Bytes != null) {
+                return new Guid(Bytes);
+            } else {
+                return new Guid(MinValue.Bytes);
+            }
         }
     }
 
@@ -1009,8 +1013,10 @@ public readonly struct Uuid7
     /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
     public static Guid ToGuid(Uuid7 value, bool matchGuidEndianness) {
         var bytes = new byte[16];
-        Buffer.BlockCopy(value.Bytes, 0, bytes, 0, 16);
-        if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+        if (value.Bytes != null) {
+            Buffer.BlockCopy(value.Bytes, 0, bytes, 0, 16);
+            if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+        }
         return new Guid(bytes);
     }
 
@@ -1064,7 +1070,9 @@ public readonly struct Uuid7
     public bool Equals(Guid other) {
 #if NET7_0_OR_GREATER
         if (Vector128.IsHardwareAccelerated) {
-            var vector1 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0]);
+            var vector1 = (Bytes != null)
+                ? Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0])
+                : Vector128<byte>.Zero;
             var vector2 = Unsafe.ReadUnaligned<Vector128<byte>>(ref other.ToByteArray()[0]);
             return vector1 == vector2;
         }
@@ -1084,7 +1092,9 @@ public readonly struct Uuid7
     public bool Equals(Uuid7 other) {
 #if NET7_0_OR_GREATER
         if (Vector128.IsHardwareAccelerated) {
-            var vector1 = Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0]);
+            var vector1 = (Bytes != null)
+                ? Unsafe.ReadUnaligned<Vector128<byte>>(ref Bytes[0])
+                : Vector128<byte>.Zero;
             if (other.Bytes == null) {
                 return vector1 == Vector128<byte>.Zero;
             } else {
