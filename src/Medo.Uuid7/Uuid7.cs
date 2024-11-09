@@ -570,7 +570,11 @@ public readonly struct Uuid7
     /// Returns current UUID as binary equivalent System.Guid.
     /// </summary>
     public Guid ToGuid() {
-        return new Guid(Bytes);
+        if (Bytes != null) {
+            return new Guid(Bytes);
+        } else {
+            return new Guid(MinValue.Bytes);
+        }
     }
 
     /// <summary>
@@ -618,7 +622,7 @@ public readonly struct Uuid7
     /// <param name="bigEndian">If true, bytes will be in big-endian (natural) order.</param>
     public byte[] ToByteArray(bool bigEndian) {
         var copy = new byte[16];
-        Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
+        if (Bytes != null) { Buffer.BlockCopy(Bytes, 0, copy, 0, 16); }
         if (bigEndian) {
             return copy;
         } else {
@@ -633,6 +637,7 @@ public readonly struct Uuid7
     /// </summary>
     /// <exception cref="InvalidOperationException">UUID is not version 7.</exception>
     public DateTime ToDateTime() {
+        if (Bytes == null) { return DateTime.MinValue; }
         if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
         var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
         var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
@@ -645,6 +650,7 @@ public readonly struct Uuid7
     /// </summary>
     /// <exception cref="InvalidOperationException">UUID is not version 7.</exception>
     public DateTimeOffset ToDateTimeOffset() {
+        if (Bytes == null) { return DateTimeOffset.MinValue; }
         if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
         var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
         var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
@@ -785,6 +791,7 @@ public readonly struct Uuid7
     /// Returns a hash code for the current object.
     /// </summary>
     public override int GetHashCode() {
+        if (Bytes == null) { return 0; }
         var hc = ((Bytes[3] ^ Bytes[7] ^ Bytes[11] ^ Bytes[15]) << 24)
                | ((Bytes[2] ^ Bytes[6] ^ Bytes[10] ^ Bytes[14]) << 16)
                | ((Bytes[1] ^ Bytes[5] ^ Bytes[9] ^ Bytes[13]) << 8)
@@ -1003,7 +1010,7 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="value">Value.</param>
     public static Guid ToGuid(Uuid7 value) {
-        return new Guid(value.Bytes);
+        return (value.Bytes != null) ? new Guid(value.Bytes) : Guid.Empty;
     }
 
     /// <summary>

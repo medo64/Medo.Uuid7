@@ -372,6 +372,36 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(Guid.Empty.ToString(), list[0].ToString());
     }
 
+    [TestMethod]
+    public void Uuid7_NoConstructor_HashCode() {
+        var listU = new Uuid7[1];
+        var listG = new Guid[1];
+        Assert.AreEqual(listU[0].GetHashCode(), listG[0].GetHashCode());
+    }
+
+    [TestMethod]
+    public void Uuid7_NoConstructor_ToGuid() {
+        var list = new Uuid7[1];
+        Assert.AreEqual(Guid.Empty, list[0].ToGuid());
+        Assert.AreEqual(Guid.Empty, list[0].ToGuid(matchGuidEndianness: true));
+        Assert.AreEqual(Guid.Empty, list[0].ToGuid(matchGuidEndianness: false));
+    }
+
+    [TestMethod]
+    public void Uuid7_NoConstructor_ToByteArray() {
+        var list = new Uuid7[1];
+        Assert.AreEqual("00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00", BitConverter.ToString(list[0].ToByteArray()));
+        Assert.AreEqual("00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00", BitConverter.ToString(list[0].ToByteArray(bigEndian: false)));
+        Assert.AreEqual("00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00", BitConverter.ToString(list[0].ToByteArray(bigEndian: true)));
+    }
+
+    [TestMethod]
+    public void Uuid7_NoConstructor_ToDateTime() {
+        var list = new Uuid7[1];
+        Assert.AreEqual(DateTime.MinValue, list[0].ToDateTime());
+        Assert.AreEqual(DateTimeOffset.MinValue, list[0].ToDateTimeOffset());
+    }
+
 
     [TestMethod]
     public void Uuid7_CompareTo() {
