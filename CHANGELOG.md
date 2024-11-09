@@ -1,5 +1,10 @@
 CHANGELOG
 
+[2.1.1]
+
+- Fixed handling of non-initialized struct
+
+
 [2.1.0]
 
 - Added timestamp support for FillMsSqlUniqueIdentifier
