@@ -141,6 +141,12 @@ public readonly struct Uuid7
     /// </summary>
     public static readonly Uuid7 Empty = MinValue;
 
+    /// <summary>
+    /// A read-only instance of the Uuid7 structure whose value is all ones.
+    /// Please note this is not a valid UUID7 as it lacks the correct version bits.
+    /// </summary>
+    public static readonly Uuid7 AllBitsSet = MaxValue;
+
 
     /// <summary>
     /// Returns a new UUID version 7.
