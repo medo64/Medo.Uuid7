@@ -8,8 +8,11 @@ using Medo;
 [MemoryDiagnoser]
 public class New {
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public Guid NewSystemGuid() => Guid.NewGuid();
+
+    [Benchmark(Baseline = true)]
+    public Guid NewSystemGuid7() => Guid.CreateVersion7();
 
     [Benchmark]
     public void NewUuid7() => Uuid7.NewUuid7();
