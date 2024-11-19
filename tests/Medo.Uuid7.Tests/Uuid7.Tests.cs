@@ -46,25 +46,31 @@ public partial class Uuid7_Tests {
         Assert.IsTrue(CompareMsSqlUniqueIdentifiers(guid1, guid2) < 0);
     }
 
+
     [TestMethod]
     public void Uuid7_NewGuid() {
-        var uuid1 = Uuid7.NewGuid();
-        var uuid2 = Uuid7.NewGuid();
-        Assert.AreNotEqual(uuid1, uuid2);
+        var guid1 = Uuid7.NewGuid();
+        var guid2 = Uuid7.NewGuid();
+        Assert.AreNotEqual(guid1, guid2);
+        Assert.IsTrue(guid1 < guid2);
     }
 
     [TestMethod]
-    public void Uuid7_NewGuidNonMatched() {
-        var guid = Uuid7.NewGuid(matchGuidEndianness: false);
-        var uuid = (Uuid7)guid;
-        Assert.IsTrue(CompareArrays(guid.ToByteArray(), uuid.ToByteArray()) != 0);
+    public void Uuid7_NewGuidBE() {
+        var guid1 = Uuid7.NewGuid();
+        var guid2BE = Uuid7.NewGuid(bigEndian: true);
+        var guid2 = new Guid(guid2BE.ToByteArray(), bigEndian: true);
+        Assert.AreNotEqual(guid1, guid2);
+        Assert.IsTrue(guid1 < guid2);
     }
 
     [TestMethod]
-    public void Uuid7_NewGuidMatched() {
-        var guid = Uuid7.NewGuid(matchGuidEndianness: true);
-        var uuid = (Uuid7)guid;
-        Assert.AreEqual(guid.ToString(), uuid.ToString());
+    public void Uuid7_NewGuidLE() {
+        var guid1 = Uuid7.NewGuid();
+        var guid2LE = Uuid7.NewGuid(bigEndian: false);
+        var guid2 = new Guid(guid2LE.ToByteArray(), bigEndian: false);
+        Assert.AreNotEqual(guid1, guid2);
+        Assert.IsTrue(guid1 < guid2);
     }
 
 
@@ -83,17 +89,25 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
-    public void Uuid7_NewFromGuidNonMatched() {
+    public void Uuid7_NewFromGuidBE() {
         var guid = new Guid(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
-        var uuid = new Uuid7(guid, matchGuidEndianness: false);
-        Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+        var uuid = new Uuid7(guid, bigEndian: true);
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+        } else {
+            Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", uuid.ToString());
+        }
     }
 
     [TestMethod]
-    public void Uuid7_NewFromGuidMatched() {
+    public void Uuid7_NewFromGuidLE() {
         var guid = new Guid(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
-        var uuid = new Uuid7(guid, matchGuidEndianness: true);
-        Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", uuid.ToString());
+        var uuid = new Uuid7(guid, bigEndian: false);
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", uuid.ToString());
+        } else {
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
+        }
     }
 
 #if NET6_0_OR_GREATER
@@ -166,30 +180,37 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
-    public void Uuid7_GuidAndBackBigEndian() {
+    public void Uuid7_GuidAndBackBE() {
         var uuid1 = Uuid7.NewUuid7();
-        var guid = uuid1.ToGuid(matchGuidEndianness: true);
-        var uuid2 = new Uuid7(guid);
+        var guid = uuid1.ToGuid(bigEndian: true);
+        var uuid2 = new Uuid7(guid, bigEndian: true);
         Assert.AreEqual(uuid1, uuid2);
     }
 
     [TestMethod]
-    public void Uuid7_GuidAndBackLittleEndian() {
+    public void Uuid7_GuidAndBackLE() {
         var uuid1 = Uuid7.NewUuid7();
-        var guid = uuid1.ToGuid(matchGuidEndianness: true);
-        var uuid2 = new Uuid7(guid, matchGuidEndianness: true);
+        var guid = uuid1.ToGuid(bigEndian: false);
+        var uuid2 = new Uuid7(guid, bigEndian: false);
         Assert.AreEqual(uuid1, uuid2);
-        Assert.AreEqual(uuid1.ToString(), guid.ToString());
     }
 
     [TestMethod]
     public void Uuid7_GuidToString() {
         var uuid = new Uuid7(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 });
         var guid = uuid.ToGuid();
-        var guidNonMatched = uuid.ToGuid(matchGuidEndianness: false);
+        var guidLE = uuid.ToGuid(bigEndian: false);
+        var guidBE = uuid.ToGuid(bigEndian: true);
+
         Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", uuid.ToString());
-        Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guid.ToString());  // we keep GUID endianess by default
-        Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", guidNonMatched.ToString());
+        Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guid.ToString());
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guidLE.ToString());
+            Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", guidBE.ToString());
+        } else {
+            Assert.AreEqual("04030201-0605-0807-090a-0b0c0d0e0f10", guidLE.ToString());
+            Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", guidBE.ToString());
+        }
     }
 
     [TestMethod]
@@ -285,29 +306,27 @@ public partial class Uuid7_Tests {
         Guid guid = Guid.NewGuid();
         Uuid7 uuid = guid;
         Assert.AreEqual(uuid.ToString(), guid.ToString());
-        if (!BitConverter.IsLittleEndian) {
-            Assert.AreEqual(BitConverter.ToString(guid.ToByteArray()), BitConverter.ToString(uuid.ToByteArray()));  // same only on BE platforms
+    }
+
+    [TestMethod]
+    public void Uuid7_FromGuidLE() {
+        Guid guid = Guid.NewGuid();
+        Uuid7 uuid = Uuid7.FromGuid(guid, bigEndian: false);
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreEqual(uuid.ToString(), guid.ToString());
+        } else {
+            Assert.AreEqual(BitConverter.ToString(guid.ToByteArray()), BitConverter.ToString(uuid.ToByteArray()));
         }
     }
 
     [TestMethod]
-    public void Uuid7_FromGuidNonMatched() {
+    public void Uuid7_FromGuidBE() {
         Guid guid = Guid.NewGuid();
-        Uuid7 uuid = Uuid7.FromGuid(guid, matchGuidEndianness: false);
+        Uuid7 uuid = Uuid7.FromGuid(guid, bigEndian: true);
         if (BitConverter.IsLittleEndian) {
-            Assert.AreEqual(BitConverter.ToString(guid.ToByteArray()), BitConverter.ToString(uuid.ToByteArray()));  // same only on BE platforms
+            Assert.AreEqual(BitConverter.ToString(guid.ToByteArray()), BitConverter.ToString(uuid.ToByteArray()));
         } else {
             Assert.AreEqual(uuid.ToString(), guid.ToString());
-        }
-    }
-
-    [TestMethod]
-    public void Uuid7_FromGuidMatched() {
-        Guid guid = Guid.NewGuid();
-        Uuid7 uuid = Uuid7.FromGuid(guid, matchGuidEndianness: true);
-        Assert.AreEqual(uuid.ToString(), guid.ToString());  // textual equality
-        if (!BitConverter.IsLittleEndian) {
-            Assert.AreEqual(guid, uuid);  // same only on BE platforms
         }
     }
 
@@ -321,10 +340,11 @@ public partial class Uuid7_Tests {
         }
     }
 
+
     [TestMethod]
-    public void Uuid7_ToGuidNonMatched() {
+    public void Uuid7_ToGuid() {
         Uuid7 uuid = Uuid7.NewUuid7();
-        Guid guid = Uuid7.ToGuid(uuid, matchGuidEndianness: false);  // always big endian
+        Guid guid = Uuid7.ToGuid(uuid, bigEndian: false);
         if (BitConverter.IsLittleEndian) {
             Assert.AreEqual(BitConverter.ToString(guid.ToByteArray()), BitConverter.ToString(uuid.ToByteArray()));
         } else {
@@ -333,10 +353,21 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
-    public void Uuid7_ToGuidMatched() {
+    public void Uuid7_ToGuidLE() {
         Uuid7 uuid = Uuid7.NewUuid7();
-        Guid guid = Uuid7.ToGuid(uuid, matchGuidEndianness: true);
-        Assert.AreEqual(uuid.ToString(), guid.ToString());  // textual equality
+        Guid guid = Uuid7.ToGuid(uuid, bigEndian: false);
+        if (BitConverter.IsLittleEndian) {
+            Assert.AreEqual(BitConverter.ToString(guid.ToByteArray()), BitConverter.ToString(uuid.ToByteArray()));
+        } else {
+            Assert.AreEqual(uuid.ToString(), guid.ToString());
+        }
+    }
+
+    [TestMethod]
+    public void Uuid7_ToGuidBE() {
+        Uuid7 uuid = Uuid7.NewUuid7();
+        Guid guid = Uuid7.ToGuid(uuid, bigEndian: true);
+        Assert.AreEqual(uuid.ToString(), guid.ToString());
         if (!BitConverter.IsLittleEndian) {
             Assert.AreEqual(guid, uuid);  // same only on BE platforms
         }
@@ -387,8 +418,8 @@ public partial class Uuid7_Tests {
     public void Uuid7_NoConstructor_ToGuid() {
         var list = new Uuid7[1];
         Assert.AreEqual(Guid.Empty, list[0].ToGuid());
-        Assert.AreEqual(Guid.Empty, list[0].ToGuid(matchGuidEndianness: true));
-        Assert.AreEqual(Guid.Empty, list[0].ToGuid(matchGuidEndianness: false));
+        Assert.AreEqual(Guid.Empty, list[0].ToGuid(bigEndian: true));
+        Assert.AreEqual(Guid.Empty, list[0].ToGuid(bigEndian: false));
     }
 
     [TestMethod]
@@ -615,29 +646,25 @@ public partial class Uuid7_Tests {
     }
 
     [TestMethod]
-    public void Uuid7_FillGuidNonMatched() {
+    public void Uuid7_FillGuidBE() {
         var guids = new Guid[10000];
-        Uuid7.FillGuid(guids, matchGuidEndianness: false);
+        Uuid7.FillGuid(guids, bigEndian: true);
 
-        var prevGuid = Guid.Empty;
+        var prevGuid = Uuid7.Empty;
         foreach (var guid in guids) {
-            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
-            var uuid = Uuid7.FromGuid(guid, matchGuidEndianness: true);
-            Assert.AreEqual(uuid.ToString(), guid.ToString());
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(bigEndian: true), guid.ToByteArray(bigEndian: true)) < 0);
             prevGuid = guid;
         }
     }
 
     [TestMethod]
-    public void Uuid7_FillGuidMatched() {
+    public void Uuid7_FillGuidLE() {
         var guids = new Guid[10000];
-        Uuid7.FillGuid(guids, matchGuidEndianness: true);
+        Uuid7.FillGuid(guids, bigEndian: true);
 
         var prevGuid = Guid.Empty;
         foreach (var guid in guids) {
-            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
-            var uuid = Uuid7.FromGuid(guid, matchGuidEndianness: true);
-            Assert.AreEqual(uuid.ToString(), guid.ToString());
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(bigEndian: true), guid.ToByteArray(bigEndian: true)) < 0);
             prevGuid = guid;
         }
     }

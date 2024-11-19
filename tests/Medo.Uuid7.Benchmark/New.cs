@@ -24,10 +24,10 @@ public class New {
     public void NewGuid() => Uuid7.NewGuid();
 
     [Benchmark]
-    public void NewGuidNonMatched() => Uuid7.NewGuid(matchGuidEndianness: false);
+    public void NewGuidLE() => Uuid7.NewGuid(bigEndian: false);
 
     [Benchmark]
-    public void NewGuidMatched() => Uuid7.NewGuid(matchGuidEndianness: true);
+    public void NewGuidBE() => Uuid7.NewGuid(bigEndian: true);
 
     [Benchmark]
     public void NewMsSqlUniqueIdentifier() => Uuid7.NewMsSqlUniqueIdentifier();

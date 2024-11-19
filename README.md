@@ -72,11 +72,11 @@ selected as default
 
 Please note that, prior to 3.0, priority was given to maintaining binary
 representation. This is a **breaking change** for older versions. If you are
-upgrading from older version, use `ToGuid(matchGuidEndianness: false)` overload.
+upgrading from older version, use `ToGuid(bigEndian: true)` overload.
 
 If we want to preserve textual representation and follow behavior as defined in
-.NET 9, we can use`ToGuid()` function or its `ToGuid(matchGuidEndianness: true)`
-overload as this one takes internal Guid endianess into account.
+.NET 9, we can use`ToGuid()` function or its `ToGuid(bigEndian: false)` overload
+as this one takes internal Guid endianess into account.
 ```csharp
 using Medo;
 
@@ -94,14 +94,15 @@ differing.
 01904d33-d262-7531-b71c-05555c63df91
 ```
 
-On other hand, code below will retain binary compatibility during conversion.
+On other hand, code below will retain binary compatibility during conversion (if
+running on LE system).
 ```csharp
 using Medo;
 
 var uuid = Uuid7.NewUuid7();
 Console.WriteLine($"{uuid}");
 
-var guid = uuid.ToGuid(matchGuidEndianness: false);
+var guid = uuid.ToGuid(bigEndian: true);
 Console.WriteLine($"{guid}");
 ```
 
@@ -114,7 +115,7 @@ arguably more common big-endian order.
 ```
 
 I view this as a damn-if-you-do-damn-if-you-don't scenario and prior to version
-3, default was to keep them equivalent in binary. Since .NET 9 decided to go
+3.0, default was to keep them equivalent in binary. Since .NET 9 decided to go
 other way, the default was changed.
 
 
