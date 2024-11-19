@@ -98,9 +98,9 @@ public class Uuid7_EfCoreConverterTests {
 
         var entry = db.Database.SqlQueryRaw<string>("SELECT [Id] FROM UuidSevens").ToList()[0];
         if (BitConverter.IsLittleEndian) {
-            Assert.AreEqual("04030201-0605-0807-090A-0B0C0D0E0F10", entry);
-        } else {
             Assert.AreEqual("01020304-0506-0708-090A-0B0C0D0E0F10", entry);
+        } else {
+            Assert.AreEqual("04030201-0605-0807-090A-0B0C0D0E0F10", entry);
         }
 
         db.Database.CloseConnection();

@@ -87,8 +87,8 @@ public readonly struct Uuid7
     /// No check if GUID is version 7 UUID is made.
     /// </summary>
     /// <param name="guid">Guid.</param>
-    public Uuid7(Guid guid) {
-        Bytes = guid.ToByteArray();
+    public Uuid7(Guid guid)
+        : this(guid, matchGuidEndianness: true) {
     }
 
     /// <summary>
@@ -193,11 +193,7 @@ public readonly struct Uuid7
     /// This method is thread-safe.
     /// </summary>
     public static Guid NewGuid() {
-        var bytes = new byte[16];
-        lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
-        }
-        return new Guid(bytes);
+        return NewGuid(matchGuidEndianness: true);
     }
 
     /// <summary>
@@ -214,15 +210,6 @@ public readonly struct Uuid7
         return new Guid(bytes);
     }
 
-
-    /// <summary>
-    /// Returns Guid with endianess matching one of the system.
-    /// NOT suitable for insertion into Microsoft SQL database.
-    /// </summary>
-    [Obsolete("For UniqueIdentifier Use NewMsSqlUniqueIdentifier() or NewGuid(matchGuidEndianness: true) instead, depending on desired behavior.", error: true)]
-    public static Guid NewGuidMsSql() {
-        return NewGuid(matchGuidEndianness: true);
-    }
 
     /// <summary>
     /// Returns a System.Guid of a UUID version 7 suitable for insertion into a
@@ -315,15 +302,8 @@ public readonly struct Uuid7
     public static void FillGuid(Span<Guid> data) {
 #else
     public static void FillGuid(Guid[] data) {
-        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
 #endif
-        lock (NonThreadedSyncRoot) {
-            for (var i = 0; i < data.Length; i++) {
-                var bytes = new byte[16];
-                FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
-                data[i] = new Guid(bytes);
-            }
-        }
+        FillGuid(data, matchGuidEndianness: true);
     }
 
     /// <summary>
@@ -569,6 +549,21 @@ public readonly struct Uuid7
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static byte[] AdjustGuidEndianess(byte[] bytes) {
+        if (BitConverter.IsLittleEndian) {  // swap a few bytes on little-endian
+            var guidBytes = new byte[16];
+            guidBytes[0] = bytes[3]; guidBytes[1] = bytes[2]; guidBytes[2] = bytes[1]; guidBytes[3] = bytes[0];
+            guidBytes[4] = bytes[5]; guidBytes[5] = bytes[4];
+            guidBytes[6] = bytes[7]; guidBytes[7] = bytes[6];
+            guidBytes[8] = bytes[8]; guidBytes[9] = bytes[9]; guidBytes[10] = bytes[10]; guidBytes[11] = bytes[11];
+            guidBytes[12] = bytes[12]; guidBytes[13] = bytes[13]; guidBytes[14] = bytes[14]; guidBytes[15] = bytes[15];
+            return guidBytes;
+        } else {
+            return bytes;  // no need to swap
+        }
+    }
+
     #endregion Endianess
 
 
@@ -576,11 +571,7 @@ public readonly struct Uuid7
     /// Returns current UUID as binary equivalent System.Guid.
     /// </summary>
     public Guid ToGuid() {
-        if (Bytes != null) {
-            return new Guid(Bytes);
-        } else {
-            return new Guid(MinValue.Bytes);
-        }
+        return ToGuid(matchGuidEndianness: true);
     }
 
     /// <summary>
@@ -599,15 +590,6 @@ public readonly struct Uuid7
                 return new Guid(MinValue.Bytes);
             }
         }
-    }
-
-    /// <summary>
-    /// Returns Guid with endianess matching one of the system.
-    /// NOT suitable for insertion into Microsoft SQL database.
-    /// </summary>
-    [Obsolete("Use NewMsSqlUniqueIdentifier() or ToGuid(matchGuidEndianness: true) instead, depending on desired behavior.", error: true)]
-    public Guid ToGuidMsSql() {
-        return ToGuid(matchGuidEndianness: true);
     }
 
 
@@ -788,7 +770,9 @@ public readonly struct Uuid7
         if (obj is Uuid7 uuid) {
             return CompareArrays(Bytes, uuid.Bytes) == 0;
         } else if (obj is Guid guid) {
-            return CompareArrays(Bytes, guid.ToByteArray()) == 0;
+            var guidBytes = guid.ToByteArray();
+            AdjustGuidEndianess(ref guidBytes);
+            return CompareArrays(Bytes, guidBytes) == 0;
         }
         return false;
     }
@@ -798,10 +782,10 @@ public readonly struct Uuid7
     /// </summary>
     public override int GetHashCode() {
         if (Bytes == null) { return 0; }
-        var hc = ((Bytes[3] ^ Bytes[7] ^ Bytes[11] ^ Bytes[15]) << 24)
-               | ((Bytes[2] ^ Bytes[6] ^ Bytes[10] ^ Bytes[14]) << 16)
-               | ((Bytes[1] ^ Bytes[5] ^ Bytes[9] ^ Bytes[13]) << 8)
-               | (Bytes[0] ^ Bytes[4] ^ Bytes[8] ^ Bytes[12]);
+        var hc = ((Bytes[0] ^ Bytes[6] ^ Bytes[11] ^ Bytes[15]) << 24)
+               | ((Bytes[1] ^ Bytes[7] ^ Bytes[10] ^ Bytes[14]) << 16)
+               | ((Bytes[2] ^ Bytes[4] ^ Bytes[9] ^ Bytes[13]) << 8)
+               | (Bytes[3] ^ Bytes[5] ^ Bytes[8] ^ Bytes[12]);
         return hc;  // just XOR individual ints - compatible with Guid implementation on LE platform
     }
 
@@ -989,7 +973,7 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="value">Value.</param>
     public static Uuid7 FromGuid(Guid value) {
-        return new Uuid7(value.ToByteArray());
+        return new Uuid7(value, matchGuidEndianness: true);
     }
 
     /// <summary>
@@ -1016,7 +1000,12 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="value">Value.</param>
     public static Guid ToGuid(Uuid7 value) {
-        return (value.Bytes != null) ? new Guid(value.Bytes) : Guid.Empty;
+        if (value.Bytes == null) { return Guid.Empty; }
+#if NET8_0_OR_GREATER
+        return new Guid(value.Bytes, true);
+#else
+        return new Guid(AdjustGuidEndianess(value.Bytes));
+#endif
     }
 
     /// <summary>
@@ -1041,7 +1030,7 @@ public readonly struct Uuid7
         return ToGuid(value);
     }
 
-    #endregion Operators
+#endregion Operators
 
 
     #region IComparable<Guid>
@@ -1053,7 +1042,9 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="other">An object to compare to this instance.</param>
     public int CompareTo(Guid other) {
-        return CompareArrays(Bytes, other.ToByteArray());
+        var guidBytes = other.ToByteArray();
+        AdjustGuidEndianess(ref guidBytes);
+        return CompareArrays(Bytes, guidBytes);
     }
 
     #endregion IComparable<Guid>

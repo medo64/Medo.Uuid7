@@ -65,40 +65,25 @@ Console.WriteLine($"UUID : {uuid}");
 ## Converting to Guid
 
 Converting to and from `System.Guid` is a complicated story. There are two ways
-it can be done. One is by preserving binary equivalency and that is what I
-selected by default. Any time a conversion into `System.Guid` is done, all raw
-bytes are the same but a textual representation between `Medo.Uuid7` and
-`System.Guid` on little-endian platforms will differ.
+it can be done. One is by preserving binary equivalency and the other is by
+preserving textual respresentations. Since Microsoft's Guid implementation in
+.NET 9.0 keeps Microsoft's weird endianess behavior even with UUIDv7, this is
+selected as default
 
-For example, this code will retain binary compatibility during conversion.
+Please note that, prior to 3.0, priority was given to maintaining binary
+representation. This is a **breaking change** for older versions. If you are
+upgrading from older version, use `ToGuid(matchGuidEndianness: false)` overload.
+
+If we want to preserve textual representation and follow behavior as defined in
+.NET 9, we can use`ToGuid()` function or its `ToGuid(matchGuidEndianness: true)`
+overload as this one takes internal Guid endianess into account.
 ```csharp
 using Medo;
 
 var uuid = Uuid7.NewUuid7();
 Console.WriteLine($"{uuid}");
 
-var guid = (Guid)uuid;
-Console.WriteLine($"{guid}");
-```
-
-However, that means that textual respresentations look different since Microsoft
-prints logically numeric Guid elements in little-endian order instead of
-arguably more common big-endian order.
-```plain
-01904d33-d262-7531-b71c-05555c63df91
-334d9001-62d2-3175-b71c-05555c63df91
-```
-
-If we want to preserve textual representation, we need to actually use
-`ToGuid(matchGuidEndianness)` function overload as this one takes internal
-Guid endianess into account.
-```csharp
-using Medo;
-
-var uuid = Uuid7.NewUuid7();
-Console.WriteLine($"{uuid}");
-
-var guid = uuid.ToGuid(matchGuidEndianness: true);
+var guid = uuid.ToGuid();
 Console.WriteLine($"{guid}");
 ```
 
@@ -109,8 +94,28 @@ differing.
 01904d33-d262-7531-b71c-05555c63df91
 ```
 
-I view this as a damn-if-you-do-damn-if-you-don't scenario and I decided to be
-damned in binary format.
+On other hand, code below will retain binary compatibility during conversion.
+```csharp
+using Medo;
+
+var uuid = Uuid7.NewUuid7();
+Console.WriteLine($"{uuid}");
+
+var guid = uuid.ToGuid(matchGuidEndianness: false);
+Console.WriteLine($"{guid}");
+```
+
+Note this means that textual respresentations look different since Microsoft
+prints logically numeric Guid elements in little-endian order instead of
+arguably more common big-endian order.
+```plain
+01904d33-d262-7531-b71c-05555c63df91
+334d9001-62d2-3175-b71c-05555c63df91
+```
+
+I view this as a damn-if-you-do-damn-if-you-don't scenario and prior to version
+3, default was to keep them equivalent in binary. Since .NET 9 decided to go
+other way, the default was changed.
 
 
 ### Configuration

@@ -1,5 +1,14 @@
 CHANGELOG
 
+[3.0.0]
+
+- .NET 9 suppport
+- **BREAKING CHANGE**: ToGuid conversion done in native endianess (always big endian before)
+  - this was to match `Guid.CreateVersion7()` behavior by default
+  - old behavior possible by using `ToGuid(matchGuidEndianness: false)`
+- removed obsoleted functions
+
+
 [2.1.1]
 
 - Fixed handling of non-initialized struct
