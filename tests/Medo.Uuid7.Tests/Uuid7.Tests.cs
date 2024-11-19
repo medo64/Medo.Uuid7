@@ -364,7 +364,7 @@ public partial class Uuid7_Tests {
         var list = new Uuid7[1];
 
         Assert.IsTrue(list[0].Equals(Guid.Empty));
-        Assert.AreEqual(list[0], Guid.Empty);
+        Assert.AreEqual((Guid)list[0], Guid.Empty);
         if (!BitConverter.IsLittleEndian) {
             Assert.AreEqual(Guid.Empty, list[0]);
             Assert.AreEqual(Guid.Empty, Uuid7.ToGuid(list[0], true));
