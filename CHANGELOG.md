@@ -7,6 +7,7 @@ CHANGELOG
   - this was to match `Guid.CreateVersion7()` behavior by default
   - old behavior possible by using `ToGuid(matchGuidEndianness: false)`
 - removed obsoleted functions
+- removed official .NET 6 support (code is left behind, just not tested)
 
 
 [2.1.1]
