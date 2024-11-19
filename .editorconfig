@@ -39,7 +39,7 @@ dotnet_style_parentheses_in_other_binary_operators                       = alway
 dotnet_style_parentheses_in_other_operators                              = never_if_unnecessary : none
 # Expression-level preferences
 dotnet_style_object_initializer                                          = true : suggestion
-dotnet_style_collection_initializer                                      = true : suggestion
+dotnet_style_collection_initializer                                      = true : none
 dotnet_style_explicit_tuple_names                                        = true : suggestion
 dotnet_style_prefer_inferred_tuple_names                                 = true : suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names                 = true : suggestion
@@ -134,3 +134,5 @@ dotnet_naming_rule.private_field_naming.symbols                          = priva
 dotnet_naming_rule.private_field_naming.style                            = private_style
 # Other
 csharp_style_prefer_utf8_string_literals                                 = false
+csharp_style_namespace_declarations                                      = file_scoped
+csharp_using_directive_placement                                         = inside_namespace

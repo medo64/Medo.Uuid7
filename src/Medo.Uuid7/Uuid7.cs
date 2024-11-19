@@ -1030,7 +1030,7 @@ public readonly struct Uuid7
         return ToGuid(value);
     }
 
-#endregion Operators
+    #endregion Operators
 
 
     #region IComparable<Guid>
@@ -1732,7 +1732,7 @@ public readonly struct Uuid7
         if (count != 32) { result = Uuid7.Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        int byteCount = number.GetByteCount(isUnsigned: true);
+        var byteCount = number.GetByteCount(isUnsigned: true);
         Span<byte> buffer = stackalloc byte[byteCount];
         number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
 
@@ -1798,7 +1798,7 @@ public readonly struct Uuid7
         if (count != 25) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        int byteCount = number.GetByteCount(isUnsigned: true);
+        var byteCount = number.GetByteCount(isUnsigned: true);
         Span<byte> buffer = stackalloc byte[byteCount];
         number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
 
@@ -1863,7 +1863,7 @@ public readonly struct Uuid7
         if (count != 22) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        int byteCount = number.GetByteCount(isUnsigned: true);
+        var byteCount = number.GetByteCount(isUnsigned: true);
         Span<byte> buffer = stackalloc byte[byteCount];
         number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
 
