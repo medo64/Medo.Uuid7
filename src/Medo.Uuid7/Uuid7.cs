@@ -627,7 +627,7 @@ public readonly struct Uuid7
     public DateTime ToDateTime() {
         if (Bytes == null) { return DateTime.MinValue; }
         if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
-        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
+        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | Bytes[5];
         var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
         return new DateTime(ticks, DateTimeKind.Utc);
     }
@@ -640,7 +640,7 @@ public readonly struct Uuid7
     public DateTimeOffset ToDateTimeOffset() {
         if (Bytes == null) { return DateTimeOffset.MinValue; }
         if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
-        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
+        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | Bytes[5];
         var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
         return new DateTimeOffset(ticks, TimeSpan.Zero);
     }
