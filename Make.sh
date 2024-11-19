@@ -234,7 +234,7 @@ function package() {
 
         rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet pack "$PROJECT_FILE" \
-                    -p:PackageReleaseNotes="$RELEASE_NOTES" \
+                    -p:PackageReleaseNotes="${RELEASE_NOTES@Q}" \
                     --configuration "Release" \
                     --force \
                     --include-source \
