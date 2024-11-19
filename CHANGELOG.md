@@ -4,11 +4,11 @@ CHANGELOG
 
 - .NET 9 suppport
 - **BREAKING CHANGE**: Guid conversion is done in native endianess (was always big endian before)
-  - this was done to match `Guid.CreateVersion7()` behavior by default
-  - old behavior possible by using `ToGuid(bigEndian: true)`
-- **BREAKING CHANGE**: all overloads that used `matchGuidEndianess` were changed to `bigEndian` parameter.
+  - this was done to match Guid.CreateVersion7() behavior by default
+  - old behavior possible by using ToGuid(bigEndian: true)
+- **BREAKING CHANGE**: all overloads that used matchGuidEndianess were changed to bigEndian parameter.
   - this was done to match most of .NET 9 overloads
-  - old behavior possible by using negation, e.g., `ToGuid(bigEndian: !matchGuidEndiness)`
+  - old behavior possible by using negation, e.g., ToGuid(bigEndian: !matchGuidEndiness)
 - removed obsoleted functions
 - removed official .NET 6 support (code is left behind, just not tested)
 
