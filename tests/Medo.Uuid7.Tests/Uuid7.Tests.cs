@@ -807,6 +807,19 @@ public partial class Uuid7_Tests {
 
 
     [TestMethod]
+    public void Uuid7_Version() {
+#if NET9_0_OR_GREATER
+        var guid = Guid.CreateVersion7();
+        Assert.AreEqual(7, guid.Version);
+#else
+        var guid = Uuid7.NewUuid7().ToGuid();
+#endif
+        var uuid = (Uuid7)guid;
+        Assert.AreEqual(7, uuid.Version);
+    }
+
+
+    [TestMethod]
     public void Uuid7_ToDateTimeInvalidVersion() {
         var uuid = Uuid7.Parse("018c051e-b87a-6404-ae7f-50e3be711102");
         Assert.ThrowsException<InvalidOperationException>(() => uuid.ToDateTimeOffset());

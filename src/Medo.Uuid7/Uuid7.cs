@@ -119,6 +119,17 @@ public readonly struct Uuid7
     private readonly byte[] Bytes;
 
 
+    /// <summary>
+    /// Gets the value of the version field.
+    /// </summary>
+    public int Version {
+        get {
+            if (Bytes == null) { return 0; }
+            return (Bytes[6] & 0xF0) >> 4;
+        }
+    }
+
+
     #region Static
 
     /// <summary>
