@@ -15,6 +15,8 @@ Features:
   characteristics over UUID versions 1 or 6. The inclusion of the timestamp
   ensures a high level of uniqueness, minimizing the chances of collisions
   across different systems or instances.
+* Unlike System.Guid in .NET 9, implements monotonicity counter and not just
+  random bits (helps with ordered inserts into database).
 * Multiple string representations: In addition to the standard UUID string
   formatting, library also offers ID22 and ID25 string conversions.
 * Wide compatibility: Support for .NET Standard 2.0 makes this library
