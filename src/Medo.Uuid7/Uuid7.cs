@@ -129,6 +129,19 @@ public readonly struct Uuid7
         }
     }
 
+    /// <summary>
+    /// Gets the value of the variant field.
+    /// Please note the variant returned is 4-bit value as defined in RFC9562,
+    /// section 4.1. In practice, this means that version 7 values can have values
+    /// 8-11 (8-B, in hexadecimal).
+    /// </summary>
+    public int Variant {
+        get {
+            if (Bytes == null) { return 0; }
+            return Bytes[8] >> 4;
+        }
+    }
+
 
     #region Static
 

@@ -818,6 +818,17 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(7, uuid.Version);
     }
 
+#if NET9_0_OR_GREATER
+    [TestMethod]
+    public void Uuid7_Variant() {
+        var guid = Guid.CreateVersion7();
+        var variant = guid.Variant;
+
+        var uuid = (Uuid7)guid;
+        Assert.AreEqual(variant, uuid.Variant);
+    }
+#endif
+
 
     [TestMethod]
     public void Uuid7_ToDateTimeInvalidVersion() {
