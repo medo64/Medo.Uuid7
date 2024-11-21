@@ -598,10 +598,11 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
     public Guid ToGuid(bool bigEndian) {
+        if (Bytes == null) { return Guid.Empty; }
         if (BitConverter.IsLittleEndian == bigEndian) {
-            return (Bytes != null) ? new Guid(Bytes) : Guid.Empty;
+            return new Guid(Bytes);
         } else {
-            return (Bytes != null) ? new Guid(ReverseGuidEndianess(Bytes)) : Guid.Empty;
+            return new Guid(ReverseGuidEndianess(Bytes));
         }
     }
 
