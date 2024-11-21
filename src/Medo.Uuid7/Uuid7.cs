@@ -584,6 +584,7 @@ public readonly struct Uuid7
 
     /// <summary>
     /// Returns an array that contains UUID bytes.
+    /// Always in big-endian order.
     /// </summary>
     public byte[] ToByteArray() {
         var copy = new byte[16];
@@ -598,12 +599,13 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="bigEndian">If true, bytes will be in big-endian (natural) order.</param>
     public byte[] ToByteArray(bool bigEndian) {
-        if (IsBigEndian != bigEndian) {
+        if (Bytes == null) { return Empty.ToByteArray(); }
+        if (bigEndian) {
             var copy = new byte[16];
-            if (Bytes != null) { Buffer.BlockCopy(Bytes, 0, copy, 0, 16); }
+            Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
             return copy;
         } else {
-            return (Bytes != null) ? ReverseGuidEndianess(Bytes) : Empty.ToByteArray();
+            return ReverseGuidEndianess(Bytes);
         }
     }
 

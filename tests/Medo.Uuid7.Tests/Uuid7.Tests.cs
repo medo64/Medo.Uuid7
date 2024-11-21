@@ -640,7 +640,7 @@ public partial class Uuid7_Tests {
 
         var prevGuid = Guid.Empty;
         foreach (var guid in guids) {
-            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(bigEndian: true), guid.ToByteArray(bigEndian: true)) < 0);
             prevGuid = guid;
         }
     }
@@ -660,7 +660,7 @@ public partial class Uuid7_Tests {
     [TestMethod]
     public void Uuid7_FillGuidLE() {
         var guids = new Guid[10000];
-        Uuid7.FillGuid(guids, bigEndian: true);
+        Uuid7.FillGuid(guids, bigEndian: false);
 
         var prevGuid = Guid.Empty;
         foreach (var guid in guids) {
