@@ -46,6 +46,7 @@
     <PackageTags>RFC9562,UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4,UniqueIdentifier</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../../CHANGELOG.md"))</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7/</RepositoryUrl>

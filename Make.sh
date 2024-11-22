@@ -209,16 +209,6 @@ function package() {
     echo
     mkdir -p "$BASE_DIRECTORY/build/package/"
 
-    RELEASE_NOTES=$(cat CHANGELOG.md)
-    if [[ "$RELEASE_NOTES" == "" ]]; then
-        if [[ "$PACKAGE_VERSION" == "0.0.0" ]]; then  # allow creating package; won't be pushed anyhow
-            echo "${ANSI_YELLOW}No changelog!${ANSI_RESET}" >&2
-        else
-            echo "${ANSI_RED}No changelog!${ANSI_RESET}" >&2
-            return 1
-        fi
-    fi
-
     for PROJECT_FILE in $(find $BASE_DIRECTORY/src/MultiFramework -name "*.csproj" | sort); do
         PACKAGE_VERSION=`cat "$PROJECT_FILE" | grep "<Version>" | sed 's^</\?Version>^^g' | xargs`
         if [[ "$PACKAGE_VERSION" == "" ]]; then continue; fi  # skip projects without version - they are just helper projects
@@ -234,7 +224,6 @@ function package() {
 
         rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
         dotnet pack "$PROJECT_FILE" \
-                    -p:PackageReleaseNotes="$RELEASE_NOTES" \
                     --configuration "Release" \
                     --force \
                     --include-source \
