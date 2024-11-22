@@ -119,6 +119,30 @@ public readonly struct Uuid7
     private readonly byte[] Bytes;
 
 
+    /// <summary>
+    /// Gets the value of the version field.
+    /// </summary>
+    public int Version {
+        get {
+            if (Bytes == null) { return 0; }
+            return (Bytes[6] & 0xF0) >> 4;
+        }
+    }
+
+    /// <summary>
+    /// Gets the value of the variant field.
+    /// Please note the variant returned is 4-bit value as defined in RFC9562,
+    /// section 4.1. In practice, this means that version 7 values can have values
+    /// 8-11 (8-B, in hexadecimal).
+    /// </summary>
+    public int Variant {
+        get {
+            if (Bytes == null) { return 0; }
+            return Bytes[8] >> 4;
+        }
+    }
+
+
     #region Static
 
     /// <summary>
@@ -574,16 +598,18 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
     public Guid ToGuid(bool bigEndian) {
+        if (Bytes == null) { return Guid.Empty; }
         if (BitConverter.IsLittleEndian == bigEndian) {
-            return (Bytes != null) ? new Guid(Bytes) : Guid.Empty;
+            return new Guid(Bytes);
         } else {
-            return (Bytes != null) ? new Guid(ReverseGuidEndianess(Bytes)) : Guid.Empty;
+            return new Guid(ReverseGuidEndianess(Bytes));
         }
     }
 
 
     /// <summary>
     /// Returns an array that contains UUID bytes.
+    /// Always in big-endian order.
     /// </summary>
     public byte[] ToByteArray() {
         var copy = new byte[16];
@@ -598,12 +624,13 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="bigEndian">If true, bytes will be in big-endian (natural) order.</param>
     public byte[] ToByteArray(bool bigEndian) {
-        if (IsBigEndian != bigEndian) {
+        if (Bytes == null) { return Empty.ToByteArray(); }
+        if (bigEndian) {
             var copy = new byte[16];
-            if (Bytes != null) { Buffer.BlockCopy(Bytes, 0, copy, 0, 16); }
+            Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
             return copy;
         } else {
-            return (Bytes != null) ? ReverseGuidEndianess(Bytes) : Empty.ToByteArray();
+            return ReverseGuidEndianess(Bytes);
         }
     }
 

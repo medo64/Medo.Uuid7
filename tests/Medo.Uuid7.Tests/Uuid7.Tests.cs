@@ -640,7 +640,7 @@ public partial class Uuid7_Tests {
 
         var prevGuid = Guid.Empty;
         foreach (var guid in guids) {
-            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(), guid.ToByteArray()) < 0);
+            Assert.IsTrue(CompareArrays(prevGuid.ToByteArray(bigEndian: true), guid.ToByteArray(bigEndian: true)) < 0);
             prevGuid = guid;
         }
     }
@@ -660,7 +660,7 @@ public partial class Uuid7_Tests {
     [TestMethod]
     public void Uuid7_FillGuidLE() {
         var guids = new Guid[10000];
-        Uuid7.FillGuid(guids, bigEndian: true);
+        Uuid7.FillGuid(guids, bigEndian: false);
 
         var prevGuid = Guid.Empty;
         foreach (var guid in guids) {
@@ -804,6 +804,30 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(new DateTimeOffset(2023, 11, 25, 06, 15, 48, 602, TimeSpan.Zero), uuidTime);
         Assert.AreEqual(TimeSpan.Zero, uuidTime.Offset);
     }
+
+
+    [TestMethod]
+    public void Uuid7_Version() {
+#if NET9_0_OR_GREATER
+        var guid = Guid.CreateVersion7();
+        Assert.AreEqual(7, guid.Version);
+#else
+        var guid = Uuid7.NewUuid7().ToGuid();
+#endif
+        var uuid = (Uuid7)guid;
+        Assert.AreEqual(7, uuid.Version);
+    }
+
+#if NET9_0_OR_GREATER
+    [TestMethod]
+    public void Uuid7_Variant() {
+        var guid = Guid.CreateVersion7();
+        var variant = guid.Variant;
+
+        var uuid = (Uuid7)guid;
+        Assert.AreEqual(variant, uuid.Variant);
+    }
+#endif
 
 
     [TestMethod]

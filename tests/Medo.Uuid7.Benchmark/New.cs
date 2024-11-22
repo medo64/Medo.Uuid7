@@ -18,6 +18,9 @@ public class New {
     public void NewUuid7() => Uuid7.NewUuid7();
 
     [Benchmark]
+    public void NewUuid7ToGuid() => Uuid7.NewUuid7().ToGuid();
+
+    [Benchmark]
     public void NewUuid4() => Uuid7.NewUuid4();
 
     [Benchmark]
