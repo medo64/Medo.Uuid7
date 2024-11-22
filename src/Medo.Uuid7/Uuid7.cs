@@ -600,9 +600,19 @@ public readonly struct Uuid7
     public Guid ToGuid(bool bigEndian) {
         if (Bytes == null) { return Guid.Empty; }
         if (BitConverter.IsLittleEndian == bigEndian) {
-            return new Guid(Bytes);
+            return new Guid(  // faster than calling byte[] overload
+                Bytes[3] << 24 | Bytes[2] << 16 | Bytes[1] << 8 | Bytes[0],
+                (short)(Bytes[5] << 8 | Bytes[4]),
+                (short)(Bytes[7] << 8 | Bytes[6]),
+                Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]
+            );
         } else {
-            return new Guid(ReverseGuidEndianess(Bytes));
+            return new Guid(  // and uses less allocations too
+                Bytes[0] << 24 | Bytes[1] << 16 | Bytes[2] << 8 | Bytes[3],
+                (short)(Bytes[4] << 8 | Bytes[5]),
+                (short)(Bytes[6] << 8 | Bytes[7]),
+                Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]
+            );
         }
     }
 
