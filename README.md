@@ -17,6 +17,8 @@ Features:
   across different systems or instances.
 * Unlike System.Guid in .NET 9, implements monotonicity counter and not just
   random bits (helps with ordered inserts into database).
+* Optimized for high performance UUID version 7 creation.
+* Minimum memory allocations for most common use cases.
 * Multiple string representations: In addition to the standard UUID string
   formatting, library also offers ID22 and ID25 string conversions.
 * Wide compatibility: Support for .NET Standard 2.0 makes this library
@@ -26,8 +28,9 @@ Features:
 * Hardware acceleration: Vector128 support for Equals method.
 * Microsoft SQL Server support (`NewMsSqlUniqueIdentifier()`).
 * Support for UUID version 4 (fully random UUID)
-* Conversion from and to System.Guid
-* .NET 8 AOT support
+* Conversion from and to System.Guid; it's faster to create Uuid7 and convert it
+  to Guid than using `Guid.CreateVersion7()` on its own.
+* .NET AOT support
 * Also available as [Entity Framework Core library][nuget_uuid7_efcore].
 
 You can find packaged library at [NuGet][nuget_uuid7].

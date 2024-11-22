@@ -9,6 +9,7 @@ CHANGELOG
 - **BREAKING CHANGE**: all overloads that used matchGuidEndianess were changed to bigEndian parameter.
   - this was done to match most of .NET 9 overloads
   - it is possible to get the old behavior by using opposite boolean value
+- improved ToGuid() performance
 - removed obsoleted functions
 - removed official .NET 6 support
 
