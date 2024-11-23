@@ -22,7 +22,6 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.Id, user.Id);
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -34,7 +33,6 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.Id, user.Id);
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -46,7 +44,6 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsBytes, user.AsBytes);
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -58,7 +55,6 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsString, user.AsString);
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -70,7 +66,6 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsIdTwentyFive, user.AsIdTwentyFive);
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -82,7 +77,6 @@ public class Uuid7_EfCoreConverterTests {
         db.SaveChanges();
         User dbUser = db.UuidSevens.First();
         Assert.AreEqual(dbUser.AsIdTwentyTwo, user.AsIdTwentyTwo);
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -103,7 +97,6 @@ public class Uuid7_EfCoreConverterTests {
             Assert.AreEqual("04030201-0605-0807-090A-0B0C0D0E0F10", entry);
         }
 
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -117,7 +110,6 @@ public class Uuid7_EfCoreConverterTests {
         var entry = db.Database.SqlQueryRaw<byte[]>("SELECT [AsBytes] FROM UuidSevens").ToList()[0];
         Assert.AreEqual(Convert.ToBase64String(DummyUuidBytes), Convert.ToBase64String(entry));
 
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -131,7 +123,6 @@ public class Uuid7_EfCoreConverterTests {
         var entry = db.Database.SqlQueryRaw<string>("SELECT [AsString] FROM UuidSevens").ToList()[0];
         Assert.AreEqual("01020304-0506-0708-090a-0b0c0d0e0f10", entry);
 
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -145,7 +136,6 @@ public class Uuid7_EfCoreConverterTests {
         var entry = db.Database.SqlQueryRaw<string>("SELECT [AsIdTwentyFive] FROM UuidSevens").ToList();
         Assert.AreEqual("043q0v97ii6dr81xzei508wyw", entry[0]);
 
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
@@ -159,7 +149,6 @@ public class Uuid7_EfCoreConverterTests {
         var entry = db.Database.SqlQueryRaw<string>("SELECT [AsIdTwentyTwo] FROM UuidSevens").ToList();
         Assert.AreEqual("18DfbjXLth7APvt3qQPgtf", entry[0]);
 
-        db.Database.CloseConnection();
         db.Database.EnsureDeleted();
     }
 
