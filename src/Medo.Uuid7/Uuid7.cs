@@ -1073,7 +1073,7 @@ public readonly struct Uuid7
     /// <param name="other">An object to compare to this instance.</param>
     public int CompareTo(Guid other) {
         var guidBytes = other.ToByteArray();
-        ReverseGuidEndianess(ref guidBytes);
+        if (BitConverter.IsLittleEndian) { ReverseGuidEndianess(ref guidBytes); }
         return CompareArrays(Bytes, guidBytes);
     }
 
