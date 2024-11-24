@@ -12,7 +12,6 @@ using System.Security.Cryptography;
 using System.Threading;
 
 #if NET6_0_OR_GREATER
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 #endif
 
