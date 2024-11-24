@@ -136,3 +136,4 @@ dotnet_naming_rule.private_field_naming.style                            = priva
 csharp_style_prefer_utf8_string_literals                                 = false
 csharp_style_namespace_declarations                                      = file_scoped
 csharp_using_directive_placement                                         = inside_namespace
+dotnet_style_prefer_compound_assignment                                  = false

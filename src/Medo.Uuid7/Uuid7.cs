@@ -154,7 +154,7 @@ public readonly struct Uuid7
     /// A read-only instance of the Uuid7 structure whose value is all ones.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
-    public static readonly Uuid7 MaxValue = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
+    public static readonly Uuid7 MaxValue = new([255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
 
     /// <summary>
     /// A read-only instance of the Uuid7 structure whose value is all zeros.
@@ -1396,6 +1396,7 @@ public readonly struct Uuid7
     /// <param name="s">Input.</param>
     /// <param name="provider">Not used.</param>
     /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+#pragma warning disable IDE0060  // Remove unused parameter
 #if NET6_0_OR_GREATER
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
         if (s == null) { result = Empty; return false; }
@@ -1407,6 +1408,7 @@ public readonly struct Uuid7
         return TryParseAsString(s.ToCharArray(), out result);
     }
 #endif
+#pragma warning restore IDE0060  // Remove unused parameter
 
     #endregion ISpanParsable<Uuid7>
 
