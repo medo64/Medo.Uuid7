@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Medo;
+using System.Runtime.Intrinsics;
 
 namespace Tests;
 
@@ -722,6 +723,74 @@ public partial class Uuid7_Tests {
         Marshal.FreeHGlobal(ptr);
 
         Assert.IsTrue(CompareArrays(bytes, uuid.ToByteArray()) == 0);
+    }
+
+
+    [TestMethod]
+    public void Guid_Compare1() {
+        var guidL = new Guid(new byte[] { 0x7C, 0xE2, 0xEA, 0x6E, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var guidM = new Guid(new byte[] { 0x7C, 0xE2, 0xEA, 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var guidH = new Guid(new byte[] { 0x7C, 0xE2, 0xEA, 0x70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        Assert.IsTrue(guidL < guidM);
+        Assert.IsTrue(guidL < guidH);
+        Assert.IsTrue(guidM < guidH);
+        Assert.IsTrue(guidH > guidL);
+        Assert.IsTrue(guidH > guidM);
+        Assert.IsTrue(guidM > guidL);
+    }
+
+    [TestMethod]
+    public void Guid_Compare2() {
+        var guidL = new Guid(new byte[] { 0x7B, 0xE2, 0xEA, 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var guidM = new Guid(new byte[] { 0x7C, 0xE2, 0xEA, 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var guidH = new Guid(new byte[] { 0x7D, 0xE2, 0xEA, 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        Assert.IsTrue(guidL < guidM);
+        Assert.IsTrue(guidL < guidH);
+        Assert.IsTrue(guidM < guidH);
+        Assert.IsTrue(guidH > guidL);
+        Assert.IsTrue(guidH > guidM);
+        Assert.IsTrue(guidM > guidL);
+    }
+
+    [TestMethod]
+    public void Uuid_Compare1() {
+        var uuidAL = new Uuid7(new byte[] { 0x7C, 0xE2, 0xEA, 0x6E, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var uuidAM = new Uuid7(new byte[] { 0x7C, 0xE2, 0xEA, 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var uuidAH = new Uuid7(new byte[] { 0x7C, 0xE2, 0xEA, 0x70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        Assert.IsTrue(uuidAL < uuidAM);
+        Assert.IsTrue(uuidAL < uuidAH);
+        Assert.IsTrue(uuidAM < uuidAH);
+        Assert.IsTrue(uuidAH > uuidAL);
+        Assert.IsTrue(uuidAH > uuidAM);
+        Assert.IsTrue(uuidAM > uuidAL);
+    }
+
+    [TestMethod]
+    public void Uuid_Compare2() {
+        var uuidL = new Uuid7(new byte[] { 0x7C, 0xE2, 0xEA, 0x6E, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var uuidM = new Uuid7(new byte[] { 0x7C, 0xE2, 0xEA, 0x6F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        var uuidH = new Uuid7(new byte[] { 0x7C, 0xE2, 0xEA, 0x70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
+        Assert.IsTrue(uuidL < uuidM);
+        Assert.IsTrue(uuidL < uuidH);
+        Assert.IsTrue(uuidM < uuidH);
+        Assert.IsTrue(uuidH > uuidL);
+        Assert.IsTrue(uuidH > uuidM);
+        Assert.IsTrue(uuidM > uuidL);
+    }
+
+
+    [TestMethod]
+    public void Uuid_Ssse3() {
+        var bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var shuffle_mask = System.Runtime.Intrinsics.Vector128.Create<byte>([3, 2, 1, 0, 5, 4, 7, 6, 8, 9, 10, 11, 12, 13, 14, 15]);
+        var vector1 = System.Runtime.CompilerServices.Unsafe.ReadUnaligned<System.Runtime.Intrinsics.Vector128<byte>>(ref bytes[0]);
+        var vectorShuff = System.Runtime.Intrinsics.X86.Ssse3.Shuffle(vector1, shuffle_mask);
+        vectorShuff.StoreUnsafe(ref bytes[0]);
+        Assert.AreEqual("04-03-02-01-06-05-08-07-09-0A-0B-0C-0D-0E-0F-10", BitConverter.ToString(bytes));
     }
 
 
