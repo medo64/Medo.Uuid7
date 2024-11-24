@@ -1,5 +1,8 @@
 CHANGELOG
 
+Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
+
+
 [3.0.0]
 
 - .NET 9 suppport
@@ -14,19 +17,19 @@ CHANGELOG
 - removed explicit .NET 6 support
 
 
-[2.1.1]
+[2.1.1] (2024-11-08)
 
 - Fixed handling of non-initialized struct
 
 
-[2.1.0]
+[2.1.0] (2024-11-05)
 
 - Added timestamp support for FillMsSqlUniqueIdentifier
 - Removed explicit .NET 7 support
 - Fixed handling of non-initialized struct
 
 
-[2.0.0]
+[2.0.0] (2024-06-29)
 
 - Compatible with the final [RFC 9562](https://datatracker.ietf.org/doc/rfc9562/)
 - Fixed compatibility with Microsoft SQL Server UniqueIdentifier
@@ -165,6 +168,10 @@ CHANGELOG
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[3.0.0]: https://www.nuget.org/packages/Medo.Uuid7/3.0.0
+[2.1.1]: https://www.nuget.org/packages/Medo.Uuid7/2.1.1
+[2.1.0]: https://www.nuget.org/packages/Medo.Uuid7/2.1.0
+[2.0.0]: https://www.nuget.org/packages/Medo.Uuid7/2.0.0
 [1.9.1]: https://www.nuget.org/packages/Medo.Uuid7/1.9.1
 [1.9.0]: https://www.nuget.org/packages/Medo.Uuid7/1.9.0
 [1.8.2]: https://www.nuget.org/packages/Medo.Uuid7/1.8.2
