@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 /// <summary>
 /// Defines conversions from an object of one Uuid7 in a model to a byte array in the store.
 /// </summary>
-public class Uuid7ToBytesConverter  : ValueConverter<Uuid7, byte[]> {
+public class Uuid7ToBytesConverter : ValueConverter<Uuid7, byte[]> {
     private static readonly ConverterMappingHints defaultHints = new ConverterMappingHints(size: 16);
 
     /// <summary>

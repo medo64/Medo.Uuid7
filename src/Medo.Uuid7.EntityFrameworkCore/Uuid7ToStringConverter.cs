@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 /// <summary>
 /// Defines conversions from an object of one Uuid7 in a model to a string in the store.
 /// </summary>
-public class Uuid7ToStringConverter  : ValueConverter<Uuid7, string> {
+public class Uuid7ToStringConverter : ValueConverter<Uuid7, string> {
 
     /// <summary>
     /// Creates a new instance.
