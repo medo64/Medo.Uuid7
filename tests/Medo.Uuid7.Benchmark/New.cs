@@ -8,11 +8,17 @@ using Medo;
 [MemoryDiagnoser]
 public class New {
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public Guid NewSystemGuid() => Guid.NewGuid();
+
+    [Benchmark(Baseline = true)]
+    public Guid NewSystemGuid7() => Guid.CreateVersion7();
 
     [Benchmark]
     public void NewUuid7() => Uuid7.NewUuid7();
+
+    [Benchmark]
+    public void NewUuid7ToGuid() => Uuid7.NewUuid7().ToGuid();
 
     [Benchmark]
     public void NewUuid4() => Uuid7.NewUuid4();
@@ -21,10 +27,10 @@ public class New {
     public void NewGuid() => Uuid7.NewGuid();
 
     [Benchmark]
-    public void NewGuidNonMatched() => Uuid7.NewGuid(matchGuidEndianness: false);
+    public void NewGuidLE() => Uuid7.NewGuid(bigEndian: false);
 
     [Benchmark]
-    public void NewGuidMatched() => Uuid7.NewGuid(matchGuidEndianness: true);
+    public void NewGuidBE() => Uuid7.NewGuid(bigEndian: true);
 
     [Benchmark]
     public void NewMsSqlUniqueIdentifier() => Uuid7.NewMsSqlUniqueIdentifier();

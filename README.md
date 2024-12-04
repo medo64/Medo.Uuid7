@@ -15,6 +15,10 @@ Features:
   characteristics over UUID versions 1 or 6. The inclusion of the timestamp
   ensures a high level of uniqueness, minimizing the chances of collisions
   across different systems or instances.
+* Unlike System.Guid in .NET 9, implements monotonicity counter and not just
+  random bits (helps with ordered inserts into database).
+* Optimized for high performance UUID version 7 creation.
+* Minimum memory allocations for most common use cases.
 * Multiple string representations: In addition to the standard UUID string
   formatting, library also offers ID22 and ID25 string conversions.
 * Wide compatibility: Support for .NET Standard 2.0 makes this library
@@ -24,8 +28,9 @@ Features:
 * Hardware acceleration: Vector128 support for Equals method.
 * Microsoft SQL Server support (`NewMsSqlUniqueIdentifier()`).
 * Support for UUID version 4 (fully random UUID)
-* Conversion from and to System.Guid
-* .NET 8 AOT support
+* Conversion from and to System.Guid; it's faster to create Uuid7 and convert it
+  to Guid than using `Guid.CreateVersion7()` on its own.
+* .NET AOT support
 * Also available as [Entity Framework Core library][nuget_uuid7_efcore].
 
 You can find packaged library at [NuGet][nuget_uuid7].
@@ -65,40 +70,25 @@ Console.WriteLine($"UUID : {uuid}");
 ## Converting to Guid
 
 Converting to and from `System.Guid` is a complicated story. There are two ways
-it can be done. One is by preserving binary equivalency and that is what I
-selected by default. Any time a conversion into `System.Guid` is done, all raw
-bytes are the same but a textual representation between `Medo.Uuid7` and
-`System.Guid` on little-endian platforms will differ.
+it can be done. One is by preserving binary equivalency and the other is by
+preserving textual respresentations. Since Microsoft's Guid implementation in
+.NET 9.0 keeps Microsoft's weird endianess behavior even with UUIDv7, this is
+selected as default
 
-For example, this code will retain binary compatibility during conversion.
+Please note that, prior to 3.0, priority was given to maintaining binary
+representation. This is a **breaking change** for older versions. If you are
+upgrading from older version, use `ToGuid(bigEndian: true)` overload.
+
+If we want to preserve textual representation and follow behavior as defined in
+.NET 9, we can use`ToGuid()` function or its `ToGuid(bigEndian: false)` overload
+as this one takes internal Guid endianess into account.
 ```csharp
 using Medo;
 
 var uuid = Uuid7.NewUuid7();
 Console.WriteLine($"{uuid}");
 
-var guid = (Guid)uuid;
-Console.WriteLine($"{guid}");
-```
-
-However, that means that textual respresentations look different since Microsoft
-prints logically numeric Guid elements in little-endian order instead of
-arguably more common big-endian order.
-```plain
-01904d33-d262-7531-b71c-05555c63df91
-334d9001-62d2-3175-b71c-05555c63df91
-```
-
-If we want to preserve textual representation, we need to actually use
-`ToGuid(matchGuidEndianness)` function overload as this one takes internal
-Guid endianess into account.
-```csharp
-using Medo;
-
-var uuid = Uuid7.NewUuid7();
-Console.WriteLine($"{uuid}");
-
-var guid = uuid.ToGuid(matchGuidEndianness: true);
+var guid = uuid.ToGuid();
 Console.WriteLine($"{guid}");
 ```
 
@@ -109,8 +99,29 @@ differing.
 01904d33-d262-7531-b71c-05555c63df91
 ```
 
-I view this as a damn-if-you-do-damn-if-you-don't scenario and I decided to be
-damned in binary format.
+On other hand, code below will retain binary compatibility during conversion (if
+running on LE system).
+```csharp
+using Medo;
+
+var uuid = Uuid7.NewUuid7();
+Console.WriteLine($"{uuid}");
+
+var guid = uuid.ToGuid(bigEndian: true);
+Console.WriteLine($"{guid}");
+```
+
+Note this means that textual respresentations look different since Microsoft
+prints logically numeric Guid elements in little-endian order instead of
+arguably more common big-endian order.
+```plain
+01904d33-d262-7531-b71c-05555c63df91
+334d9001-62d2-3175-b71c-05555c63df91
+```
+
+I view this as a damn-if-you-do-damn-if-you-don't scenario and prior to version
+3.0, default was to keep them equivalent in binary. Since .NET 9 decided to go
+other way, the default was changed.
 
 
 ### Configuration

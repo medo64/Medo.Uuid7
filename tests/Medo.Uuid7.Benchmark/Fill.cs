@@ -35,15 +35,15 @@ public class Fill {
     }
 
     [Benchmark]
-    public void FillGuidNonMatched() {
+    public void FillGuidLE() {
         var elements = new Guid[1000];
-        Uuid7.FillGuid(elements, matchGuidEndianness: false);
+        Uuid7.FillGuid(elements, bigEndian: false);
     }
 
     [Benchmark]
-    public void FillGuidMatched() {
+    public void FillGuidBE() {
         var elements = new Guid[1000];
-        Uuid7.FillGuid(elements, matchGuidEndianness: true);
+        Uuid7.FillGuid(elements, bigEndian: true);
     }
 
     [Benchmark]

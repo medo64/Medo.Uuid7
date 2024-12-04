@@ -12,7 +12,6 @@ using System.Security.Cryptography;
 using System.Threading;
 
 #if NET6_0_OR_GREATER
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 #endif
 
@@ -87,8 +86,8 @@ public readonly struct Uuid7
     /// No check if GUID is version 7 UUID is made.
     /// </summary>
     /// <param name="guid">Guid.</param>
-    public Uuid7(Guid guid) {
-        Bytes = guid.ToByteArray();
+    public Uuid7(Guid guid)
+        : this(guid, bigEndian: IsBigEndian) {
     }
 
     /// <summary>
@@ -96,14 +95,12 @@ public readonly struct Uuid7
     /// No check if GUID is version 7 UUID is made.
     /// </summary>
     /// <param name="guid">Guid.</param>
-    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
-    public Uuid7(Guid guid, bool matchGuidEndianness) {
-        if (matchGuidEndianness) {
-            var bytes = guid.ToByteArray();
-            AdjustGuidEndianess(ref bytes);
-            Bytes = bytes;
-        } else {
+    /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
+    public Uuid7(Guid guid, bool bigEndian) {
+        if (IsBigEndian != bigEndian) {
             Bytes = guid.ToByteArray();
+        } else {
+            Bytes = ReverseGuidEndianess(guid.ToByteArray());
         }
     }
 
@@ -121,6 +118,30 @@ public readonly struct Uuid7
     private readonly byte[] Bytes;
 
 
+    /// <summary>
+    /// Gets the value of the version field.
+    /// </summary>
+    public int Version {
+        get {
+            if (Bytes == null) { return 0; }
+            return (Bytes[6] & 0xF0) >> 4;
+        }
+    }
+
+    /// <summary>
+    /// Gets the value of the variant field.
+    /// Please note the variant returned is 4-bit value as defined in RFC9562,
+    /// section 4.1. In practice, this means that version 7 values can have values
+    /// 8-11 (8-B, in hexadecimal).
+    /// </summary>
+    public int Variant {
+        get {
+            if (Bytes == null) { return 0; }
+            return Bytes[8] >> 4;
+        }
+    }
+
+
     #region Static
 
     /// <summary>
@@ -133,13 +154,19 @@ public readonly struct Uuid7
     /// A read-only instance of the Uuid7 structure whose value is all ones.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
-    public static readonly Uuid7 MaxValue = new(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
+    public static readonly Uuid7 MaxValue = new([255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
 
     /// <summary>
     /// A read-only instance of the Uuid7 structure whose value is all zeros.
     /// Please note this is not a valid UUID7 as it lacks the correct version bits.
     /// </summary>
     public static readonly Uuid7 Empty = MinValue;
+
+    /// <summary>
+    /// A read-only instance of the Uuid7 structure whose value is all ones.
+    /// Please note this is not a valid UUID7 as it lacks the correct version bits.
+    /// </summary>
+    public static readonly Uuid7 AllBitsSet = MaxValue;
 
 
     /// <summary>
@@ -183,40 +210,27 @@ public readonly struct Uuid7
     }
 
     /// <summary>
-    /// Returns a binary equivalent System.Guid of a UUID version 7.
+    /// Returns an equivalent System.Guid of a UUID version 7.
     /// This method is thread-safe.
     /// </summary>
     public static Guid NewGuid() {
-        var bytes = new byte[16];
-        lock (NonThreadedSyncRoot) {
-            FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
-        }
-        return new Guid(bytes);
+        return NewGuid(bigEndian: IsBigEndian);
     }
 
     /// <summary>
-    /// Returns a binary equivalent System.Guid of a UUID version 7.
+    /// Returns an equivalent System.Guid of a UUID version 7.
     /// This method is thread-safe.
     /// </summary>
-    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
-    public static Guid NewGuid(bool matchGuidEndianness) {
+    /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
+    public static Guid NewGuid(bool bigEndian) {
         var bytes = new byte[16];
         lock (NonThreadedSyncRoot) {
             FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
         }
-        if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+        if (IsBigEndian == bigEndian) { ReverseGuidEndianess(ref bytes); }
         return new Guid(bytes);
     }
 
-
-    /// <summary>
-    /// Returns Guid with endianess matching one of the system.
-    /// NOT suitable for insertion into Microsoft SQL database.
-    /// </summary>
-    [Obsolete("For UniqueIdentifier Use NewMsSqlUniqueIdentifier() or NewGuid(matchGuidEndianness: true) instead, depending on desired behavior.", error: true)]
-    public static Guid NewGuidMsSql() {
-        return NewGuid(matchGuidEndianness: true);
-    }
 
     /// <summary>
     /// Returns a System.Guid of a UUID version 7 suitable for insertion into a
@@ -300,7 +314,7 @@ public readonly struct Uuid7
     }
 
     /// <summary>
-    /// Fills a span with binary-compatible System.Guid elements.
+    /// Fills a span with System.Guid elements.
     /// This method is thread-safe.
     /// </summary>
     /// <param name="data">The span to fill.</param>
@@ -309,35 +323,29 @@ public readonly struct Uuid7
     public static void FillGuid(Span<Guid> data) {
 #else
     public static void FillGuid(Guid[] data) {
-        if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
 #endif
-        lock (NonThreadedSyncRoot) {
-            for (var i = 0; i < data.Length; i++) {
-                var bytes = new byte[16];
-                FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
-                data[i] = new Guid(bytes);
-            }
-        }
+        FillGuid(data, bigEndian: IsBigEndian);
     }
 
     /// <summary>
-    /// Fills a span with binary-compatible System.Guid elements.
+    /// Fills a span with System.Guid elements.
     /// This method is thread-safe.
     /// </summary>
     /// <param name="data">The span to fill.</param>
-    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
+    /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
     /// <exception cref="ArgumentNullException">Data cannot be null.</exception>
 #if NET6_0_OR_GREATER
-    public static void FillGuid(Span<Guid> data, bool matchGuidEndianness) {
+    public static void FillGuid(Span<Guid> data, bool bigEndian) {
 #else
-    public static void FillGuid(Guid[] data, bool matchGuidEndianness) {
+    public static void FillGuid(Guid[] data, bool bigEndian) {
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
 #endif
+        var shouldReverse = (IsBigEndian == bigEndian);
         lock (NonThreadedSyncRoot) {
             for (var i = 0; i < data.Length; i++) {
                 var bytes = new byte[16];
                 FillBytes7(ref bytes, DateTime.UtcNow.Ticks, ref NonThreadedLastMillisecond, ref NonThreadedMillisecondCounter, ref NonThreadedMonotonicCounter);  // DateTime is a smidgen faster than DateTimeOffset
-                if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+                if (shouldReverse) { ReverseGuidEndianess(ref bytes); }
                 data[i] = new Guid(bytes);
             }
         }
@@ -554,59 +562,63 @@ public readonly struct Uuid7
 
     #region Endianess
 
+    private static readonly bool IsBigEndian = !BitConverter.IsLittleEndian;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void AdjustGuidEndianess(ref byte[] bytes) {
-        if (BitConverter.IsLittleEndian) {  // swap a few bytes on little-endian
-            (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
-            (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
-            (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
-        }
+    private static void ReverseGuidEndianess(ref byte[] bytes) {
+        (bytes[0], bytes[1], bytes[2], bytes[3]) = (bytes[3], bytes[2], bytes[1], bytes[0]);
+        (bytes[4], bytes[5]) = (bytes[5], bytes[4]);
+        (bytes[6], bytes[7]) = (bytes[7], bytes[6]);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static byte[] ReverseGuidEndianess(byte[] bytes) {
+        var guidBytes = new byte[16];
+        guidBytes[0] = bytes[3]; guidBytes[1] = bytes[2]; guidBytes[2] = bytes[1]; guidBytes[3] = bytes[0];
+        guidBytes[4] = bytes[5]; guidBytes[5] = bytes[4];
+        guidBytes[6] = bytes[7]; guidBytes[7] = bytes[6];
+        guidBytes[8] = bytes[8]; guidBytes[9] = bytes[9]; guidBytes[10] = bytes[10]; guidBytes[11] = bytes[11];
+        guidBytes[12] = bytes[12]; guidBytes[13] = bytes[13]; guidBytes[14] = bytes[14]; guidBytes[15] = bytes[15];
+        return guidBytes;
     }
 
     #endregion Endianess
 
 
     /// <summary>
-    /// Returns current UUID as binary equivalent System.Guid.
+    /// Returns current UUID as an equivalent System.Guid.
     /// </summary>
     public Guid ToGuid() {
-        if (Bytes != null) {
-            return new Guid(Bytes);
-        } else {
-            return new Guid(MinValue.Bytes);
-        }
+        return ToGuid(bigEndian: IsBigEndian);
     }
 
     /// <summary>
-    /// Returns current UUID as either binary or text equivalent System.Guid.
+    /// Converts current UUID to an equivalent System.Guid.
     /// </summary>
-    /// <param name="matchGuidEndianness">If true, result will also have endianess adjusted so that textual representation matches System.Guid.</param>
-    public Guid ToGuid(bool matchGuidEndianness) {
-        if (matchGuidEndianness) {
-            var bytes = ToByteArray();
-            AdjustGuidEndianess(ref bytes);
-            return new Guid(bytes);
+    /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
+    public Guid ToGuid(bool bigEndian) {
+        if (Bytes == null) { return Guid.Empty; }
+        if (BitConverter.IsLittleEndian == bigEndian) {
+            return new Guid(  // faster than calling byte[] overload
+                Bytes[3] << 24 | Bytes[2] << 16 | Bytes[1] << 8 | Bytes[0],
+                (short)(Bytes[5] << 8 | Bytes[4]),
+                (short)(Bytes[7] << 8 | Bytes[6]),
+                Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]
+            );
         } else {
-            if (Bytes != null) {
-                return new Guid(Bytes);
-            } else {
-                return new Guid(MinValue.Bytes);
-            }
+            return new Guid(  // and uses less allocations too
+                Bytes[0] << 24 | Bytes[1] << 16 | Bytes[2] << 8 | Bytes[3],
+                (short)(Bytes[4] << 8 | Bytes[5]),
+                (short)(Bytes[6] << 8 | Bytes[7]),
+                Bytes[8], Bytes[9], Bytes[10], Bytes[11], Bytes[12], Bytes[13], Bytes[14], Bytes[15]
+            );
         }
-    }
-
-    /// <summary>
-    /// Returns Guid with endianess matching one of the system.
-    /// NOT suitable for insertion into Microsoft SQL database.
-    /// </summary>
-    [Obsolete("Use NewMsSqlUniqueIdentifier() or ToGuid(matchGuidEndianness: true) instead, depending on desired behavior.", error: true)]
-    public Guid ToGuidMsSql() {
-        return ToGuid(matchGuidEndianness: true);
     }
 
 
     /// <summary>
     /// Returns an array that contains UUID bytes.
+    /// Always in big-endian order.
     /// </summary>
     public byte[] ToByteArray() {
         var copy = new byte[16];
@@ -621,14 +633,14 @@ public readonly struct Uuid7
     /// </summary>
     /// <param name="bigEndian">If true, bytes will be in big-endian (natural) order.</param>
     public byte[] ToByteArray(bool bigEndian) {
-        var copy = new byte[16];
-        if (Bytes != null) { Buffer.BlockCopy(Bytes, 0, copy, 0, 16); }
+        if (Bytes == null) { return Empty.ToByteArray(); }
         if (bigEndian) {
+            var copy = new byte[16];
+            Buffer.BlockCopy(Bytes, 0, copy, 0, 16);
             return copy;
         } else {
-            AdjustGuidEndianess(ref copy);
+            return ReverseGuidEndianess(Bytes);
         }
-        return copy;
     }
 
     /// <summary>
@@ -639,7 +651,7 @@ public readonly struct Uuid7
     public DateTime ToDateTime() {
         if (Bytes == null) { return DateTime.MinValue; }
         if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
-        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
+        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | Bytes[5];
         var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
         return new DateTime(ticks, DateTimeKind.Utc);
     }
@@ -652,7 +664,7 @@ public readonly struct Uuid7
     public DateTimeOffset ToDateTimeOffset() {
         if (Bytes == null) { return DateTimeOffset.MinValue; }
         if ((Bytes[6] & 0xF0) != 0x70) { throw new InvalidOperationException("UUID is not version 7."); }
-        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | (long)Bytes[5];
+        var unixMs = (long)Bytes[0] << 40 | (long)Bytes[1] << 32 | (long)Bytes[2] << 24 | (long)Bytes[3] << 16 | (long)Bytes[4] << 8 | Bytes[5];
         var ticks = (UnixEpochMilliseconds + unixMs) * TicksPerMillisecond;
         return new DateTimeOffset(ticks, TimeSpan.Zero);
     }
@@ -782,7 +794,9 @@ public readonly struct Uuid7
         if (obj is Uuid7 uuid) {
             return CompareArrays(Bytes, uuid.Bytes) == 0;
         } else if (obj is Guid guid) {
-            return CompareArrays(Bytes, guid.ToByteArray()) == 0;
+            var guidBytes = guid.ToByteArray();
+            ReverseGuidEndianess(ref guidBytes);
+            return CompareArrays(Bytes, guidBytes) == 0;
         }
         return false;
     }
@@ -792,10 +806,10 @@ public readonly struct Uuid7
     /// </summary>
     public override int GetHashCode() {
         if (Bytes == null) { return 0; }
-        var hc = ((Bytes[3] ^ Bytes[7] ^ Bytes[11] ^ Bytes[15]) << 24)
-               | ((Bytes[2] ^ Bytes[6] ^ Bytes[10] ^ Bytes[14]) << 16)
-               | ((Bytes[1] ^ Bytes[5] ^ Bytes[9] ^ Bytes[13]) << 8)
-               | (Bytes[0] ^ Bytes[4] ^ Bytes[8] ^ Bytes[12]);
+        var hc = ((Bytes[0] ^ Bytes[6] ^ Bytes[11] ^ Bytes[15]) << 24)
+               | ((Bytes[1] ^ Bytes[7] ^ Bytes[10] ^ Bytes[14]) << 16)
+               | ((Bytes[2] ^ Bytes[4] ^ Bytes[9] ^ Bytes[13]) << 8)
+               | (Bytes[3] ^ Bytes[5] ^ Bytes[8] ^ Bytes[12]);
         return hc;  // just XOR individual ints - compatible with Guid implementation on LE platform
     }
 
@@ -979,26 +993,26 @@ public readonly struct Uuid7
 
 
     /// <summary>
-    /// Returns binary-compatible Uuid7 from given Guid.
+    /// Returns Uuid7 from given Guid.
     /// </summary>
     /// <param name="value">Value.</param>
     public static Uuid7 FromGuid(Guid value) {
-        return new Uuid7(value.ToByteArray());
+        return new Uuid7(value, bigEndian: IsBigEndian);
     }
 
     /// <summary>
-    /// Returns binary or text compatible Uuid7 from given Guid.
+    /// Returns an Uuid7 from given Guid.
     /// </summary>
     /// <param name="value">Value.</param>
-    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
-    public static Uuid7 FromGuid(Guid value, bool matchGuidEndianness) {
+    /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
+    public static Uuid7 FromGuid(Guid value, bool bigEndian) {
         var bytes = value.ToByteArray();
-        if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
+        if (IsBigEndian == bigEndian) { ReverseGuidEndianess(ref bytes); }
         return new Uuid7(bytes);
     }
 
     /// <summary>
-    /// Returns binary-compatible Uuid7 from given Guid.
+    /// Returns an Uuid7 from given Guid.
     /// </summary>
     /// <param name="value">Value.</param>
     public static implicit operator Uuid7(Guid value) {
@@ -1006,25 +1020,36 @@ public readonly struct Uuid7
     }
 
     /// <summary>
-    /// Returns binary-compatible Guid from given Uuid7.
+    /// Returns an Guid from given Uuid7.
     /// </summary>
     /// <param name="value">Value.</param>
     public static Guid ToGuid(Uuid7 value) {
-        return (value.Bytes != null) ? new Guid(value.Bytes) : Guid.Empty;
+        if (value.Bytes == null) { return Guid.Empty; }
+#if NET8_0_OR_GREATER
+        return new Guid(value.Bytes, true);
+#else
+        var bytes = new byte[16];
+        Buffer.BlockCopy(value.Bytes, 0, bytes, 0, 16);
+        if (BitConverter.IsLittleEndian) { ReverseGuidEndianess(ref bytes); }
+        return new Guid(bytes);
+#endif
     }
 
     /// <summary>
-    /// Returns binary or text compatible Guid from given Uuid7.
+    /// Returns an Guid from given Uuid7.
     /// </summary>
     /// <param name="value">Value.</param>
-    /// <param name="matchGuidEndianness">If true, conversion will also adjust endianess so that textual representation matches System.Guid.</param>
-    public static Guid ToGuid(Uuid7 value, bool matchGuidEndianness) {
+    /// <param name="bigEndian">If true, input will be assumed to be in a big-endian format.</param>
+    public static Guid ToGuid(Uuid7 value, bool bigEndian) {
+        if (value.Bytes == null) { return Guid.Empty; }
+#if NET8_0_OR_GREATER
+        return new Guid(value.Bytes, bigEndian);
+#else
         var bytes = new byte[16];
-        if (value.Bytes != null) {
-            Buffer.BlockCopy(value.Bytes, 0, bytes, 0, 16);
-            if (matchGuidEndianness) { AdjustGuidEndianess(ref bytes); }
-        }
+        Buffer.BlockCopy(value.Bytes, 0, bytes, 0, 16);
+        if (IsBigEndian != bigEndian) { ReverseGuidEndianess(ref bytes); }
         return new Guid(bytes);
+#endif
     }
 
     /// <summary>
@@ -1043,11 +1068,12 @@ public readonly struct Uuid7
     /// <summary>
     /// Compares this instance to a specified Guid object and returns an indication of their relative values.
     /// A negative integer if this instance is less than value; a positive integer if this instance is greater than value; or zero if this instance is equal to value.
-    /// GUID and UUID are compared for their binary value.
     /// </summary>
     /// <param name="other">An object to compare to this instance.</param>
     public int CompareTo(Guid other) {
-        return CompareArrays(Bytes, other.ToByteArray());
+        var guidBytes = other.ToByteArray();
+        if (BitConverter.IsLittleEndian) { ReverseGuidEndianess(ref guidBytes); }
+        return CompareArrays(Bytes, guidBytes);
     }
 
     #endregion IComparable<Guid>
@@ -1071,7 +1097,6 @@ public readonly struct Uuid7
 
     /// <summary>
     /// Returns a value that indicates whether this instance is equal to a specified object.
-    /// Objects are considered equal if they have the same binary representation.
     /// </summary>
     /// <param name="other">An object to compare to this instance.</param>
     public bool Equals(Guid other) {
@@ -1371,6 +1396,7 @@ public readonly struct Uuid7
     /// <param name="s">Input.</param>
     /// <param name="provider">Not used.</param>
     /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+#pragma warning disable IDE0060  // Remove unused parameter
 #if NET6_0_OR_GREATER
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
         if (s == null) { result = Empty; return false; }
@@ -1382,6 +1408,7 @@ public readonly struct Uuid7
         return TryParseAsString(s.ToCharArray(), out result);
     }
 #endif
+#pragma warning restore IDE0060  // Remove unused parameter
 
     #endregion ISpanParsable<Uuid7>
 
@@ -1735,7 +1762,7 @@ public readonly struct Uuid7
         if (count != 32) { result = Uuid7.Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        int byteCount = number.GetByteCount(isUnsigned: true);
+        var byteCount = number.GetByteCount(isUnsigned: true);
         Span<byte> buffer = stackalloc byte[byteCount];
         number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
 
@@ -1801,7 +1828,7 @@ public readonly struct Uuid7
         if (count != 25) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        int byteCount = number.GetByteCount(isUnsigned: true);
+        var byteCount = number.GetByteCount(isUnsigned: true);
         Span<byte> buffer = stackalloc byte[byteCount];
         number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
 
@@ -1866,7 +1893,7 @@ public readonly struct Uuid7
         if (count != 22) { result = Empty; return false; }
 
 #if NET6_0_OR_GREATER
-        int byteCount = number.GetByteCount(isUnsigned: true);
+        var byteCount = number.GetByteCount(isUnsigned: true);
         Span<byte> buffer = stackalloc byte[byteCount];
         number.TryWriteBytes(buffer, out _, isUnsigned: true, isBigEndian: true);
 

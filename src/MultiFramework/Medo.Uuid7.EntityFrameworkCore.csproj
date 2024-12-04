@@ -4,13 +4,16 @@
     <AssemblyName>Medo.Uuid7.EntityFrameworkCore</AssemblyName>
     <RootNamespace>Medo</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net9.0;net8.0;netstandard2.0</TargetFrameworks>
     <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -30,8 +33,9 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <NoWarn>CA1720</NoWarn>
+    <NoWarn>CA1720,CA2265</NoWarn>
     <!-- CA1720: Identifiers should not contain type names -->
+    <!-- CA2265: Comparing a span to 'null' might be redundant, the 'null' literal will be implicitly converted to a 'Span<T>.Empty' -->
   </PropertyGroup>
 
   <PropertyGroup>
@@ -43,6 +47,7 @@
     <PackageTags>UUID,GUID,UUID7,UUIDv7,UUID4,UUIDv4,EFCore</PackageTags>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README-EFCore.md</PackageReadmeFile>
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../../CHANGELOG.md"))</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/medo64/Medo.Uuid7.EntityFrameworkCore/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/medo64/Medo.Uuid7.EntityFrameworkCore/</RepositoryUrl>
@@ -57,12 +62,20 @@
     </Description>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[9.0.0,)" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0,)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.11  ,)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[7.0.20,)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6.0.0,)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6.0.36,)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

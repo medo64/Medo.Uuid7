@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 /// <summary>
 /// Defines conversions from an object of one Uuid7 in a model to a Guid in the store.
 /// </summary>
-public class Uuid7ToGuidConverter  : ValueConverter<Uuid7, Guid> {
+public class Uuid7ToGuidConverter : ValueConverter<Uuid7, Guid> {
 
     /// <summary>
     /// Creates a new instance.
