@@ -137,7 +137,7 @@ function debug() {
 
 function release() {
     echo
-    if [[ `shell git status -s 2>/dev/null | wc -l` -gt 0 ]]; then
+    if [[ `git status -s 2>/dev/null | wc -l` -gt 0 ]]; then
         echo "${ANSI_YELLOW}Uncommited changes present.${ANSI_RESET}" >&2
     fi
     mkdir -p "$BASE_DIRECTORY/bin/"
