@@ -249,6 +249,18 @@ Example:
     0185aee1-4413-7023-9109-bde493efe31d
 
 
+### Id26
+
+Id26 uses lexicographical sortable Base-32 dictionary with 2-bit modulo 2
+[Fletcher checksum](https://en.wikipedia.org/wiki/Fletcher%27s_checksum).
+While checksum is quite short (only 2 bits), it can help with all off-by-one
+errors and with many positional errors too. Intention of this format is to
+provide textual representation that allows for basic checking of manual input,
+retains sort order, and is case-insensitive. Generation of this checksum should
+also might be faster since use of Base-32 minimizes the number of division
+operations.
+
+
 ### Id25
 
 Alternative string representation is Id25 (Base-35), courtesy of [stevesimmons][git_stevesimmons_uuid7].

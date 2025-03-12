@@ -706,6 +706,41 @@ public readonly struct Uuid7
 
 
     /// <summary>
+    /// Returns UUID representation in Id26 format.
+    /// Id26 uses lexicographical sortable Base-32 dictionary with 2-bit modulo 2 Fletcher checksum.
+    /// </summary>
+    public string ToId26String() {
+        return ToString(format: "6", formatProvider: null);
+    }
+
+    /// <summary>
+    /// Returns UUID from given text representation.
+    /// All characters not belonging to Id26 alphabet are ignored.
+    /// Input must contain exactly 26 characters.
+    /// </summary>
+    /// <param name="id26Text">Id26 text.</param>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+#if NET6_0_OR_GREATER
+    public static Uuid7 FromId26String(ReadOnlySpan<char> id26Text) {
+        if (TryParseAsId26(id26Text, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#else
+    public static Uuid7 FromId26String(string id26Text) {
+        if (id26Text == null) { throw new ArgumentNullException(nameof(id26Text), "Text cannot be null."); }
+        if (TryParseAsId26(id26Text.ToCharArray(), out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#endif
+
+
+    /// <summary>
     /// Returns UUID representation in Id25 format.
     /// Please note that while conversion is the same as one in
     /// https://github.com/stevesimmons/uuid7-csharp/, UUIDs are not fully
@@ -1195,6 +1230,7 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
             case "N":
             case "n": {
 #if NET6_0_OR_GREATER
@@ -1206,6 +1242,7 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
             case "B":
             case "b": {
 #if NET6_0_OR_GREATER
@@ -1217,6 +1254,7 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
             case "P":
             case "p": {
 #if NET6_0_OR_GREATER
@@ -1228,6 +1266,7 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
             case "X":
             case "x": {
 #if NET6_0_OR_GREATER
@@ -1239,6 +1278,18 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
+            case "6": {  // non-standard (Id26C)
+#if NET6_0_OR_GREATER
+                    return string.Create(26, Bytes, static (destination, bytes)
+                        => TryWriteAsId26(destination, bytes, out _));
+#else
+                    var destination = new char[26];
+                    TryWriteAsId26(destination, Bytes, out _);
+                    return new string(destination);
+#endif
+                }
+
             case "5": {  // non-standard (Id25)
 #if NET6_0_OR_GREATER
                     return string.Create(25, Bytes, static (destination, bytes)
@@ -1249,6 +1300,7 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
             case "2": {  // non-standard (Id22)
 #if NET6_0_OR_GREATER
                     return string.Create(22, Bytes, static (destination, bytes)
@@ -1259,6 +1311,7 @@ public readonly struct Uuid7
                     return new string(destination);
 #endif
                 }
+
             default: throw new FormatException("Invalid UUID format.");
         }
     }
@@ -1287,6 +1340,7 @@ public readonly struct Uuid7
             'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
             'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
             'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
+            '6' => TryWriteAsId26(destination, Bytes, out charsWritten),
             '5' => TryWriteAsId25(destination, Bytes, out charsWritten),
             '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
             _ => throw new FormatException("Invalid UUID format."),
@@ -1311,6 +1365,7 @@ public readonly struct Uuid7
             'B' or 'b' => TryWriteAsBracesString(destination, Bytes, out charsWritten),
             'P' or 'p' => TryWriteAsParenthesesString(destination, Bytes, out charsWritten),
             'X' or 'x' => TryWriteAsHexadecimalString(destination, Bytes, out charsWritten),
+            '6' => TryWriteAsId26(destination, Bytes, out charsWritten),
             '5' => TryWriteAsId25(destination, Bytes, out charsWritten),
             '2' => TryWriteAsId22(destination, Bytes, out charsWritten),
             _ => throw new FormatException("Invalid UUID format."),
@@ -1729,6 +1784,44 @@ public readonly struct Uuid7
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#if NET6_0_OR_GREATER
+    private static bool TryWriteAsId26(Span<char> destination, ReadOnlySpan<byte> bytes, out int charsWritten) {
+#else
+    private static bool TryWriteAsId26(char[] destination, byte[] bytes, out int charsWritten) {
+#endif
+        if (destination.Length < 26) { charsWritten = 0; return false; }
+
+        if (bytes == null) { bytes = MinValue.Bytes; }
+
+        var sum1 = 1;
+        var sum2 = 0;
+        var reservoir = 0;
+        var level = 0;
+        var sourceIndex = 0;
+        for (var i = 0; i < 26; i++) {
+            if (level < 5) {  // load new byte
+                byte data;
+                if (sourceIndex < 16) {
+                    data = bytes[sourceIndex++];
+                    sum1 += data;
+                    sum2 += sum1;
+                } else {
+                    data = (byte)(((sum1 % 2) << 7) | ((sum2 % 2) << 6));
+                }
+                reservoir = (reservoir << 8) | data;
+                level += 8;
+            }
+            level -= 5;
+            var index = (reservoir >> level) & 0b11111;
+
+            destination[i] = Id26Alphabet[index];
+        }
+
+        charsWritten = 26;
+        return true;
+    }
+
     private static readonly BigInteger Base16Modulo = 16;
     private static readonly char[] Base16Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7',
@@ -1786,6 +1879,65 @@ public readonly struct Uuid7
             buffer = newBuffer;
         }
 #endif
+
+        result = new Uuid7(buffer);
+        return true;
+    }
+
+    private static readonly char[] Id26Alphabet = [
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'b', 'c', 'd', 'e', 'f', 'g',
+        'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    ];
+    private static readonly Lazy<Dictionary<char, int>> Id26AlphabetDict = new(() => {
+        var dict = new Dictionary<char, int>(Id26Alphabet.Length);
+        for (var i = 0; i < Id26Alphabet.Length; i++) {
+            var ch = Id26Alphabet[i];
+            dict.Add(ch, i);
+            if (char.IsLetter(ch)) {  // case-insensitive
+                dict.Add(char.ToUpperInvariant(ch), i);
+            }
+        }
+        return dict;
+    });
+
+#if NET6_0_OR_GREATER
+    private static bool TryParseAsId26(ReadOnlySpan<char> source, out Uuid7 result) {
+#else
+    private static bool TryParseAsId26(char[] source, out Uuid7 result) {
+#endif
+
+        var buffer = new byte[16];
+        var outCount = 0;
+        var alphabetDict = Id26AlphabetDict.Value;
+        var inCount = 0;
+        var sum1 = 1;
+        var sum2 = 0;
+        var reservoir = 0;
+        var level = 0;
+        foreach (var ch in source) {
+            if (alphabetDict.TryGetValue(ch, out var offset)) {
+                inCount++;
+                reservoir = (reservoir << 5) | offset;
+                level += 5;
+                if (level >= 8) {  // enough for a byte
+                    level -= 8;
+                    var data = (byte)(reservoir >> level);
+                    buffer[outCount++] = (byte)data;
+                    sum1 += data;
+                    sum2 += sum1;
+                    if (outCount == 16) {
+                        var expected = (byte)(((sum1 % 2) << 1) | ((sum2 % 2) << 0));
+                        if ((reservoir & 0b11) != expected) {  // invalid checksum; fill result anyhow
+                            result = new Uuid7(buffer);  // return parsed data anyhow
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        if (inCount != 26) { result = Empty; return false; }
 
         result = new Uuid7(buffer);
         return true;

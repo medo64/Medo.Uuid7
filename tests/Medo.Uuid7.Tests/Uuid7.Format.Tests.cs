@@ -1,9 +1,8 @@
+namespace Tests;
 using System;
 using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Medo;
-
-namespace Tests;
 
 public partial class Uuid7_Tests {
 
@@ -33,6 +32,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", uuid.ToString("x"));
         Assert.AreEqual("112drYSDr45nCJ6chixdxJ", uuid.ToString("2"));
         Assert.AreEqual("000jnpiacvek52kvka6to5ogn", uuid.ToString("5"));
+        Assert.AreEqual("000h40tn6pv7gf5tzcxztzgyzy", uuid.ToString("6"));
         Assert.ThrowsException<FormatException>(() => {
             uuid.ToString("y");
         });
@@ -56,6 +56,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual("{0x00010203,0x3435,0x7677,{0xb8,0xb9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff}}", $"{uuid:x}");
         Assert.AreEqual("112drYSDr45nCJ6chixdxJ", $"{uuid:2}");
         Assert.AreEqual("000jnpiacvek52kvka6to5ogn", $"{uuid:5}");
+        Assert.AreEqual("000h40tn6pv7gf5tzcxztzgyzy", $"{uuid:6}");
         Assert.ThrowsException<FormatException>(() => {
             _ = $"{uuid:y}";
         });
@@ -103,6 +104,52 @@ public partial class Uuid7_Tests {
 
 
     [DataTestMethod]
+    [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "00000000000000000000000002")]
+    [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "00000000000000000000000005")]
+    [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "0000000000000000000000000b")]
+    [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0 }, "00000000000002800000000000")]
+    [DataRow(new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 }, "000h40tn6pv7gf5tzcxztzgyzy")]
+    [DataRow(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "04000000000000000000000000")]
+    [DataRow(new byte[] { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "08000000000000000000000002")]
+    [DataRow(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, "zzzzzzzzzzzzzzzzzzzzzzzzzy")]
+    public void Uuid7_FormatParse_Id26(byte[] bytes, string id26Text) {
+        var uuid = new Uuid7(bytes);
+        Assert.AreEqual(id26Text, uuid.ToId26String());
+        Assert.AreEqual(uuid, Uuid7.FromId26String(id26Text));
+    }
+
+    [DataTestMethod]
+    [DataRow("0001/0203/3435/7677/b8b9/fafb/fcfd/feff", "00/0h4/0tn/6pv/7gf/5tz/cxz/tzg/yzy")]
+    [DataRow("ffffffff-ffff-ffff-ffff-ffffffffffff", "zz zzz zzz zzz zzz zzz zzz zzz zzy")]
+    public void Uuid7_FormatParse_Id26Dirty(string uuidText, string id26Text) {
+        var expectedUuid = Uuid7.Parse(uuidText);
+        var id26Uuid = Uuid7.FromId26String(id26Text);
+        Assert.AreEqual(expectedUuid, id26Uuid);
+        Assert.AreNotEqual(Uuid7.Empty, expectedUuid);
+        Assert.AreNotEqual(Uuid7.Empty, id26Uuid);
+    }
+
+    [DataTestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow("X")]
+    [DataRow("usz5x bbiqs fq7s7 27n0p zr2x")]  // too short
+    [DataRow("usz5x bbiqs fq7s7 27n0p zr2xaa")]  // too long
+    public void Uuid7_FormatParse_Id26Errors(string text) {
+        if (text == null && !IsModernDotNet) {
+            // Only NetStandard 2.0 throws ArgumentNullException
+            Assert.ThrowsException<ArgumentNullException>(() => {
+                Uuid7.FromId26String(text);
+            });
+        } else {
+            Assert.ThrowsException<FormatException>(() => {
+                Uuid7.FromId26String(text);
+            });
+        }
+    }
+
+
+    [DataTestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "0000000000000000000000000")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "0000000000000000000000001")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "0000000000000000000000002")]
@@ -132,8 +179,8 @@ public partial class Uuid7_Tests {
     [DataRow(null)]
     [DataRow("")]
     [DataRow("X")]
-    [DataRow("usz5x bbiqs fq7s7 27n0p zr2x")]  // too short
-    [DataRow("usz5x bbiqs fq7s7 27n0p zr2xaa")]  // too long
+    [DataRow("000jnpiacvek52kvka6to5og")]  // too short
+    [DataRow("000jnpiacvek52kvka6to5ogna")]  // too long
     public void Uuid7_FormatParse_Id25Errors(string text) {
         if (text == null && !IsModernDotNet) {
             // Only NetStandard 2.0 throws ArgumentNullException
@@ -191,6 +238,35 @@ public partial class Uuid7_Tests {
                 Uuid7.FromId22String(text);
             });
         }
+    }
+
+
+    [TestMethod]
+    public void Uuid7_FormatParse_26Format_1() {
+        var bytes = new byte[] {
+            0b_0000_1000, 0b_0100_0010, 0b_0001_0000, 0b_1000_0100,
+            0b_0010_0001, 0b_0000_1000, 0b_0100_0010, 0b_0001_0000,
+            0b_1000_0100, 0b_0010_0001, 0b_0000_1000, 0b_0100_0010,
+            0b_0001_0000, 0b_1000_0100, 0b_0010_0001, 0b_0000_1000,
+        };
+        var uuid = new Uuid7(bytes);
+        Assert.AreEqual("11111111111111111111111111", uuid.ToId26String());
+        Assert.AreEqual(BitConverter.ToString(bytes),
+                        BitConverter.ToString(Uuid7.FromId26String(uuid.ToId26String()).ToByteArray()));
+    }
+
+    [TestMethod]
+    public void Uuid7_FormatParse_26Format_2() {
+        var bytes = new byte[] {
+            0b_0010_0001, 0b_0000_1000, 0b_0100_0010, 0b_0001_0000,
+            0b_1000_0100, 0b_0010_0001, 0b_0000_1000, 0b_0100_0010,
+            0b_0001_0000, 0b_1000_0100, 0b_0010_0001, 0b_0000_1000,
+            0b_0100_0010, 0b_0001_0000, 0b_1000_0100, 0b_0010_0001,
+        };
+        var uuid = new Uuid7(bytes);
+        Assert.AreEqual("44444444444444444444444446", uuid.ToId26String());
+        Assert.AreEqual(BitConverter.ToString(bytes),
+                        BitConverter.ToString(Uuid7.FromId26String(uuid.ToId26String()).ToByteArray()));
     }
 
 }
