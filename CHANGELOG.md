@@ -3,7 +3,12 @@ CHANGELOG
 Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
-[3.0.0]
+[3.1.0] (2025-03-16)
+
+- Added ID26 output
+
+
+[3.0.0] (2024-12-03)
 
 - .NET 9 suppport
 - **BREAKING CHANGE**: Guid conversion is done in native endianess (was always big endian before)
@@ -168,6 +173,7 @@ Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[3.1.0]: https://www.nuget.org/packages/Medo.Uuid7/3.1.0
 [3.0.0]: https://www.nuget.org/packages/Medo.Uuid7/3.0.0
 [2.1.1]: https://www.nuget.org/packages/Medo.Uuid7/2.1.1
 [2.1.0]: https://www.nuget.org/packages/Medo.Uuid7/2.1.0
