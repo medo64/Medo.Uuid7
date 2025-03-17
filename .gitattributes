@@ -1,3 +1,5 @@
+#~ .NET Project
+
 * text=auto eol=lf
 
 *.bat     text eol=crlf
@@ -5,6 +7,6 @@
 *.cs      text diff=csharp
 *.csproj  text
 *.md      text
+*.sh      text
 *.sln     text
-*.input   binary
-*.output  binary
+*.raw     binary
