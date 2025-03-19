@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="../tests/Medo.Uuid7.EntityFrameworkCore.Tests/Medo.Uuid7.EntityFrameworkCore.Tests.csproj" />
+  </Folder>
+  <Project Path="Medo.Uuid7.EntityFrameworkCore/Medo.Uuid7.EntityFrameworkCore.csproj" />
+</Solution>

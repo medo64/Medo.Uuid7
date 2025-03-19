@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Examples/">
+    <Project Path="../examples/Uuid7Benchmark/Uuid7Benchmark.csproj" />
+    <Project Path="../examples/Uuid7Generator/Uuid7Generator.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="../tests/Medo.Uuid7.Tests/Medo.Uuid7.Tests.csproj" />
+  </Folder>
+  <Project Path="Medo.Uuid7/Medo.Uuid7.csproj" />
+</Solution>
