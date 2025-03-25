@@ -260,7 +260,7 @@ retains sort order, and is case-insensitive. Generation of this checksum should
 also might be faster since use of Base-32 minimizes the number of division
 operations.
 
-ExampleL
+Example:
 
     062uxsb42es27489rrk97vz33r
 
