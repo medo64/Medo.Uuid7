@@ -280,7 +280,7 @@ Example:
 
 ### Id26
 
-Id26 uses lexicographical sortable Base-32 dictionary with 2-bit modulo 2
+Id26 uses lexicographically sortable Base-32 dictionary with 2-bit modulo 2
 [Fletcher checksum](https://en.wikipedia.org/wiki/Fletcher%27s_checksum).
 While checksum is quite short (only 2 bits), it can help with all off-by-one
 errors and with many positional errors too. Intention of this format is to
