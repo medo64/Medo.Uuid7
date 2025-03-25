@@ -17,6 +17,7 @@ internal static class App {
 
             foreach (var uuid in uuids) {
                 Console.WriteLine($"UUID: {uuid}");
+                Console.WriteLine($"ID26: {uuid.ToId26String()}");
                 Console.WriteLine($"ID25: {uuid.ToId25String()}");
                 Console.WriteLine($"ID22: {uuid.ToId22String()}");
                 Console.WriteLine();

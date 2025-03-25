@@ -9,6 +9,7 @@ internal static class App {
         while (true) {
             var uuid = Uuid7.NewUuid7();
             Console.WriteLine($"UUID: {uuid}");
+            Console.WriteLine($"ID26: {uuid.ToId26String()}");
             Console.WriteLine($"ID25: {uuid.ToId25String()}");
             Console.WriteLine($"ID22: {uuid.ToId22String()}");
             Console.WriteLine();
