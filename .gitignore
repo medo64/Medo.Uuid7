@@ -13,6 +13,8 @@ research/
 **/*.DotSettings.user
 **/BenchmarkDotNet.Artifacts
 
+*.log
+
 TODO.md
-.meta.private
+.meta.*
 .nuget.key
