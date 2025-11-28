@@ -3,6 +3,11 @@ CHANGELOG
 Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
+[3.2.0] (2025-11-27)
+
+- .NET 10.0 support
+
+
 [3.1.0] (2025-03-16)
 
 - Added ID26 output
@@ -173,6 +178,7 @@ Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[3.2.0]: https://www.nuget.org/packages/Medo.Uuid7/3.2.0
 [3.1.0]: https://www.nuget.org/packages/Medo.Uuid7/3.1.0
 [3.0.0]: https://www.nuget.org/packages/Medo.Uuid7/3.0.0
 [2.1.1]: https://www.nuget.org/packages/Medo.Uuid7/2.1.1
