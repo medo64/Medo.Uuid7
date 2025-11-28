@@ -139,7 +139,11 @@ public readonly partial struct Uuid7 {
     [ThreadStatic]
     private static uint PerThreadMonotonicCounter;  // counter that gets embedded into UUID
 
+#if NET9_0_OR_GREATER
+    private static readonly System.Threading.Lock NonThreadedSyncRoot = new();  // sync root for all static counters
+#else
     private static readonly object NonThreadedSyncRoot = new();  // sync root for all static counters
+#endif
     private static long NonThreadedLastMillisecond;  // real time in milliseconds since 0001-01-01
     private static long NonThreadedMillisecondCounter;  // usually real time but doesn't go backward
     private static uint NonThreadedMonotonicCounter;  // counter that gets embedded into UUID
