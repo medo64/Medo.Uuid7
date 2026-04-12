@@ -9,9 +9,12 @@ research/
 **/obj/
 **/.idea/
 **/.vs/
+**/BenchmarkDotNet.Artifacts/
+
 **/*.csproj.user
 **/*.DotSettings.user
-**/BenchmarkDotNet.Artifacts
+**/*.lscache
+
 
 *.log
 
