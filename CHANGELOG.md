@@ -3,6 +3,11 @@ CHANGELOG
 Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
+[3.3.1] (2026-11-10)
+
+- .NET 11.0 support for Entity Framework too
+
+
 [3.3.0] (2026-11-10)
 
 - .NET 11.0 support
@@ -183,6 +188,8 @@ Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[3.3.1]: https://www.nuget.org/packages/Medo.Uuid7/3.3.1
+[3.3.0]: https://www.nuget.org/packages/Medo.Uuid7/3.3.0
 [3.2.0]: https://www.nuget.org/packages/Medo.Uuid7/3.2.0
 [3.1.0]: https://www.nuget.org/packages/Medo.Uuid7/3.1.0
 [3.0.0]: https://www.nuget.org/packages/Medo.Uuid7/3.0.0
