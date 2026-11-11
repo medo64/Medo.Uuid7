@@ -187,9 +187,10 @@ function test() {
         mkdir -p "$BASE_DIRECTORY/build/test/$BASE_NAME/"
 
         rm -r $BASE_DIRECTORY/src/bin 2>/dev/null
-        dotnet test "$TEST_PROJECT_FILE" \
-                    --configuration "Debug" \
-                    --verbosity "minimal" \
+        DOTNET_TEST_RUNNER=Microsoft.Testing.Platform \
+        dotnet test "$TEST_PROJECT_FILE"              \
+                    --configuration "Debug"           \
+                    --verbosity "minimal"             \
                     || return 1
     done
 

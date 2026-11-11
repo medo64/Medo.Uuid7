@@ -370,7 +370,7 @@ public partial class Uuid7_Tests {
         Guid guid = Uuid7.ToGuid(uuid, bigEndian: true);
         Assert.AreEqual(uuid.ToString(), guid.ToString());
         if (!BitConverter.IsLittleEndian) {
-            Assert.AreEqual(guid, uuid);  // same only on BE platforms
+            Assert.AreEqual<Guid>(guid, uuid);  // same only on BE platforms
         }
     }
 
@@ -398,7 +398,7 @@ public partial class Uuid7_Tests {
         Assert.IsTrue(list[0].Equals(Guid.Empty));
         Assert.AreEqual((Guid)list[0], Guid.Empty);
         if (!BitConverter.IsLittleEndian) {
-            Assert.AreEqual(Guid.Empty, list[0]);
+            Assert.AreEqual<Guid>(Guid.Empty, list[0]);
             Assert.AreEqual(Guid.Empty, Uuid7.ToGuid(list[0], true));
             Assert.AreEqual(Guid.Empty, list[0].ToGuid(true));
         } else {
@@ -902,13 +902,13 @@ public partial class Uuid7_Tests {
     [TestMethod]
     public void Uuid7_ToDateTimeInvalidVersion() {
         var uuid = Uuid7.Parse("018c051e-b87a-6404-ae7f-50e3be711102");
-        Assert.ThrowsException<InvalidOperationException>(() => uuid.ToDateTimeOffset());
+        Assert.ThrowsExactly<InvalidOperationException>(() => uuid.ToDateTimeOffset());
     }
 
     [TestMethod]
     public void Uuid7_ToDateTimeOffsetInvalidVersion() {
         var uuid = Uuid7.Parse("018c051e-b87a-6404-ae7f-50e3be711102");
-        Assert.ThrowsException<InvalidOperationException>(() => uuid.ToDateTimeOffset());
+        Assert.ThrowsExactly<InvalidOperationException>(() => uuid.ToDateTimeOffset());
     }
 
 

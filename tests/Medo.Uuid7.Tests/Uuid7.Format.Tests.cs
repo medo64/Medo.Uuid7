@@ -33,7 +33,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual("112drYSDr45nCJ6chixdxJ", uuid.ToString("2"));
         Assert.AreEqual("000jnpiacvek52kvka6to5ogn", uuid.ToString("5"));
         Assert.AreEqual("000h40tn6pv7gf5tzcxztzgyzy", uuid.ToString("6"));
-        Assert.ThrowsException<FormatException>(() => {
+        Assert.ThrowsExactly<FormatException>(() => {
             uuid.ToString("y");
         });
     }
@@ -57,7 +57,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual("112drYSDr45nCJ6chixdxJ", $"{uuid:2}");
         Assert.AreEqual("000jnpiacvek52kvka6to5ogn", $"{uuid:5}");
         Assert.AreEqual("000h40tn6pv7gf5tzcxztzgyzy", $"{uuid:6}");
-        Assert.ThrowsException<FormatException>(() => {
+        Assert.ThrowsExactly<FormatException>(() => {
             _ = $"{uuid:y}";
         });
     }
@@ -90,12 +90,12 @@ public partial class Uuid7_Tests {
         Assert.IsFalse(Uuid7.TryParse(text, out _));
         Assert.IsFalse(Uuid7.TryParse(text, CultureInfo.InvariantCulture, out _));
         if (text == null) {
-            Assert.ThrowsException<ArgumentNullException>(() => {
+            Assert.ThrowsExactly<ArgumentNullException>(() => {
                 Uuid7.Parse(text);
                 Uuid7.Parse(text, CultureInfo.InvariantCulture);
             });
         } else {
-            Assert.ThrowsException<FormatException>(() => {
+            Assert.ThrowsExactly<FormatException>(() => {
                 Uuid7.Parse(text);
                 Uuid7.Parse(text, CultureInfo.InvariantCulture);
             });
@@ -138,11 +138,11 @@ public partial class Uuid7_Tests {
     public void Uuid7_FormatParse_Id26Errors(string text) {
         if (text == null && !IsModernDotNet) {
             // Only NetStandard 2.0 throws ArgumentNullException
-            Assert.ThrowsException<ArgumentNullException>(() => {
+            Assert.ThrowsExactly<ArgumentNullException>(() => {
                 Uuid7.FromId26String(text);
             });
         } else {
-            Assert.ThrowsException<FormatException>(() => {
+            Assert.ThrowsExactly<FormatException>(() => {
                 Uuid7.FromId26String(text);
             });
         }
@@ -184,11 +184,11 @@ public partial class Uuid7_Tests {
     public void Uuid7_FormatParse_Id25Errors(string text) {
         if (text == null && !IsModernDotNet) {
             // Only NetStandard 2.0 throws ArgumentNullException
-            Assert.ThrowsException<ArgumentNullException>(() => {
+            Assert.ThrowsExactly<ArgumentNullException>(() => {
                 Uuid7.FromId25String(text);
             });
         } else {
-            Assert.ThrowsException<FormatException>(() => {
+            Assert.ThrowsExactly<FormatException>(() => {
                 Uuid7.FromId25String(text);
             });
         }
@@ -230,11 +230,11 @@ public partial class Uuid7_Tests {
     public void Uuid7_FormatParse_Id22Errors(string text) {
         if (text == null && !IsModernDotNet) {
             // Only NetStandard 2.0 throws ArgumentNullException
-            Assert.ThrowsException<ArgumentNullException>(() => {
+            Assert.ThrowsExactly<ArgumentNullException>(() => {
                 Uuid7.FromId22String(text);
             });
         } else {
-            Assert.ThrowsException<FormatException>(() => {
+            Assert.ThrowsExactly<FormatException>(() => {
                 Uuid7.FromId22String(text);
             });
         }
