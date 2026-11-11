@@ -3,6 +3,11 @@ CHANGELOG
 Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
+[3.3.0] (2026-11-10)
+
+- .NET 11.0 support
+
+
 [3.2.0] (2025-11-27)
 
 - .NET 10.0 support
