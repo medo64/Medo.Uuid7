@@ -286,8 +286,8 @@ While checksum is quite short (only 2 bits), it can help with all off-by-one
 errors and with many positional errors too. Intention of this format is to
 provide textual representation that allows for basic checking of manual input,
 retains sort order, and is case-insensitive. Generation of this checksum should
-also might be faster since use of Base-32 minimizes the number of division
-operations.
+also be faster since use of Base-32 minimizes the number of division operations
+as compared to Id25 or Id22.
 
 Example:
 
