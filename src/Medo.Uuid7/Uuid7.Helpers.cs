@@ -468,6 +468,12 @@ public readonly partial struct Uuid7 {
                 dict.Add(char.ToUpperInvariant(ch), i);
             }
         }
+        dict.Add('o', 0);
+        dict.Add('O', 0);
+        dict.Add('l', 1);
+        dict.Add('L', 1);
+        dict.Add('i', 1);
+        dict.Add('I', 1);
         return dict;
     });
 
