@@ -12,6 +12,6 @@ public class ToString_Id26 {
     public string Uuid7_ToString() => ExampleUuid7.ToString();
 
     [Benchmark]
-    public string Uuid7_ToId26CString() => ExampleUuid7.ToId22String();
+    public string Uuid7_ToId26String() => ExampleUuid7.ToId26String();
 
 }

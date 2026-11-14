@@ -21,6 +21,62 @@ public readonly partial struct Uuid7 {
 
 
     /// <summary>
+    /// Returns UUID representation in Crockford base 32 format.
+    /// Crockford base 32 uses lexicographical sortable Base-32 dictionary.
+    /// </summary>
+    public string ToCrockfordString() {
+ #if NET6_0_OR_GREATER
+        return string.Create(26, Bytes, static (destination, bytes) => TryWriteAsCrockford(uppercase: true, includeChecksum: false, destination, bytes, out _));
+#else
+        var destination = new char[26];
+        TryWriteAsCrockford(uppercase: true, includeChecksum: false, destination, Bytes, out _);
+        return new string(destination);
+#endif
+    }
+
+    /// <summary>
+    /// Returns UUID representation in Crockford base 32 format.
+    /// Crockford base 32 uses lexicographical sortable Base-32 dictionary with an optional checksum.
+    /// </summary>
+    /// <param name="uppercase"></param>
+    /// <param name="includeChecksum">If true, the last 2 bit will contain modulo 3 checksum.</param>
+    public string ToCrockfordString(bool uppercase, bool includeChecksum) {
+ #if NET6_0_OR_GREATER
+        return string.Create(26, Bytes, (destination, bytes) => TryWriteAsCrockford(uppercase, includeChecksum, destination, bytes, out _));
+#else
+        var destination = new char[26];
+        TryWriteAsCrockford(uppercase, includeChecksum, destination, Bytes, out _);
+        return new string(destination);
+#endif
+    }
+
+    /// <summary>
+    /// Returns UUID from given text representation.
+    /// All characters not belonging to Crockford alphabet are ignored.
+    /// </summary>
+    /// <param name="crockfordText">Crockford base 32 text.</param>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+#if NET6_0_OR_GREATER
+    public static Uuid7 FromCrockfordString(ReadOnlySpan<char> crockfordText) {
+        if (TryParseAsCrockford(crockfordText, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#else
+    public static Uuid7 FromCrockfordString(string crockfordText) {
+        if (crockfordText == null) { throw new ArgumentNullException(nameof(crockfordText), "Text cannot be null."); }
+        if (TryParseAsCrockford(crockfordText.ToCharArray(), out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+#endif
+
+
+    /// <summary>
     /// Returns UUID representation in Id26 format.
     /// Id26 uses lexicographical sortable Base-32 dictionary with 2-bit modulo 2 Fletcher checksum.
     /// </summary>
@@ -31,7 +87,6 @@ public readonly partial struct Uuid7 {
     /// <summary>
     /// Returns UUID from given text representation.
     /// All characters not belonging to Id26 alphabet are ignored.
-    /// Input must contain exactly 26 characters.
     /// </summary>
     /// <param name="id26Text">Id26 text.</param>
     /// <exception cref="FormatException">Unrecognized UUID format.</exception>

@@ -122,7 +122,27 @@ public readonly partial struct Uuid7 : IFormattable {
 #endif
                 }
 
-            case "6": {  // non-standard (Id26C)
+#if NET6_0_OR_GREATER
+            case "C":
+                    return string.Create(26, Bytes, static (destination, bytes)
+                        => TryWriteAsCrockford(uppercase: true, includeChecksum: false, destination, bytes, out _));
+            case "c":
+                    return string.Create(26, Bytes, static (destination, bytes)
+                        => TryWriteAsCrockford(uppercase: false, includeChecksum: false, destination, bytes, out _));
+#else
+            case "C": {
+                    var destination = new char[26];
+                    TryWriteAsCrockford(uppercase: true, includeChecksum: false, destination, Bytes, out _);
+                    return new string(destination);
+                }
+            case "c": {
+                    var destination = new char[26];
+                    TryWriteAsCrockford(uppercase: false, includeChecksum: false, destination, Bytes, out _);
+                    return new string(destination);
+                }
+#endif
+
+            case "6": {  // non-standard (Id26)
 #if NET6_0_OR_GREATER
                     return string.Create(26, Bytes, static (destination, bytes)
                         => TryWriteAsId26(destination, bytes, out _));

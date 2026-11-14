@@ -249,6 +249,22 @@ Example:
     0185aee1-4413-7023-9109-bde493efe31d
 
 
+### Crockford Base 32
+
+Crockford base 32 uses lexicographically sortable Base-32 dictionary with an
+optional modulo 3 checksum. Intention of this format is to provide a human-readable
+textual representation that retains UUID's sort order, is case-insensitive, and
+allows for forgivable parsing.
+
+An optional modulo 3 checksum doesn't increase length of the output as it is
+packed into leftover 2 bits. It can help with all off-by-one errors and many
+positional errors too.
+
+Example:
+
+    062TXRA42DR27489QQJ97VZ33M
+
+
 ### Id26
 
 Id26 uses lexicographically sortable Base-32 dictionary with 2-bit modulo 2

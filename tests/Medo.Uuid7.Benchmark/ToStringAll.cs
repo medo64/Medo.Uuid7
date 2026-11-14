@@ -18,6 +18,9 @@ public class ToStringAll {
     public string Uuid7_ToString() => ExampleUuid7.ToString();
 
     [Benchmark]
+    public string Uuid7_ToCrockfordString() => ExampleUuid7.ToCrockfordString();
+
+    [Benchmark]
     public string Uuid7_ToId26String() => ExampleUuid7.ToId26String();
 
     [Benchmark]
