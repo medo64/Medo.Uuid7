@@ -63,7 +63,7 @@ public partial class Uuid7_Tests {
     }
 
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "00000000-0000-0000-0000-000000000000")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "00000000-0000-0000-0000-000000000001")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "00000000-0000-0000-0000-000000000002")]
@@ -80,7 +80,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(uuid, parsed);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     [DataRow("")]
     [DataRow("X")]
@@ -103,7 +103,7 @@ public partial class Uuid7_Tests {
     }
 
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "00000000000000000000000002")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "00000000000000000000000005")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "0000000000000000000000000b")]
@@ -118,7 +118,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(uuid, Uuid7.FromId26String(id26Text));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("0001/0203/3435/7677/b8b9/fafb/fcfd/feff", "00/0h4/0tn/6pv/7gf/5tz/cxz/tzg/yzy")]
     [DataRow("ffffffff-ffff-ffff-ffff-ffffffffffff", "zz zzz zzz zzz zzz zzz zzz zzz zzy")]
     public void Uuid7_FormatParse_Id26Dirty(string uuidText, string id26Text) {
@@ -129,7 +129,7 @@ public partial class Uuid7_Tests {
         Assert.AreNotEqual(Uuid7.Empty, id26Uuid);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     [DataRow("")]
     [DataRow("X")]
@@ -149,7 +149,7 @@ public partial class Uuid7_Tests {
     }
 
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "0000000000000000000000000")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "0000000000000000000000001")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "0000000000000000000000002")]
@@ -164,7 +164,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(uuid, Uuid7.FromId25String(id25Text));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("0001/0203/3435/7677/b8b9/fafb/fcfd/feff", "00/0jn/pi/acv/ek/52k/vk/a6t/o5/ogn")]
     [DataRow("ffffffff-ffff-ffff-ffff-ffffffffffff", "usz5x bbiqs fq7s7 27n0p zr2xa")]
     public void Uuid7_FormatParse_Id25Dirty(string uuidText, string id25Text) {
@@ -175,7 +175,7 @@ public partial class Uuid7_Tests {
         Assert.AreNotEqual(Uuid7.Empty, id25Uuid);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     [DataRow("")]
     [DataRow("X")]
@@ -195,7 +195,7 @@ public partial class Uuid7_Tests {
     }
 
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "1111111111111111111111")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "1111111111111111111112")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "1111111111111111111113")]
@@ -210,7 +210,7 @@ public partial class Uuid7_Tests {
         Assert.AreEqual(uuid, Uuid7.FromId22String(id22Text));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("0001/0203/3435/7677/b8b9/fafb/fcfd/feff", "112d/rYSD/r45/nCJ6/chix/dxJ")]
     [DataRow("ffffffff-ffff-ffff-ffff-ffffffffffff", "YcVfx kQb6JR zqk5k F2tNLv")]
     public void Uuid7_FormatParse_Id22Dirty(string uuidText, string id22Text) {
@@ -221,7 +221,7 @@ public partial class Uuid7_Tests {
         Assert.AreNotEqual(Uuid7.Empty, id22Uuid);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     [DataRow("")]
     [DataRow("X")]
