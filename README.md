@@ -257,7 +257,7 @@ textual representation that retains UUID's sort order, is case-insensitive, and
 allows for forgivable parsing.
 
 An optional modulo 3 checksum doesn't increase length of the output as it is
-packed into leftover 2 bits. It can help with all off-by-one errors and many
+packed into leftover 2 bits. It can help with off-by-one errors and many
 positional errors too.
 
 Example:
@@ -269,7 +269,7 @@ Example:
 
 Id26 uses lexicographically sortable Base-32 dictionary with 2-bit modulo 2
 [Fletcher checksum](https://en.wikipedia.org/wiki/Fletcher%27s_checksum).
-While checksum is quite short (only 2 bits), it can help with all off-by-one
+While checksum is quite short (only 2 bits), it can help with some off-by-one
 errors and with many positional errors too. Intention of this format is to
 provide textual representation that allows for basic checking of manual input,
 retains sort order, and is case-insensitive. Generation of this checksum should
