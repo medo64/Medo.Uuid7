@@ -109,12 +109,14 @@ public partial class Uuid7_Tests {
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "0000000000000000000000000b")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0 }, "00000000000002800000000000")]
     [DataRow(new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 }, "000h40tn6pv7gf5tzcxztzgyzy")]
+    [DataRow(new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 }, "000H40TN6PV7GF5TZCXZTZGYZY")]
     [DataRow(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "04000000000000000000000000")]
     [DataRow(new byte[] { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "08000000000000000000000002")]
     [DataRow(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, "zzzzzzzzzzzzzzzzzzzzzzzzzy")]
+    [DataRow(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, "ZZZZZZZZZZZZZZZZZZZZZZZZZY")]
     public void Uuid7_FormatParse_Id26(byte[] bytes, string id26Text) {
         var uuid = new Uuid7(bytes);
-        Assert.AreEqual(id26Text, uuid.ToId26String());
+        Assert.AreEqual(id26Text, uuid.ToId26String(), ignoreCase: true);
         Assert.AreEqual(uuid, Uuid7.FromId26String(id26Text));
     }
 
@@ -154,13 +156,18 @@ public partial class Uuid7_Tests {
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, "0000000000000000000000001")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, "0000000000000000000000002")]
     [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0 }, "00000000000006q3abpe675nu")]
+    [DataRow(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0 }, "00000000000006Q3ABPE675NU")]
     [DataRow(new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 }, "000jnpiacvek52kvka6to5ogn")]
+    [DataRow(new byte[] { 0, 1, 2, 3, 52, 53, 118, 119, 184, 185, 250, 251, 252, 253, 254, 255 }, "000JNPIACVEK52KVKA6TO5OGN")]
     [DataRow(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "042kt5d5ybb4r50zg5p72g3f1")]
+    [DataRow(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "042KT5D5YBB4R50ZG5P72G3F1")]
     [DataRow(new byte[] { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "0856marbwnn9ha1yxbde4x6v2")]
+    [DataRow(new byte[] { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, "0856MARBWNN9HA1YXBDE4X6V2")]
     [DataRow(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, "usz5xbbiqsfq7s727n0pzr2xa")]
+    [DataRow(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, "USZ5XBBIQSFQ7S727N0PZR2XA")]
     public void Uuid7_FormatParse_Id25(byte[] bytes, string id25Text) {
         var uuid = new Uuid7(bytes);
-        Assert.AreEqual(id25Text, uuid.ToId25String());
+        Assert.AreEqual(id25Text, uuid.ToId25String(), ignoreCase: true);
         Assert.AreEqual(uuid, Uuid7.FromId25String(id25Text));
     }
 
