@@ -12,6 +12,7 @@ public class ParseAll {
     private string GuidDefault =  Template.ToGuid().ToString();
     private string Uuid7Default =  Template.ToString();
     private string Uuid7Crockford =  Template.ToCrockfordString();
+    private string Uuid7CrockfordChecksum = Template.ToCrockfordString(includeChecksum: true);
     private string Uuid7Id26 =  Template.ToId26String();
     private string Uuid7Id25 =  Template.ToId25String();
     private string Uuid7Id22 =  Template.ToId22String();
@@ -25,6 +26,9 @@ public class ParseAll {
 
     [Benchmark]
     public Uuid7 Uuid7_ParseCrockford() => Uuid7.FromCrockfordString(Uuid7Crockford);
+
+    [Benchmark]
+    public Uuid7 Uuid7_ParseCrockfordChecksum() => Uuid7.FromCrockfordString(Uuid7CrockfordChecksum);
 
     [Benchmark]
     public Uuid7 Uuid7_ParseId26() => Uuid7.FromId26String(Uuid7Id26);

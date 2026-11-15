@@ -5,7 +5,7 @@ using Medo;
 
 public class ToString_Crockford {
 
-    private Uuid7 ExampleUuid7 =  Uuid7.NewUuid7();
+    private Uuid7 ExampleUuid7 = Uuid7.NewUuid7();
 
 
     [Benchmark(Baseline = true)]
@@ -13,5 +13,8 @@ public class ToString_Crockford {
 
     [Benchmark]
     public string Uuid7_ToCrockfordString() => ExampleUuid7.ToCrockfordString();
+
+    [Benchmark]
+    public string Uuid7_ToCrockfordChecksumString() => ExampleUuid7.ToCrockfordString(includeChecksum: true);
 
 }
