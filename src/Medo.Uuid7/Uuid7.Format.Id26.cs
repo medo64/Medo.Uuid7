@@ -4,9 +4,102 @@ namespace Medo;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 public readonly partial struct Uuid7 {
+
+    /// <summary>
+    /// Returns UUID parsed from a given input.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 ParseId26(string s) {
+        return ParseId26(s, provider: null);
+    }
+
+    /// <summary>
+    /// Returns UUID parsed from a given input.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <exception cref="ArgumentNullException">Input cannot be null.</exception>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 ParseId26(string s, IFormatProvider? provider) {
+        if (s is null) { throw new ArgumentNullException(nameof(s), "Input cannot be null."); }
+        if (TryParseId26(s, provider, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+
+#if NET7_0_OR_GREATER
+
+    /// <summary>
+    /// Returns UUID parsed from a given input.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <exception cref="FormatException">Unrecognized UUID format.</exception>
+    public static Uuid7 ParseId26(ReadOnlySpan<char> s, IFormatProvider? provider) {
+        if (TryParseId26(s, provider, out var result)) {
+            return result;
+        } else {
+            throw new FormatException("Unrecognized UUID format.");
+        }
+    }
+
+#endif
+
+
+    /// <summary>
+    /// Returns true if UUID was successfully parsed.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+#if NET6_0_OR_GREATER
+    public static bool TryParseId26([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out Uuid7 result) {
+#else
+    public static bool TryParseId26(string? s, out Uuid7 result) {
+#endif
+        return TryParseId26(s, provider: null, out result);
+    }
+
+    /// <summary>
+    /// Returns true if UUID was successfully parsed.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+#pragma warning disable IDE0060  // Remove unused parameter
+#if NET6_0_OR_GREATER
+    public static bool TryParseId26([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
+        if (s == null) { result = Empty; return false; }
+        return TryParseAsId26(s.AsSpan(), out result);
+    }
+#else
+    public static bool TryParseId26(string? s, IFormatProvider? provider, out Uuid7 result) {
+        if (s == null) { result = Empty; return false; }
+        return TryParseAsId26(s.ToCharArray(), out result);
+    }
+#endif
+#pragma warning restore IDE0060  // Remove unused parameter
+
+#if NET7_0_OR_GREATER
+
+    /// <summary>
+    /// Returns true if UUID was successfully parsed.
+    /// </summary>
+    /// <param name="s">Input.</param>
+    /// <param name="provider">Not used.</param>
+    /// <param name="result">When this method returns, contains the result of successfully parsing or an undefined value on failure.</param>
+    public static bool TryParseId26(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out Uuid7 result) {
+        return TryParseAsId26(s, out result);
+    }
+
+#endif
+
 
     private static readonly char[] Id26Alphabet = [
         '0', '1', '2', '3', '4', '5', '6', '7',

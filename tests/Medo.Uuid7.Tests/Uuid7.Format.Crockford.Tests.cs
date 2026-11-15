@@ -34,6 +34,7 @@ public class Uuid7_Crockford_Tests {
         var uuid = new Uuid7(bytes);
         Assert.AreEqual(crockfordText, uuid.ToCrockfordString(), ignoreCase: true);
         Assert.AreEqual(uuid, Uuid7.FromCrockfordString(crockfordText));
+        Assert.IsTrue(Uuid7.TryParseCrockford(crockfordText, out var _));
     }
 
     [TestMethod]
@@ -55,6 +56,7 @@ public class Uuid7_Crockford_Tests {
         var uuid = new Uuid7(bytes);
         Assert.AreEqual(crockfordText, uuid.ToCrockfordString(uppercase: false, includeChecksum: true), ignoreCase: true);
         Assert.AreEqual(uuid, Uuid7.FromCrockfordString(crockfordText));
+        Assert.IsTrue(Uuid7.TryParseCrockford(crockfordText, out var _));
     }
 
     [TestMethod]
@@ -69,6 +71,7 @@ public class Uuid7_Crockford_Tests {
         Assert.AreEqual(plainUuid, crockfordUuid);
         Assert.AreNotEqual(Uuid7.Empty, plainUuid);
         Assert.AreNotEqual(Uuid7.Empty, crockfordUuid);
+        Assert.IsTrue(Uuid7.TryParseCrockford(crockfordText, out var _));
     }
 
     [TestMethod]
@@ -80,6 +83,7 @@ public class Uuid7_Crockford_Tests {
         Assert.ThrowsExactly<FormatException>(() => {
             Uuid7.FromCrockfordString(text);
         });
+        Assert.IsFalse(Uuid7.TryParseCrockford(text, out var _));
     }
 
     [TestMethod]
@@ -99,6 +103,7 @@ public class Uuid7_Crockford_Tests {
                 Uuid7.FromCrockfordString(text);
             });
         }
+        Assert.IsFalse(Uuid7.TryParseCrockford(text, out var _));
     }
 
 }

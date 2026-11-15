@@ -29,6 +29,7 @@ public class Uuid7_Id22_Tests {
         var uuid = new Uuid7(bytes);
         Assert.AreEqual(id22Text, uuid.ToId22String());
         Assert.AreEqual(uuid, Uuid7.FromId22String(id22Text));
+        Assert.IsTrue(Uuid7.TryParseId22(id22Text, out var _));
     }
 
     [TestMethod]
@@ -40,6 +41,7 @@ public class Uuid7_Id22_Tests {
         Assert.AreEqual(parsedUuid, id22Uuid);
         Assert.AreNotEqual(Uuid7.Empty, parsedUuid);
         Assert.AreNotEqual(Uuid7.Empty, id22Uuid);
+        Assert.IsTrue(Uuid7.TryParseId22(id22Text, out var _));
     }
 
     [TestMethod]
@@ -48,17 +50,18 @@ public class Uuid7_Id22_Tests {
     [DataRow("X")]
     [DataRow("YcVfx kQb6JR zqk5k F2tNL")]  // too short
     [DataRow("YcVfx kQb6JR zqk5k F2tNLvv")]  // too long
-    public void Uuid7_FormatParse_Id22Errors(string text) {
-        if (text == null && !IsModernDotNet) {
+    public void Uuid7_FormatParse_Id22Errors(string id22Text) {
+        if (id22Text == null && !IsModernDotNet) {
             // Only NetStandard 2.0 throws ArgumentNullException
             Assert.ThrowsExactly<ArgumentNullException>(() => {
-                Uuid7.FromId22String(text);
+                Uuid7.FromId22String(id22Text);
             });
         } else {
             Assert.ThrowsExactly<FormatException>(() => {
-                Uuid7.FromId22String(text);
+                Uuid7.FromId22String(id22Text);
             });
         }
+        Assert.IsFalse(Uuid7.TryParseId22(id22Text, out var _));
     }
 
 }

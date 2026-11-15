@@ -13,11 +13,9 @@ for (var i = 2; i <= id.Length; i++) {
     var left = id[0..(i - 2)];
     var swapped = id[(i - 1)..i] + id[(i - 2)..(i - 1)];
     var right = id[i..^0];
-    var id2 = left + swapped + right;
-    try {
-        Uuid7.FromCrockfordString(id2);
-        Print(left, swapped, right);  // print if checksum passes after swap
-    } catch (FormatException) { }
+    if (Uuid7.TryParseCrockford(left + swapped + right, out var _)) {
+        Print(left, swapped, right);
+    }
 }
 
 Console.WriteLine();
@@ -26,11 +24,9 @@ for (var i = 0; i < id.Length; i++) {
     var left = id[0..i];
     var lower = ((char)(id[i] - 1)).ToString();
     var right = id[(i + 1)..^0];
-    var id2 = left + lower + right;
-    try {
-        Uuid7.FromCrockfordString(id2);
-        Print(left, lower, right);  // print if checksum passes after swap
-    } catch (FormatException) { }
+    if (Uuid7.TryParseCrockford(left + lower + right, out var _)) {
+        Print(left, lower, right);
+    }
 }
 
 Console.WriteLine();
@@ -39,11 +35,9 @@ for (var i = 0; i < id.Length; i++) {
     var left = id[0..i];
     var upper = ((char)(id[i] + 1)).ToString();
     var right = id[(i + 1)..^0];
-    var id2 = left + upper + right;
-    try {
-        Uuid7.FromCrockfordString(id2);
-        Print(left, upper, right);  // print if checksum passes after swap
-    } catch (FormatException) { }
+    if (Uuid7.TryParseCrockford(left + upper + right, out var _)) {
+        Print(left, upper, right);
+    }
 }
 
 
