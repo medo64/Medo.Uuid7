@@ -54,7 +54,7 @@ public class Uuid7_Crockford_Tests {
     [DataRow(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, "zzzzzzzzzzzzzzzzzzzzzzzzzy")]
     public void Uuid7_FormatParse_CrockfordWithChecksum(byte[] bytes, string crockfordText) {
         var uuid = new Uuid7(bytes);
-        Assert.AreEqual(crockfordText, uuid.ToCrockfordString(uppercase: false, includeChecksum: true), ignoreCase: true);
+        Assert.AreEqual(crockfordText, uuid.ToCrockfordString(includeChecksum: true), ignoreCase: true);
         Assert.AreEqual(uuid, Uuid7.FromCrockfordString(crockfordText));
         Assert.IsTrue(Uuid7.TryParseCrockford(crockfordText, out var _));
     }

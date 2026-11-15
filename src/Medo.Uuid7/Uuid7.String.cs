@@ -38,14 +38,13 @@ public readonly partial struct Uuid7 {
     /// Returns UUID representation in Crockford base 32 format.
     /// Crockford base 32 uses lexicographical sortable Base-32 dictionary with an optional checksum.
     /// </summary>
-    /// <param name="uppercase"></param>
     /// <param name="includeChecksum">If true, the last 2 bit will contain modulo 3 checksum.</param>
-    public string ToCrockfordString(bool uppercase, bool includeChecksum) {
+    public string ToCrockfordString(bool includeChecksum) {
  #if NET6_0_OR_GREATER
-        return string.Create(26, Bytes, (destination, bytes) => TryWriteAsCrockford(uppercase, includeChecksum, destination, bytes, out _));
+        return string.Create(26, Bytes, (destination, bytes) => TryWriteAsCrockford(uppercase: true, includeChecksum, destination, bytes, out _));
 #else
         var destination = new char[26];
-        TryWriteAsCrockford(uppercase, includeChecksum, destination, Bytes, out _);
+        TryWriteAsCrockford(uppercase: true, includeChecksum, destination, Bytes, out _);
         return new string(destination);
 #endif
     }
