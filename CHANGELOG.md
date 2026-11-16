@@ -3,6 +3,13 @@ CHANGELOG
 Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
+[3.4.0] (2026-11-21)
+
+- Added Crockford Base 32 output
+- Faster hex parsing
+- Added TryParse for Id22, Id25, Id26, and Crockford
+
+
 [3.3.1] (2026-11-10)
 
 - .NET 11.0 support for Entity Framework too
@@ -188,6 +195,7 @@ Changelog at https://github.com/medo64/Medo.Uuid7/blob/main/CHANGELOG.md
 
 
 [unreleased]: https://github.com/medo64/Medo.uuid7
+[3.4.0]: https://www.nuget.org/packages/Medo.Uuid7/3.4.0
 [3.3.1]: https://www.nuget.org/packages/Medo.Uuid7/3.3.1
 [3.3.0]: https://www.nuget.org/packages/Medo.Uuid7/3.3.0
 [3.2.0]: https://www.nuget.org/packages/Medo.Uuid7/3.2.0
