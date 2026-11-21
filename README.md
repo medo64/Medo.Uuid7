@@ -39,32 +39,32 @@ You can find packaged library at [NuGet][nuget_uuid7].
 ## Usage
 
 To generate a new database-friendly UUID v7, simply call `NewUuid7` method:
-```csharp
+~~~csharp
 using System;
 using Medo;
 
 var uuid = Uuid7.NewUuid7();  // or 'Uuid7.NewGuid()'
 Console.WriteLine($"UUID : {uuid}");
-```
+~~~
 
 Alternatively, if a fully random UUID v4 is desired, call `NewUuid4` method:
-```csharp
+~~~csharp
 using System;
 using Medo;
 
 var uuid = Uuid7.NewUuid4();
 Console.WriteLine($"UUID : {uuid}");
-```
+~~~
 
 If higher multi-thread performance is needed and per-thread seqencing is
 sufficient, you can instantiate UUID directly:
-```csharp
+~~~csharp
 using System;
 using Medo;
 
 var uuid = new Uuid7();
 Console.WriteLine($"UUID : {uuid}");
-```
+~~~
 
 
 ## Converting to Guid
@@ -82,7 +82,7 @@ upgrading from older version, use `ToGuid(bigEndian: true)` overload.
 If we want to preserve textual representation and follow behavior as defined in
 .NET 9, we can use`ToGuid()` function or its `ToGuid(bigEndian: false)` overload
 as this one takes internal Guid endianess into account.
-```csharp
+~~~csharp
 using Medo;
 
 var uuid = Uuid7.NewUuid7();
@@ -90,18 +90,18 @@ Console.WriteLine($"{uuid}");
 
 var guid = uuid.ToGuid();
 Console.WriteLine($"{guid}");
-```
+~~~
 
 Textual output in this case would be equal but at the cost of raw binary bytes
 differing.
-```plain
+~~~plain
 01904d33-d262-7531-b71c-05555c63df91
 01904d33-d262-7531-b71c-05555c63df91
-```
+~~~
 
 On other hand, code below will retain binary compatibility during conversion (if
 running on LE system).
-```csharp
+~~~csharp
 using Medo;
 
 var uuid = Uuid7.NewUuid7();
@@ -109,15 +109,15 @@ Console.WriteLine($"{uuid}");
 
 var guid = uuid.ToGuid(bigEndian: true);
 Console.WriteLine($"{guid}");
-```
+~~~
 
 Note this means that textual respresentations look different since Microsoft
 prints logically numeric Guid elements in little-endian order instead of
 arguably more common big-endian order.
-```plain
+~~~plain
 01904d33-d262-7531-b71c-05555c63df91
 334d9001-62d2-3175-b71c-05555c63df91
-```
+~~~
 
 I view this as a damn-if-you-do-damn-if-you-don't scenario and prior to version
 3.0, default was to keep them equivalent in binary. Since .NET 9 decided to go
@@ -133,11 +133,11 @@ less frequent but bigger requests toward random number generator. If buffering
 is not desired (e.g. only a small count of UUIDs is needed), you can disable it
 using `UUID7_NO_RANDOM_BUFFER` preprocessor constant.
 
-```plain
+~~~plain
 <PropertyGroup>
     <DefineConstants>UUID7_NO_RANDOM_BUFFER</DefineConstants>
 </PropertyGroup>
-```
+~~~
 
 Note that this will decrease performance significantly.
 
