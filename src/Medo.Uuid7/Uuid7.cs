@@ -175,6 +175,7 @@ public readonly partial struct Uuid7 {
     /// This method is thread-safe.
     /// </summary>
     public static Uuid7 NewUuid7(DateTimeOffset timestamp) {
+        if (timestamp.ToUnixTimeMilliseconds() is < 0) { throw new ArgumentOutOfRangeException(nameof(timestamp), "Timestamp outside the representable range.."); }  //  no need for upper check really as it's after 9999-12-31
         var bytes = new byte[16];
         long lastMillisecond = 0;
         long millisecondCounter = 0;
@@ -268,6 +269,7 @@ public readonly partial struct Uuid7 {
     public static void Fill(Uuid7[] data, DateTimeOffset timestamp) {
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
 #endif
+        if (timestamp.ToUnixTimeMilliseconds() is < 0) { throw new ArgumentOutOfRangeException(nameof(timestamp), "Timestamp outside the representable range.."); }  //  no need for upper check really as it's after 9999-12-31
         long lastMillisecond = 0;
         long millisecondCounter = 0;
         uint monotonicCounter = 0;
@@ -378,6 +380,7 @@ public readonly partial struct Uuid7 {
     public static void FillMsSqlUniqueIdentifier(Guid[] data, DateTimeOffset timestamp) {
         if (data == null) { throw new ArgumentNullException(nameof(data), "Data cannot be null."); }
 #endif
+        if (timestamp.ToUnixTimeMilliseconds() is < 0) { throw new ArgumentOutOfRangeException(nameof(timestamp), "Timestamp outside the representable range.."); }  //  no need for upper check really as it's after 9999-12-31
         lock (NonThreadedSyncRoot) {
             for (var i = 0; i < data.Length; i++) {
                 var bytes = new byte[16];

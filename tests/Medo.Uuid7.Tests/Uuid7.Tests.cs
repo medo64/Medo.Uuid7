@@ -911,6 +911,11 @@ public partial class Uuid7_Tests {
         Assert.ThrowsExactly<InvalidOperationException>(() => uuid.ToDateTimeOffset());
     }
 
+    [TestMethod]
+    public void Uuid7_TimestampNotInRange() {
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Uuid7.NewUuid7(DateTimeOffset.UnixEpoch.AddTicks(-1)));
+    }
+
 
     #region Helpers
 
